@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import CONSTANTS from "../CONSTANTS";
 import { fetchStyleCode } from "../firebase";
+import { Card } from 'antd';
+const { Meta } = Card;
+
 
 const PostIcon = () => {
   return (
@@ -14,8 +17,13 @@ const PostIcon = () => {
   );
 };
 
-const styleCodeCard = () => {
-  return <div></div>;
+const StyleCodeCard = ({imageSrc, styleCodeName, status}) => {
+  return <Card
+           hoverable
+           cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+        >
+            <Meta title="Europe Street beat" description="www.instagram.com" />
+        </Card>;
 };
 
 const Home = () => {
@@ -31,9 +39,7 @@ const Home = () => {
     console.log("The styleCodes are", styleCodes);
     return (
       <div>
-        {styleCodes.map((styleCode) => (
-          <div> {styleCode} </div>
-        ))}
+        {styleCodes.map((styleCode) => <StyleCodeCard/> )}
       </div>
     );
   };
