@@ -128,15 +128,14 @@ const RegistrationForm = () => {
         label="Enter Garment Category"
         rules={[
           {
-            type: 'array',
+            type: 'string',
             required: true,
             message: 'Please select Garment Category',
           },
         ]}
       >
-        <Select placeholder="select your gender">
-          <Option value="male">Male</Option>
-          <Option value="female">Female</Option>
+        <Select placeholder="Select Garment Category">
+          <Option value="casual">Casual</Option>
           <Option value="other">Other</Option>
         </Select>
       </Form.Item>
