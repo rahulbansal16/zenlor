@@ -143,12 +143,12 @@ const RegistrationForm = () => {
 {/* XS S M L XL XXL */}
       <Form.Item name = "quantity" label="Enter Quantity XS | S | M | L | XL | XXL ">
         <Space wrap>
-            <InputNumber placeholder="XS"/>
-            <InputNumber placeholder="S"/>
-            <InputNumber placeholder="M"/>
-            <InputNumber placeholder="L"/>
-            <InputNumber placeholder="XL"/>
-            <InputNumber placeholder="XXL"/>
+            <InputNumber inputMode="numeric" placeholder="XS"/>
+            <InputNumber inputMode="numeric" placeholder="S"/>
+            <InputNumber inputMode="numeric" placeholder="M"/>
+            <InputNumber inputMode="numeric" placeholder="L"/>
+            <InputNumber inputMode="numeric" placeholder="XL"/>
+            <InputNumber inputMode="numeric" placeholder="XXL"/>
         </Space>
       </Form.Item>
 
