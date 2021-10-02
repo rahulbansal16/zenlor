@@ -14,8 +14,9 @@ import {
   Space,
   AutoComplete,
 } from 'antd';
+import { Avatar, Typography } from 'antd';
 const { Option } = Select;
-
+const { Title } = Typography;
 const residences = [
   {},{}
 ];
@@ -23,7 +24,7 @@ const formItemLayout = {
   labelCol: {
     xs: {
       span: 20,
-      offset:2
+      // offset:2
     },
     sm: {
       span: 20,
@@ -32,11 +33,11 @@ const formItemLayout = {
   wrapperCol: {
     xs: {
       span: 20,
-      offset:2
+      // offset:2
     },
     sm: {
       span: 20,
-      offset:2
+      // offset:2
     },
   },
 };
@@ -44,11 +45,11 @@ const tailFormItemLayout = {
   wrapperCol: {
     xs: {
       span: 24,
-      offset: 2,
+      // offset: 2,
     },
     sm: {
       span: 24,
-      offset: 2,
+      // offset: 2,
     },
   },
 };
@@ -81,6 +82,10 @@ const RegistrationForm = () => {
       {...formItemLayout}
       layout="vertical"
       form={form}
+      style = {{
+        marginLeft:'8px',
+        marginRight:'8px'
+      }}
       size="large"
       name="styleCodeEditor"
       align="left"
@@ -217,7 +222,9 @@ const StyleCodeEditor = () => {
         <div
         // style = {{marginLeft:'auto', marginRight:'auto'}}
         >
-            <h1>Create Style</h1>
+            <Title align="left" level={2} style ={{
+              marginLeft:'8px'
+            }}>Create StyleCode</Title>
             <RegistrationForm/>
         </div>
     );
