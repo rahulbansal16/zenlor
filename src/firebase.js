@@ -25,6 +25,13 @@ firebase.auth().useDeviceLanguage();
 export const firestore = firebase.firestore();
 export const db = firestore;
 
+//
+// The style code needs to be fetched from the database
+// 
+export const fetchStyleCode = async (company) => {
+
+}
+
 // export const getUser = async (username) => {
 //     // console.log('The username is', username)
 //     const snapshot = await db.collection('users').where('username','==', username).limit(1).get()
