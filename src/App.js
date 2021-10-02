@@ -10,6 +10,7 @@ const renderPages = () => {
   return (
     <Switch>
       <Route exact path = "/" render = { () => <Home></Home>} />
+      <Route exact path = "/home" render = { () => <Home></Home>} />
       <Route exact path = "/stylecode" render = { () => <StyleCodeEditor/>} />
       <Route exact path = "/login" render = { () => <Login/>} />
     </Switch>

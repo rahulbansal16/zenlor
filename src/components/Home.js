@@ -1,19 +1,36 @@
 import { useEffect, useState } from "react";
 import CONSTANTS from "../CONSTANTS";
 import { fetchStyleCode } from "../firebase";
-import { Card } from 'antd';
+import { Card, Space } from 'antd';
+import { Link, useHistory } from 'react-router-dom';
+
+import postImage from "../assets/post48.png"
 const { Meta } = Card;
 
 
 const PostIcon = () => {
+  const history = useHistory()
+
   return (
-    <img
-      //   className="zoom"
-      alt="Create new Style Code"
-      style={{ backgroundColor: "none", borderRadius: "24px" }}
-      //   onClick={this.logEvent}
-      src={require("../assets/post48.png").require}
-    />
+    <div>
+      <img
+        //   className="zoom"
+        alt="Create new Style Code"
+        style={{ backgroundColor: "black",
+         position:'fixed',
+          borderRadius:'24px',
+          bottom: '40px',
+          right:'20px'
+
+        }}
+        onClick={
+          () => {
+            history.push('/stylecode')
+          }
+        }
+        src={postImage}
+        />
+    </div>
   );
 };
 
@@ -39,13 +56,17 @@ const Home = () => {
     console.log("The styleCodes are", styleCodes);
     return (
       <div>
+        <Space wrap>
         {styleCodes.map((styleCode) => <StyleCodeCard/> )}
+        </Space>
       </div>
     );
   };
 
   return (
-    <div>
+    <div style = {{
+      position:'relative'
+    }}>
       {populateStyleCodes()}
       <PostIcon />
     </div>

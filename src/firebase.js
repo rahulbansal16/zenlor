@@ -27,7 +27,7 @@ export const db = firestore;
 
 //
 // The style code needs to be fetched from the database
-// 
+//
 export const fetchStyleCode = async (company) => {
 
 }
