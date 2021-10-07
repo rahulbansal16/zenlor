@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Home from "./components/Home"
 import Login from "./container/Login"
 import StyleCodeEditor from './components/StyleCodeEditor';
+import Header from './components/Header'
 import {auth} from './firebase';
 import { useEffect } from 'react';
 
@@ -24,6 +25,7 @@ function App() {
   return (
     <div className="App">
       <Router>
+        <Header/>
         {renderPages()}
       </Router>
     </div>
