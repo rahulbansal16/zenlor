@@ -28,7 +28,20 @@ export const db = firestore;
 //
 // The style code needs to be fetched from the database
 //
-export const fetchStyleCode = async (company) => {
+export const fetchStyleCode = async (company_id, populateStyleCodes) => {
+  // anusha_8923
+  const styleCodeRef = await db.collection('company').doc(company_id).collection('style_codes').orderBy('timestamp', 'desc')
+  return new Promise( (resolve, reject) => {
+    styleCodeRef.onSnapshot( snapshot => {
+      let styleCodes = []
+      snapshot.docs.forEach( d => {
+          console.log('Fetching the existing notification', d.data())
+          styleCodes.push(d.data())
+      })
+      resolve(styleCodes)
+     })
+  })
+
 
 }
 
