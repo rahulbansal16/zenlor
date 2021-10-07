@@ -4,6 +4,7 @@ import 'firebase/analytics';
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/functions";
+import { generateUId, getTimeStamp } from "./util";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAbXZfE3-8LgoKqqUOWElAR4aQnkuKAVwo",
@@ -24,13 +25,15 @@ export const storage = firebase.storage().ref()
 firebase.auth().useDeviceLanguage();
 export const firestore = firebase.firestore();
 export const db = firestore;
-
+firebase.firestore().settings({
+  ignoreUndefinedProperties: true,
+})
 //
 // The style code needs to be fetched from the database
 //
-export const fetchStyleCode = async (company_id, populateStyleCodes) => {
+export const fetchStyleCode = async (companyId, populateStyleCodes) => {
   // anusha_8923
-  const styleCodeRef = await db.collection('company').doc(company_id).collection('style_codes').orderBy('timestamp', 'desc')
+  const styleCodeRef = await db.collection('company').doc(companyId).collection('style_codes').orderBy('timestamp', 'desc')
   return new Promise( (resolve, reject) => {
     styleCodeRef.onSnapshot( snapshot => {
       let styleCodes = []
@@ -43,6 +46,26 @@ export const fetchStyleCode = async (company_id, populateStyleCodes) => {
   })
 
 
+}
+
+export const createStyleCode = (value) => {
+  console.log('The value is', value)
+  const {companyId, buyerName, dueDate, status, sizeSet, garmentCategory, styleCodeId} = value
+  const styleCodeInternalId = generateUId('sc:', 15);
+  const createdAt = getTimeStamp();
+  console.log('The values are  ', {companyId, buyerName, dueDate, status, sizeSet, garmentCategory, styleCodeId})
+  return new Promise(async (resolve, reject) => {
+    await db.collection('company').doc(companyId).collection('style_codes').doc(styleCodeInternalId).set({
+      buyerName,
+      sizeSet,
+      garmentCategory,
+      styleCodeId,
+      dueDate,
+      createdAt,
+      status
+    })
+    resolve(styleCodeInternalId)
+  })
 }
 
 // export const getUser = async (username) => {
