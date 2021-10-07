@@ -14,7 +14,9 @@ import {
   Space,
   AutoComplete,
 } from 'antd';
+import { createStyleCode } from '../firebase';
 import { Avatar, Typography } from 'antd';
+import CONSTANTS from '../CONSTANTS';
 const { Option } = Select;
 const { Title } = Typography;
 const residences = [
@@ -59,8 +61,21 @@ const RegistrationForm = () => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
+    values['sizeSet'] = generateSizeSet()
+    values['companyId'] = CONSTANTS.company_id
+    createStyleCode(values)
+    // console.log('The value of the sizeSet is', generateSizeSet())
     console.log('Received values of form: ', values);
   };
+
+  const generateSizeSet = () => {
+    const sizes = ['xs', 's', 'm', 'l', 'xl', 'xxl']
+    var set = {}
+    for (let i of sizes){
+      set[i] = document.getElementById(i).value
+    }
+    return set
+  }
 
   const [autoCompleteResult, setAutoCompleteResult] = useState([]);
 
@@ -129,7 +144,7 @@ const RegistrationForm = () => {
       </Form.Item>
 
       <Form.Item
-        name="garment Category"
+        name="garmentCategory"
         label="Enter Garment Category"
         rules={[
           {
@@ -146,14 +161,14 @@ const RegistrationForm = () => {
       </Form.Item>
 
 {/* XS S M L XL XXL */}
-      <Form.Item name = "quantity" label="Enter Quantity XS | S | M | L | XL | XXL ">
+      <Form.Item name = "quantitySet" label="Enter Quantity XS | S | M | L | XL | XXL ">
         <Space wrap>
-            <InputNumber inputMode="numeric" placeholder="XS"/>
-            <InputNumber inputMode="numeric" placeholder="S"/>
-            <InputNumber inputMode="numeric" placeholder="M"/>
-            <InputNumber inputMode="numeric" placeholder="L"/>
-            <InputNumber inputMode="numeric" placeholder="XL"/>
-            <InputNumber inputMode="numeric" placeholder="XXL"/>
+            <InputNumber id = "xs" inputMode="numeric" placeholder="XS"/>
+            <InputNumber id = "s" inputMode="numeric" placeholder="S"/>
+            <InputNumber id = "m" inputMode="numeric" placeholder="M"/>
+            <InputNumber id = "l" inputMode="numeric" placeholder="L"/>
+            <InputNumber id = "xl" inputMode="numeric" placeholder="XL"/>
+            <InputNumber id = "xxl" inputMode="numeric" placeholder="XXL"/>
         </Space>
       </Form.Item>
 
