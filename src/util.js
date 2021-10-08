@@ -1,5 +1,5 @@
 export const getTimeStamp = () => {
-    return new Date().getTime().toString();
+    return new Date().getTime()
 }
 
 // program to generate random strings
