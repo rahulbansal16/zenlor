@@ -10,10 +10,10 @@ module.exports = {
           lessOptions: {
             modifyVars: {
                 // '@primary-color': '#2D89F4',
-                '@primary-color': '#F76C8E',
+                '@primary-color': 'green',
                 '@secondary-color': '#F76C8E',
                 '@font-family': "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif",
-                '@font-size-base': '12px',
+                '@font-size-base': '18px',
             },
             javascriptEnabled: true,
           },
