@@ -17,6 +17,8 @@ import {
 import { createStyleCode } from '../firebase';
 import { Avatar, Typography } from 'antd';
 import CONSTANTS from '../CONSTANTS';
+import {getTimeStamp} from "../util";
+
 const { Option } = Select;
 const { Title } = Typography;
 const residences = [
@@ -63,6 +65,8 @@ const RegistrationForm = () => {
   const onFinish = (values) => {
     values['sizeSet'] = generateSizeSet()
     values['companyId'] = CONSTANTS.company_id
+    if (!values['dueDate'])
+      values['dueDate'] = getTimeStamp() + CONSTANTS.days_75;
     createStyleCode(values)
     // console.log('The value of the sizeSet is', generateSizeSet())
     console.log('Received values of form: ', values);
