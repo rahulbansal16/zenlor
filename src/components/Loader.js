@@ -4,10 +4,11 @@ const Loader = () => {
         <div className = "storySize" style ={{
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            height:'100vh'
         }}>
             <Space size="middle">
-                <Spin size="small" />
+                <Spin size="large" />
                 <Spin />
             <Spin size="large" />
             </Space>
