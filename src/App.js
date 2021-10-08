@@ -1,20 +1,51 @@
 import './App.less';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch,Redirect, Link } from "react-router-dom";
 import Home from "./components/Home"
 import Login from "./container/Login"
 import StyleCodeEditor from './components/StyleCodeEditor';
 import Header from './components/Header'
-import {auth} from './firebase';
+import {auth, useAuthState, AuthContextProvider} from './firebase';
 import { useEffect } from 'react';
-import RedirectToLogin from './components/RedirectToLogin';
+// import RedirectToLogin from './components/RedirectToLogin';
+
+const AuthenticatedRoute = ({ component: C, ...props }) => {
+  const { isAuthenticated } = useAuthState()
+  console.log('The props in authenticatedRoute are', props)
+  console.log(`AuthenticatedRoute: ${isAuthenticated}`)
+  return (
+    <Route
+      {...props}
+      render={routeProps =>
+        isAuthenticated || (props.location && props.location.state && props.location.state.currentUser) ? <C {...routeProps} /> : <Redirect
+        to={{
+          pathname: "login",
+          state: { source: props.path}
+        }}/>
+      }
+    />
+  )
+}
+
+const UnauthenticatedRoute = ({ component: C, ...props }) => {
+  const { isAuthenticated } = useAuthState()
+  console.log(`UnauthenticatedRoute: ${isAuthenticated}`)
+  return (
+    <Route
+      {...props}
+      render={routeProps =>
+        !isAuthenticated ? <C {...routeProps} /> : <Redirect to="/" />
+      }
+    />
+  )
+}
 
 const renderPages = () => {
   return (
     <Switch>
-      <Route exact path = "/" render = { () => <Home></Home>} />
-      <Route exact path = "/home" render = { () => <Home></Home>} />
-      <Route exact path = "/stylecode" render = { () => <StyleCodeEditor/>} />
-      <Route exact path = "/login" render = { () => <Login/>} />
+      <AuthenticatedRoute exact path="/" component={Home} />
+      <UnauthenticatedRoute path="/login" component={Login} />
+      <AuthenticatedRoute  path="/home" component = { ()  => <Home></Home>} />
+      <AuthenticatedRoute path="/stylecode" component = { () => <StyleCodeEditor/>} />
     </Switch>
 
   )
@@ -25,11 +56,16 @@ function App() {
   },[])
   return (
     <div className="App">
-      <Router>
-        <Header/>
-        <RedirectToLogin/>
-        {renderPages()}
-      </Router>
+      <AuthContextProvider>
+        <Router>
+        <div>
+          <Link to="/">Home</Link> | <Link to="/login">Login</Link> |{' '}
+          <Link to="/signup">SignUp</Link>
+        </div>
+          <Header/>
+          {renderPages()}
+        </Router>
+      </AuthContextProvider>
     </div>
   );
 }
