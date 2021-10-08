@@ -51,7 +51,7 @@ export const fetchStyleCode = async (companyId, populateStyleCodes) => {
 export const createStyleCode = (value) => {
   console.log('The value is', value)
   const {companyId, buyerName, dueDate, status, sizeSet, garmentCategory, styleCodeId} = value
-  const styleCodeInternalId = generateUId('sc:', 15);
+  const styleCodeInternalId = generateUId('sc:' + getTimeStamp(), 15);
   const createdAt = getTimeStamp();
   console.log('The values are  ', {companyId, buyerName, dueDate, status, sizeSet, garmentCategory, styleCodeId})
   return new Promise(async (resolve, reject) => {
