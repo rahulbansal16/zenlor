@@ -27,7 +27,6 @@ function App() {
     <div className="App">
       <Router>
         <Header/>
-        <RedirectToLogin/>
         {renderPages()}
       </Router>
     </div>
