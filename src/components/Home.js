@@ -5,6 +5,7 @@ import { Card, Space } from 'antd';
 import { Link, useHistory } from 'react-router-dom';
 
 import postImage from "../assets/post48.png"
+import Loader from "./Loader";
 const { Meta } = Card;
 
 
@@ -44,11 +45,15 @@ const StyleCodeCard = ({imageSrc, styleCodeName, status}) => {
 };
 
 const Home = () => {
-  const [styleCodes, setStyleCodes] = useState(["r", "b"]);
+  const [styleCodes, setStyleCodes] = useState([]);
+  const [showLoader, setShowLoader]  = useState(true)
 
   useEffect(() => {
     fetchStyleCode(CONSTANTS.company_id).then((responseStyleCodes) => {
-      if (responseStyleCodes) setStyleCodes(responseStyleCodes);
+      if (responseStyleCodes) {
+        setStyleCodes(responseStyleCodes);
+        setShowLoader(false)
+      }
     });
   }, []);
 
@@ -67,6 +72,7 @@ const Home = () => {
     <div style = {{
       position:'relative'
     }}>
+      {showLoader && <Loader/>}
       {populateStyleCodes()}
       <PostIcon />
     </div>
