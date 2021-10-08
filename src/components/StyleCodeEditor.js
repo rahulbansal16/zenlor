@@ -18,6 +18,9 @@ import { createStyleCode } from '../firebase';
 import { Avatar, Typography } from 'antd';
 import CONSTANTS from '../CONSTANTS';
 import {getTimeStamp} from "../util";
+import { useHistory } from 'react-router-dom';
+import MessageBox from './Messagebox';
+
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -58,16 +61,28 @@ const tailFormItemLayout = {
   },
 };
 
-const RegistrationForm = () => {
+const RegistrationForm = ({messageBoxStateHandler}) => {
 
   const [form] = Form.useForm();
+  const history = useHistory();
 
   const onFinish = (values) => {
     values['sizeSet'] = generateSizeSet()
     values['companyId'] = CONSTANTS.company_id
     if (!values['dueDate'])
       values['dueDate'] = getTimeStamp() + CONSTANTS.days_75;
-    createStyleCode(values)
+    // {title, text, backHandler, forwardHandler, open}
+    messageBoxStateHandler({
+      open: true,
+      okButtonText:'Yes',
+      cancelButtonText:'Cancel',
+      text:'Style Codes details cannot be changed later. PROCCED?',
+      forwardHandler: () => {
+        createStyleCode(values)
+        history.push('/home')
+      },
+      backHandler: () => messageBoxStateHandler({open:false})
+    })
     // console.log('The value of the sizeSet is', generateSizeSet())
     console.log('Received values of form: ', values);
   };
@@ -181,47 +196,8 @@ const RegistrationForm = () => {
         label="Enter Style Code"
       >
           <Input/>
-
       </Form.Item>
-
-      {/* <Form.Item
-        name="website"
-        label="Website"
-        rules={[
-          {
-            required: true,
-            message: 'Please input website!',
-          },
-        ]}
-      >
-        <AutoComplete options={websiteOptions} onChange={onWebsiteChange} placeholder="website">
-          <Input />
-        </AutoComplete>
-      </Form.Item> */}
-
-      {/* <Form.Item label="Captcha" extra="We must make sure that your are a human.">
-        <Row gutter={8}>
-          <Col span={12}>
-            <Form.Item
-              name="captcha"
-              noStyle
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input the captcha you got!',
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Button>Get captcha</Button>
-          </Col>
-        </Row>
-      </Form.Item> */}
-
-      <Form.Item {...tailFormItemLayout}>
+       <Form.Item {...tailFormItemLayout}>
         <Space>
             <Button type="secondary"> Back </Button>
             <Button type="primary" htmlType="submit">
@@ -236,6 +212,15 @@ const RegistrationForm = () => {
 // ReactDOM.render(<RegistrationForm />, mountNode);
 
 const StyleCodeEditor = () => {
+  // {title, text, backHandler, forwardHandler, open}
+  const [messageBoxState, setMessageBoxState] = useState({
+    open: false,
+    okButtonText: '',
+    cancelButtonText: '',
+    text:'',
+    backHandler: () => {},
+    forwardHandler:() => {}
+  })
 
     return (
         <div
@@ -244,7 +229,8 @@ const StyleCodeEditor = () => {
             <Title align="left" level={2} style ={{
               marginLeft:'8px'
             }}>Create StyleCode</Title>
-            <RegistrationForm/>
+            <RegistrationForm messageBoxStateHandler = {setMessageBoxState}/>
+            <MessageBox {...messageBoxState}/>
         </div>
     );
   }
