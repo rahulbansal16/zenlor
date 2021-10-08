@@ -16,7 +16,7 @@ const PostIcon = () => {
       <img
         //   className="zoom"
         alt="Create new Style Code"
-        style={{ backgroundColor: "black",
+        style={{ backgroundColor: "green",
          position:'fixed',
           borderRadius:'24px',
           bottom: '40px',
