@@ -199,7 +199,21 @@ const RegistrationForm = ({messageBoxStateHandler}) => {
       </Form.Item>
        <Form.Item {...tailFormItemLayout}>
         <Space>
-            <Button type="secondary"> Back </Button>
+            <Button type="secondary" onClick = { () => {
+                messageBoxStateHandler({
+                  open: true,
+                  okButtonText:'Yes',
+                  cancelButtonText:'Cancel',
+                  text:'Style Codes Not saved. Exit?',
+                  forwardHandler: () => {
+                    // createStyleCode(values)
+                    messageBoxStateHandler({open:false})
+                    history.push('/home')
+                    // history.push('/home')
+                  },
+                  backHandler: () => messageBoxStateHandler({open:false})
+    })
+            }}> Back </Button>
             <Button type="primary" htmlType="submit">
             Register
             </Button>
