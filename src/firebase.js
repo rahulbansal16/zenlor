@@ -5,6 +5,7 @@ import "firebase/auth";
 import "firebase/firestore";
 import "firebase/functions";
 import { generateUId, getTimeStamp } from "./util";
+import { useEffect, useState, useContext, createContext } from "react";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAbXZfE3-8LgoKqqUOWElAR4aQnkuKAVwo",
@@ -66,6 +67,28 @@ export const createStyleCode = (value) => {
     })
     resolve(styleCodeInternalId)
   })
+}
+
+
+export const AuthContext = createContext()
+
+export const AuthContextProvider = props => {
+  const [user, setUser] = useState()
+  const [error, setError] = useState()
+
+  useEffect(() => {
+    const unsubscribe = firebase.auth().onAuthStateChanged( async userAuth => {
+      console.log('The uesrAuth is', userAuth)
+      setUser(userAuth)
+    })
+    return () => unsubscribe()
+  }, [])
+  return <AuthContext.Provider value={{ user, error }} {...props} />
+}
+
+export const useAuthState = () => {
+  const auth = useContext(AuthContext)
+  return { ...auth, isAuthenticated: auth.user != null }
 }
 
 // export const getUser = async (username) => {
