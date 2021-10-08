@@ -6,11 +6,10 @@ const RedirectToLogin = () => {
 
     const history = useHistory();
     useEffect ( () => {
-        console.log('The auth is', auth)
-        if (!auth || !auth.currentUser || !auth.currentUser.uid){
+        if (auth && auth.currentUser && auth.currentUser.uid){
             history.push('/login')
         }
-    }, [])
+    })
     return(<div></div>)
 }
 export default RedirectToLogin
