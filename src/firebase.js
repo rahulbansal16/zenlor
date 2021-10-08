@@ -34,7 +34,7 @@ firebase.firestore().settings({
 //
 export const fetchStyleCode = async (companyId, populateStyleCodes) => {
   // anusha_8923
-  const styleCodeRef = await db.collection('company').doc(companyId).collection('style_codes').orderBy('timestamp', 'desc')
+  const styleCodeRef = await db.collection('company').doc(companyId).collection('style_codes').orderBy('dueDate', 'desc')
   return new Promise( (resolve, reject) => {
     styleCodeRef.onSnapshot( snapshot => {
       let styleCodes = []
