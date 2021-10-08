@@ -1,25 +1,20 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'antd';
+import { conditionalExpression } from '@babel/types';
 
 const MessageBox = ({title, text, backHandler, forwardHandler, open}) => {
-    const [isModalVisible, setIsModalVisible] = useState(open);
-
-    const showModal = () => {
-      setIsModalVisible(true);
-    };
+    console.log('The message Box value is', open)
 
     const handleOk = () => {
-      setIsModalVisible(false);
       forwardHandler()
     };
 
     const handleCancel = () => {
-      setIsModalVisible(false);
       backHandler();
     };
 
     return (
-        <Modal visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+        <Modal visible={open} onOk={handleOk} onCancel={handleCancel}>
             {text}
         </Modal>
     )
