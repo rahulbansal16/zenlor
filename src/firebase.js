@@ -70,26 +70,26 @@ export const createStyleCode = (value) => {
 }
 
 
-export const AuthContext = createContext()
+// export const AuthContext = createContext()
 
-export const AuthContextProvider = props => {
-  const [user, setUser] = useState()
-  const [error, setError] = useState()
+// export const AuthContextProvider = props => {
+//   const [user, setUser] = useState()
+//   const [error, setError] = useState()
 
-  useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged( async userAuth => {
-      console.log('The uesrAuth is', userAuth)
-      setUser(userAuth)
-    })
-    return () => unsubscribe()
-  }, [])
-  return <AuthContext.Provider value={{ user, error }} {...props} />
-}
+//   useEffect(() => {
+//     const unsubscribe = firebase.auth().onAuthStateChanged( async userAuth => {
+//       console.log('The uesrAuth is', userAuth)
+//       setUser(userAuth)
+//     })
+//     return () => unsubscribe()
+//   }, [])
+//   return <AuthContext.Provider value={{ user, error }} {...props} />
+// }
 
-export const useAuthState = () => {
-  const auth = useContext(AuthContext)
-  return { ...auth, isAuthenticated: auth.user != null }
-}
+// export const useAuthState = () => {
+//   const auth = useContext(AuthContext)
+//   return { ...auth, isAuthenticated: auth.user != null }
+// }
 
 // export const getUser = async (username) => {
 //     // console.log('The username is', username)
