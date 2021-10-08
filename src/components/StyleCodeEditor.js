@@ -240,7 +240,7 @@ const StyleCodeEditor = () => {
         <div
         // style = {{marginLeft:'auto', marginRight:'auto'}}
         >
-            <Title align="left" level={2} style ={{
+            <Title align="left" level={4} style ={{
               marginLeft:'8px'
             }}>Create StyleCode</Title>
             <RegistrationForm messageBoxStateHandler = {setMessageBoxState}/>
