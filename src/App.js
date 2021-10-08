@@ -6,6 +6,7 @@ import StyleCodeEditor from './components/StyleCodeEditor';
 import Header from './components/Header'
 import {auth} from './firebase';
 import { useEffect } from 'react';
+import RedirectToLogin from './components/RedirectToLogin';
 
 const renderPages = () => {
   return (
@@ -26,6 +27,7 @@ function App() {
     <div className="App">
       <Router>
         <Header/>
+        <RedirectToLogin/>
         {renderPages()}
       </Router>
     </div>
