@@ -41,18 +41,28 @@ const PostIcon = () => {
 const StyleCodeCard = ({buyerName, dueDate, fabricUrl, styleCodeName, status}) => {
   return <Card
            hoverable
+           title = {"Buyer: " + buyerName }
            style = {{
-             width:'100%'
+             width:'100%',
            }}
-           cover={
-            <Image
-            width="50%"
+        >
+
+          <Card.Grid style = {{
+            padding: "0 !imporant"
+          }}>
+          <Image
+            width="120%"
             src={fabricUrl || "error" }
             fallback={zenlor}
           />
-          }
-        >
-            <Meta title={ "Buyer: " + buyerName} description={"Due Date " + moment(dueDate).format('MM-DD-YY')} />
+          </Card.Grid>
+          <div style ={{
+            textAlign:'center',
+          }}>
+           <Meta description={"Due Date " + moment(dueDate).format('MM-DD-YY')} />
+          </div>
+
+          {/* <Meta  description={"Due Date " + moment(dueDate).format('MM-DD-YY')} /> */}
         </Card>;
 };
 
@@ -73,7 +83,7 @@ const Home = () => {
     console.log("The styleCodes are", styleCodes);
     return (
       <div>
-        <Space align="center" wrap>
+        <Space align="center" size="middle" wrap>
         {styleCodes.map((styleCode) => <StyleCodeCard key = {styleCode.id} {...styleCode}/> )}
         </Space>
       </div>
