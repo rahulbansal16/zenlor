@@ -3,8 +3,11 @@ import CONSTANTS from "../CONSTANTS";
 import { fetchStyleCode } from "../firebase";
 import { Card, Space } from 'antd';
 import { Link, useHistory } from 'react-router-dom';
+import { Image } from 'antd';
+
 
 import postImage from "../assets/post48.png"
+import zenlor from "../assets/zenlor.png"
 import Loader from "./Loader";
 const { Meta } = Card;
 
@@ -35,12 +38,21 @@ const PostIcon = () => {
   );
 };
 
-const StyleCodeCard = ({imageSrc, styleCodeName, status}) => {
+const StyleCodeCard = ({buyerName, dueDate, imageSrc, styleCodeName, status}) => {
   return <Card
            hoverable
-           cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+           style = {{
+             width:'100%'
+           }}
+           cover={
+            <Image
+            width="50%"
+            src="error"
+            fallback={zenlor}
+          />
+          }
         >
-            <Meta title="Europe Street beat" description="www.instagram.com" />
+            <Meta title={ "Buyer: " + buyerName} description={"Due Date " + dueDate} />
         </Card>;
 };
 
@@ -61,8 +73,8 @@ const Home = () => {
     console.log("The styleCodes are", styleCodes);
     return (
       <div>
-        <Space wrap>
-        {styleCodes.map((styleCode) => <StyleCodeCard/> )}
+        <Space align="center" wrap>
+        {styleCodes.map((styleCode) => <StyleCodeCard {...styleCode}/> )}
         </Space>
       </div>
     );
