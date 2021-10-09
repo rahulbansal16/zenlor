@@ -4,7 +4,7 @@ import { fetchStyleCode } from "../firebase";
 import { Card, Space } from 'antd';
 import { Link, useHistory } from 'react-router-dom';
 import { Image } from 'antd';
-
+import moment from "moment";
 
 import postImage from "../assets/post48.png"
 import zenlor from "../assets/zenlor.png"
@@ -52,7 +52,7 @@ const StyleCodeCard = ({buyerName, dueDate, imageSrc, styleCodeName, status}) =>
           />
           }
         >
-            <Meta title={ "Buyer: " + buyerName} description={"Due Date " + dueDate} />
+            <Meta title={ "Buyer: " + buyerName} description={"Due Date " + moment(dueDate).format('MM-DD-YY')} />
         </Card>;
 };
 
