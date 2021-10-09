@@ -38,7 +38,7 @@ const PostIcon = () => {
   );
 };
 
-const StyleCodeCard = ({buyerName, dueDate, imageSrc, styleCodeName, status}) => {
+const StyleCodeCard = ({buyerName, dueDate, fabricUrl, styleCodeName, status}) => {
   return <Card
            hoverable
            style = {{
@@ -47,7 +47,7 @@ const StyleCodeCard = ({buyerName, dueDate, imageSrc, styleCodeName, status}) =>
            cover={
             <Image
             width="50%"
-            src="error"
+            src={fabricUrl || "error" }
             fallback={zenlor}
           />
           }
