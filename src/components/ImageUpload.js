@@ -12,7 +12,7 @@ const UploadButton = () => (
     </div>
   );
 
-const ImageUpload = ({onSuccess}) => {
+const ImageUpload = ({onSuccessHandler}) => {
 
   const [loading, setLoading] = useState(false);
   const[imageUrl, setImageUrl] = useState("");
@@ -52,8 +52,10 @@ const ImageUpload = ({onSuccess}) => {
       try {
         const image = await imgFile.put(file, metadata);
         const URL = await imgFile.getDownloadURL();
-        onSuccess(URL);
+        onSuccess()
+        onSuccessHandler(URL);
       } catch(e) {
+        console.log('Error uploading the image', e)
         onError(e);
       }
     };
