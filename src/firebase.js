@@ -63,7 +63,8 @@ export const createStyleCode = (value) => {
       styleCodeId,
       dueDate,
       createdAt,
-      status
+      status,
+      id: styleCodeInternalId
     })
     resolve(styleCodeInternalId)
   })
