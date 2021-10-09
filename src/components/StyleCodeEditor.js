@@ -20,6 +20,7 @@ import CONSTANTS from '../CONSTANTS';
 import {getTimeStamp} from "../util";
 import { useHistory } from 'react-router-dom';
 import MessageBox from './Messagebox';
+import ImageUpload from './ImageUpload';
 
 
 const { Option } = Select;
@@ -65,12 +66,17 @@ const RegistrationForm = ({messageBoxStateHandler}) => {
 
   const [form] = Form.useForm();
   const history = useHistory();
+  const [downloadUrl, setDownloadURl] = useState("");
 
   const onFinish = (values) => {
     values['sizeSet'] = generateSizeSet()
     values['companyId'] = CONSTANTS.company_id
+    values['fabric_url'] = downloadUrl;
     if (!values['dueDate'])
       values['dueDate'] = getTimeStamp() + CONSTANTS.days_75;
+    else{
+      values['dueDate'] = values['dueDate'].valueOf()
+    }
     // {title, text, backHandler, forwardHandler, open}
     messageBoxStateHandler({
       open: true,
@@ -196,6 +202,14 @@ const RegistrationForm = ({messageBoxStateHandler}) => {
         label="Enter Style Code"
       >
           <Input/>
+      </Form.Item>
+      <Form.Item
+        name = "fabricImage"
+        label="Upload Fabric Image"
+      >
+          <ImageUpload onSuccessHandler = { (URL) => {
+            console.log('The success URL is', URL)
+            setDownloadURl(URL)}}/>
       </Form.Item>
        <Form.Item {...tailFormItemLayout}>
         <Space>
