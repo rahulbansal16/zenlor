@@ -57,13 +57,8 @@ export const createStyleCode = (value) => {
   console.log('The values are  ', {companyId, buyerName, dueDate, status, sizeSet, garmentCategory, styleCodeId})
   return new Promise(async (resolve, reject) => {
     await db.collection('company').doc(companyId).collection('style_codes').doc(styleCodeInternalId).set({
-      buyerName,
-      sizeSet,
-      garmentCategory,
-      styleCodeId,
-      dueDate,
+      ...value,
       createdAt,
-      status,
       id: styleCodeInternalId
     })
     resolve(styleCodeInternalId)
