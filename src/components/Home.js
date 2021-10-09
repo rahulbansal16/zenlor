@@ -74,7 +74,7 @@ const Home = () => {
     return (
       <div>
         <Space align="center" wrap>
-        {styleCodes.map((styleCode) => <StyleCodeCard {...styleCode}/> )}
+        {styleCodes.map((styleCode) => <StyleCodeCard key = {styleCode.id} {...styleCode}/> )}
         </Space>
       </div>
     );
