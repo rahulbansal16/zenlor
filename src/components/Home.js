@@ -9,6 +9,7 @@ import moment from "moment";
 import postImage from "../assets/post48.png"
 import zenlor from "../assets/zenlor.png"
 import Loader from "./Loader";
+import ZenlorCard from "./ZenlorCard"
 const { Meta } = Card;
 
 
@@ -38,33 +39,6 @@ const PostIcon = () => {
   );
 };
 
-const StyleCodeCard = ({buyerName, dueDate, fabricUrl, styleCodeName, status}) => {
-  return <Card
-           hoverable
-           title = {"Buyer: " + buyerName }
-           style = {{
-             width:'100%',
-           }}
-        >
-
-          <Card.Grid style = {{
-            padding: "0 !imporant"
-          }}>
-          <Image
-            width="120%"
-            src={fabricUrl || "error" }
-            fallback={zenlor}
-          />
-          </Card.Grid>
-          <div style ={{
-            textAlign:'center',
-          }}>
-           <Meta description={"Due Date " + moment(dueDate).format('MM-DD-YY')} />
-          </div>
-
-          {/* <Meta  description={"Due Date " + moment(dueDate).format('MM-DD-YY')} /> */}
-        </Card>;
-};
 
 const Home = () => {
   const [styleCodes, setStyleCodes] = useState([]);
@@ -84,7 +58,7 @@ const Home = () => {
     return (
       <div>
         <Space align="center" size="middle" wrap>
-        {styleCodes.map((styleCode) => <StyleCodeCard key = {styleCode.id} {...styleCode}/> )}
+        {styleCodes.map((styleCode) => <ZenlorCard key = {styleCode.id} {...styleCode}/> )}
         </Space>
       </div>
     );
