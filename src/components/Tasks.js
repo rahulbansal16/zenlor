@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useState } from "react/cjs/react.development";
+import { useEffect, useState } from "react";
 import ZenlorCard from "./ZenlorCard";
 import { Card, Empty, Space, Typography } from 'antd';
 import { functions } from "../firebase";
