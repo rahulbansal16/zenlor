@@ -13,10 +13,10 @@ exports.fetchTasks = functions.https.onCall(async (data, context) => {
         let totalTask = []
         const styleCodesSnapshot = await admin.firestore().collection("company").doc(companyId).collection('style_codes').where('status', "==", "active").get()
         for (let styleCodeSnapshot of styleCodesSnapshot.docs){
-            const {buyerName, fabricUrl} = styleCodeSnapshot.data()
+            const {buyerName, fabricUrl, styleCode} = styleCodeSnapshot.data()
             const tasksSnapshots =  await styleCodeSnapshot.ref.collection('tasks').where('status', `!=`, "complete").get()
             for (let tasksSnapshot of tasksSnapshots.docs){
-                totalTask.push({...tasksSnapshot.data(), id: tasksSnapshot.id, styleCodeId: styleCodeSnapshot.id, buyerName, fabricUrl})
+                totalTask.push({...tasksSnapshot.data(), id: tasksSnapshot.id, styleCodeId: styleCodeSnapshot.id, buyerName, fabricUrl, styleCode})
             }
         }
         return totalTask
