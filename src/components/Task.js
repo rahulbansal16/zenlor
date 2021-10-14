@@ -71,6 +71,7 @@ const Task = ({styleCodeId, taskId}) => {
             align="left"
             onFinish={onFinish}
             initialValues={{
+              status:"incomplete"
                 // residence: ['zhejiang', 'hangzhou', 'xihu'],
                 // prefix: '86',
             }}
