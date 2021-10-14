@@ -1,6 +1,7 @@
-import {Form, Select, Input, Radio, Space, Button} from "antd"
+import {Form, Input, Radio, Space, Button} from "antd"
+import { useEffect } from "react";
 import { useHistory } from "react-router";
-const { Option } = Select;
+import { updateTaskStatus, fetchTask } from "../firebase";
 
 const formItemLayout = {
     labelCol: {
@@ -37,11 +38,23 @@ const formItemLayout = {
     },
   };
 
-const Task = () => {
+const Task = ({styleCodeId, taskId}) => {
 
     const [form] = Form.useForm();
     const history = useHistory()
-    const onFinish = (values) => {}
+
+    const onFinish = (values) => {
+        console.log(values)
+        updateTaskStatus(styleCodeId, taskId, values)
+        history.push('/tasks')
+    }
+
+    useEffect(() => {
+        // const getData = async () => {
+        //     const task = await fetchTask(styleCodeId, taskId)
+        // }
+        // getData()
+    },[styleCodeId, taskId])
 
     return (
         <div>
@@ -63,13 +76,13 @@ const Task = () => {
             }}
             scrollToFirstError
             >
-                <Form.Item label="Task Status">
+                <Form.Item label="Task Status" name="taskStatus" required>
                     <Radio.Group>
                         <Radio value="incomplete">Incomplete</Radio>
                         <Radio value="complete">Complete</Radio>
                     </Radio.Group>
                 </Form.Item>
-                <Form.Item label = "Progress Update">
+                <Form.Item label = "Progress Update" name = "progressUpdate">
                     <Input/>
                 </Form.Item>
 
