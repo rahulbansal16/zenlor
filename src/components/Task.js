@@ -73,7 +73,7 @@ const Task = ({styleCodeId, taskId}) => {
 
     return (
         <div>
-            <TaskHeader taskName={task.name}/>
+            <TaskHeader taskName={task.name || "Task Name"}/>
             <Form
             {...formItemLayout}
             layout="vertical"
