@@ -3,7 +3,7 @@ import zenlor from "../assets/zenlor.png"
 import moment from "moment";
 const { Meta } = Card;
 
-const ZenlorCard = ({buyerName, dueDate, fabricUrl, styleCodeName, status, onClick}) => {
+const ZenlorCard = ({buyerName, dueDate, fabricUrl, styleCodeName, description, status, onClick}) => {
         return <Card
                  onClick = {onClick}
                  hoverable
@@ -26,7 +26,7 @@ const ZenlorCard = ({buyerName, dueDate, fabricUrl, styleCodeName, status, onCli
                   textAlign:'center',
                 }}>
                 <div>
-                    <Meta title = {"Due Date " + moment(dueDate).format('DD-MMM-YY')} description = {"This is th task"}/>
+                    <Meta title = {"Due Date " + moment(dueDate).format('DD-MMM-YY')} description = {description}/>
                     {/* <Meta description="This is the task name"/> */}
                  </div>
                 </div>
