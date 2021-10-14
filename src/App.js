@@ -8,6 +8,7 @@ import {auth} from './firebase';
 import { useEffect } from 'react';
 import RedirectToLogin from './components/RedirectToLogin';
 import Tasks from './components/Tasks';
+import Task from './components/Task';
 
 const renderPages = () => {
   return (
@@ -15,6 +16,7 @@ const renderPages = () => {
       <Route exact path = "/" render = { () => <Home></Home>} />
       <Route exact path = "/home" render = { () => <Home></Home>} />
       <Route exact path = "/stylecode" render = { () => <StyleCodeEditor/>} />
+      <Route exact path ="/task/:id" render = { (props) => <Task id={props.match.params.id}/>} />
       <Route exact path ="/tasks" render = { () => <Tasks/>}/>
       <Route exact path = "/login" render = { () => <Login/>} />
     </Switch>
