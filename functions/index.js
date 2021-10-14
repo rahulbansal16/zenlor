@@ -15,7 +15,7 @@ exports.fetchTasks = functions.https.onCall(async (data, context) => {
         for (let styleCodeSnapshot of styleCodesSnapshot.docs){
             const tasksSnapshots =  await styleCodeSnapshot.ref.collection('tasks').get()
             for (let tasksSnapshot of tasksSnapshots.docs){
-                totalTask.push({...tasksSnapshot.data(), id: tasksSnapshot.id})
+                totalTask.push({...tasksSnapshot.data(), id: tasksSnapshot.id, styleCodeId: styleCodeSnapshot.id})
             }
         }
         return totalTask
