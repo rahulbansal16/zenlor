@@ -48,7 +48,7 @@ const ImageUpload = ({onSuccessHandler}) => {
       }
       const storageRef = storage;
       const imageName = generateUId('', 12) //a unique name for the image
-      const imgFile = storageRef.child(`stylecodes/${CONSTANTS.company_id}/${imageName}.png`);
+      const imgFile = storageRef.child(`stylecodes/${CONSTANTS.companyId}/${imageName}.png`);
       try {
         const image = await imgFile.put(file, metadata);
         const URL = await imgFile.getDownloadURL();

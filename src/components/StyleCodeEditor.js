@@ -70,7 +70,7 @@ const RegistrationForm = ({messageBoxStateHandler}) => {
 
   const onFinish = (values) => {
     values['sizeSet'] = generateSizeSet()
-    values['companyId'] = CONSTANTS.company_id
+    values['companyId'] = CONSTANTS.companyId
     values['fabricUrl'] = downloadUrl;
     if (!values['dueDate'])
       values['dueDate'] = getTimeStamp() + CONSTANTS.days_75;

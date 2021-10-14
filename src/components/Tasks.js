@@ -17,7 +17,7 @@ const Tasks = () => {
     useEffect(() => {
         let fetchTasks = functions.httpsCallable('fetchTasks')
         const fetchData = async () => {
-            const tasks = await fetchTasks({companyId: CONSTANTS.company_id})
+            const tasks = await fetchTasks({companyId: CONSTANTS.companyId})
             setTasks(tasks.data)
             setShowLoader(false)
         }

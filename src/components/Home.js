@@ -45,7 +45,7 @@ const Home = () => {
   const [showLoader, setShowLoader]  = useState(true)
 
   useEffect(() => {
-    fetchStyleCode(CONSTANTS.company_id).then((responseStyleCodes) => {
+    fetchStyleCode(CONSTANTS.companyId).then((responseStyleCodes) => {
       if (responseStyleCodes) {
         setStyleCodes(responseStyleCodes);
         setShowLoader(false)
