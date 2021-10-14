@@ -18,6 +18,7 @@ const Tasks = () => {
         let fetchTasks = functions.httpsCallable('fetchTasks')
         const fetchData = async () => {
             const tasks = await fetchTasks({companyId: CONSTANTS.companyId})
+            console.log(tasks.data)
             setTasks(tasks.data)
             setShowLoader(false)
         }
@@ -33,7 +34,7 @@ const Tasks = () => {
     return (
         <div>
         {showLoader && <Loader/>}
-        {tasks.length === 0 && !showLoader ? <Empty description="No Task For Today"/>: <Title style ={{width:'100%', textAlign:'center'}}align="middle" level={4}>Tasks For Today</Title>}
+        {tasks.length === 0 && !showLoader ? <Empty description="No Task For Today"/>: <Title style ={{width:'100%', textAlign:'center'}}align="middle" level={4}>Daily Tasks</Title>}
         <Space align="center" size="middle" wrap>
             {tasks.map((task) => <ZenlorCard key = {task.id} description={task.name} onClick = { () => {
                 onTaskClick(task.styleCodeId, task.id)
