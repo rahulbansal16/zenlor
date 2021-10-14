@@ -24,11 +24,11 @@ const Tasks = () => {
         fetchData()
     }, [])
 
-    const onTaskClick = (id) => {
-        if (!id)
+    const onTaskClick = (styleCodeId, taskCodeId) => {
+        if (!styleCodeId || !taskCodeId)
             return
-            
-        history.push(`/task/${id}`)
+
+        history.push(`/task/${styleCodeId}/${taskCodeId}`)
     }
     return (
         <div>
@@ -36,7 +36,7 @@ const Tasks = () => {
         <Space align="center" size="middle" wrap>
             Task
             {tasks.map((task) => <ZenlorCard key = {task.id} onClick = { () => {
-                onTaskClick(task.id)
+                onTaskClick(task.styleCodeId, task.id)
             }} {...task}/> )}
         </Space>
         </div>
