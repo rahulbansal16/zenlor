@@ -1,13 +1,14 @@
-import { Card, Space, Image } from 'antd';
+import { Card, Space, Image, Button } from 'antd';
 import zenlor from "../assets/zenlor.png"
 import moment from "moment";
 const { Meta } = Card;
 
 const ZenlorCard = ({buyerName, dueDate, fabricUrl, styleCode, description, status, onClick}) => {
         return <Card
-                 onClick = {onClick}
+                 bordered = {true}
+                //  onClick = {onClick}
                  hoverable
-                 title = {styleCode + "    ||    " + buyerName }
+                 title = {styleCode.toUpperCase() + "  ||  " + buyerName }
                  style = {{
                    width:'100%',
                  }}
@@ -17,16 +18,22 @@ const ZenlorCard = ({buyerName, dueDate, fabricUrl, styleCode, description, stat
                   padding: "0 !imporant"
                 }}>
                 <Image
-                  width="120%"
+                  width="50%"
+                  height="50%"
                   src={fabricUrl || "error" }
                   fallback={zenlor}
                 />
                 </Card.Grid>
-                <div style ={{
-                  textAlign:'center',
-                }}>
-                <div>
-                    <Meta description = {moment(dueDate).format('DD-MMM-YY')} title = {description}/>
+                <div
+                style = {{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%'}}
+                onClick = {onClick}
+                >
+                  <div style = {{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%'}}>
+                    <div>{moment(dueDate).format('DD-MMM-YY')}</div>
+                    <div>{description}</div>
+                    <Button type="primary">Update</Button>
+                    {/* <Meta description = {moment(dueDate).format('DD-MMM-YY')} title = {description}/> */}
+                    {/* <Button>hi</Button> */}
                     {/* <Meta description="This is the task name"/> */}
                  </div>
                 </div>
