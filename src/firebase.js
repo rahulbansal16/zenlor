@@ -6,6 +6,7 @@ import "firebase/firestore";
 import "firebase/functions";
 import { generateUId, getTimeStamp } from "./util";
 import { useEffect, useState, useContext, createContext } from "react";
+import CONSTANTS from "./CONSTANTS";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAbXZfE3-8LgoKqqUOWElAR4aQnkuKAVwo",
@@ -45,8 +46,26 @@ export const fetchStyleCode = async (companyId, populateStyleCodes) => {
       resolve(styleCodes)
      })
   })
+}
 
+export const updateTaskStatus = (styleCodeId, taskId, value) => {
+  return db.collection('company')
+  .doc(CONSTANTS.companyId)
+  .collection('style_codes')
+  .doc(styleCodeId)
+  .collection('tasks')
+  .doc(taskId).update(value, {
+    merge: true
+  })
+}
 
+export const fetchTask = (styleCodeId, taskId) => {
+  return db.collection('company')
+  .doc(CONSTANTS.companyId)
+  .collection('style_codes')
+  .doc(styleCodeId)
+  .collection('tasks')
+  .doc(taskId).get()
 }
 
 export const createStyleCode = (value) => {
