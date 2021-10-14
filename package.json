@@ -26,7 +26,8 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject",
-    "deploy": "firebase.cmd deploy"
+    "deploy": "firebase.cmd deploy",
+    "alpha": "firebase.cmd hosting:channel:deploy alpha"
   },
   "eslintConfig": {
     "extends": [
