@@ -94,7 +94,7 @@ const Task = ({styleCodeId, taskId}) => {
 
                 <Form.Item {...tailFormItemLayout}>
                     <Space>
-                        <Button type="secondary" onClick = { () => history.goBack()}>Back</Button>
+                        <Button danger onClick = { () => history.goBack()}>Back</Button>
                         <Button type="primary" htmlType="submit">Submit</Button>
                     </Space>
                 </Form.Item>
