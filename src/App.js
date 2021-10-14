@@ -13,8 +13,8 @@ import Task from './components/Task';
 const renderPages = () => {
   return (
     <Switch>
-      <Route exact path = "/" render = { () => <Home></Home>} />
-      <Route exact path = "/home" render = { () => <Home></Home>} />
+      <Route exact path = "/" render = { () => <Tasks/>} />
+      <Route exact path = "/stylecodes" render = { () => <Home/>} />
       <Route exact path = "/stylecode" render = { () => <StyleCodeEditor/>} />
       <Route exact path ="/task/:styleCodeId/:taskId" render = { (props) => <Task styleCodeId={props.match.params.styleCodeId} taskId={props.match.params.taskId}/>} />
       <Route exact path ="/tasks" render = { () => <Tasks/>}/>
