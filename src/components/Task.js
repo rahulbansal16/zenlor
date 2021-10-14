@@ -1,7 +1,8 @@
-import {Form, Input, Radio, Space, Button} from "antd"
-import { useEffect } from "react";
+import {Form, Input, Radio, Space, Button, Image, Typography} from "antd"
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { updateTaskStatus, fetchTask } from "../firebase";
+const {Title} = Typography
 
 const formItemLayout = {
     labelCol: {
@@ -38,10 +39,23 @@ const formItemLayout = {
     },
   };
 
+const TaskHeader = ({taskName}) => {
+  return (
+    <div style = {{
+      display:"flex",
+      flexDirection:'row'
+    }}>
+      {/* <Image width="20%" height="20%" src={"https://firebasestorage.googleapis.com/v0/b/zenlor.appspot.com/o/stylecodes%2Fanusha_8923%2FqAHJ6vkeZ1kS.png?alt=media&token=ddf65e53-3125-4385-9e0a-ee50dc7f5a3b"}></Image> */}
+      <Title style = {{ width:'100%'}} level={5}>{taskName}</Title>
+    </div>
+  )
+}
+
 const Task = ({styleCodeId, taskId}) => {
 
     const [form] = Form.useForm();
     const history = useHistory()
+    const [task, setTask] = useState({})
 
     const onFinish = async (values) => {
         console.log(values)
@@ -50,14 +64,16 @@ const Task = ({styleCodeId, taskId}) => {
     }
 
     useEffect(() => {
-        // const getData = async () => {
-        //     const task = await fetchTask(styleCodeId, taskId)
-        // }
-        // getData()
+        const getData = async () => {
+            const task = await fetchTask(styleCodeId, taskId)
+            setTask(task.data())
+        }
+        getData()
     },[styleCodeId, taskId])
 
     return (
         <div>
+            <TaskHeader taskName={task.name}/>
             <Form
             {...formItemLayout}
             layout="vertical"
