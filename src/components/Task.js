@@ -43,9 +43,9 @@ const Task = ({styleCodeId, taskId}) => {
     const [form] = Form.useForm();
     const history = useHistory()
 
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
         console.log(values)
-        updateTaskStatus(styleCodeId, taskId, values)
+        await updateTaskStatus(styleCodeId, taskId, values)
         history.push('/tasks')
     }
 
@@ -76,7 +76,7 @@ const Task = ({styleCodeId, taskId}) => {
             }}
             scrollToFirstError
             >
-                <Form.Item label="Task Status" name="taskStatus" required>
+                <Form.Item label="Task Status" name="status" required>
                     <Radio.Group>
                         <Radio value="incomplete">Incomplete</Radio>
                         <Radio value="complete">Complete</Radio>
