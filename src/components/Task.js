@@ -88,7 +88,12 @@ const Task = ({styleCodeId, taskId}) => {
                         <Radio value="complete">Complete</Radio>
                     </Radio.Group>
                 </Form.Item>
-                <Form.Item label = "Progress Update" name = "progressUpdate">
+                <Form.Item label = "Progress Update" name = "progressUpdate"
+                  rules={[{
+                    required: true,
+                    message: 'Please add the remarks',
+                  },
+              ]}>
                     <Input/>
                 </Form.Item>
 
