@@ -35,7 +35,7 @@ const Tasks = () => {
         {showLoader && <Loader/>}
         <Space align="center" size="middle" wrap>
             {tasks.length === 0 ? <Empty description="No Task For Today"/>: "Task"}
-            {tasks.map((task) => <ZenlorCard key = {task.id} onClick = { () => {
+            {tasks.map((task) => <ZenlorCard key = {task.id} description={task.name} onClick = { () => {
                 onTaskClick(task.styleCodeId, task.id)
             }} {...task}/> )}
         </Space>
