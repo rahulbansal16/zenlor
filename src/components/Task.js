@@ -76,7 +76,12 @@ const Task = ({styleCodeId, taskId}) => {
             }}
             scrollToFirstError
             >
-                <Form.Item label="Task Status" name="status" required>
+                <Form.Item label="Task Status" name="status"
+                     rules={[{
+                        required: true,
+                        message: 'Please update the Task Status',
+                      },
+                    ]}>
                     <Radio.Group>
                         <Radio value="incomplete">Incomplete</Radio>
                         <Radio value="complete">Complete</Radio>
