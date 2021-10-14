@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useState } from "react/cjs/react.development";
 import ZenlorCard from "./ZenlorCard";
-import { Card, Space } from 'antd';
+import { Card, Empty, Space } from 'antd';
 import { functions } from "../firebase";
 import CONSTANTS from "../CONSTANTS"
 import Loader from "./Loader";
@@ -34,7 +34,7 @@ const Tasks = () => {
         <div>
         {showLoader && <Loader/>}
         <Space align="center" size="middle" wrap>
-            Task
+            {tasks.length === 0 ? <Empty description="No Task For Today"/>: "Task"}
             {tasks.map((task) => <ZenlorCard key = {task.id} onClick = { () => {
                 onTaskClick(task.styleCodeId, task.id)
             }} {...task}/> )}
