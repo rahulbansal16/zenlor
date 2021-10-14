@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useState } from "react/cjs/react.development";
 import ZenlorCard from "./ZenlorCard";
-import { Card, Empty, Space } from 'antd';
+import { Card, Empty, Space, Typography } from 'antd';
 import { functions } from "../firebase";
 import CONSTANTS from "../CONSTANTS"
 import Loader from "./Loader";
 import { useHistory } from "react-router";
+const { Title } = Typography;
 
 
 const Tasks = () => {
@@ -33,8 +34,8 @@ const Tasks = () => {
     return (
         <div>
         {showLoader && <Loader/>}
+        {tasks.length === 0 && !showLoader ? <Empty description="No Task For Today"/>: <Title style ={{width:'100%', textAlign:'center'}}align="middle" level={4}>Tasks For Today</Title>}
         <Space align="center" size="middle" wrap>
-            {tasks.length === 0 ? <Empty description="No Task For Today"/>: "Task"}
             {tasks.map((task) => <ZenlorCard key = {task.id} description={task.name} onClick = { () => {
                 onTaskClick(task.styleCodeId, task.id)
             }} {...task}/> )}
