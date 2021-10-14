@@ -26,7 +26,7 @@ const ZenlorCard = ({buyerName, dueDate, fabricUrl, styleCodeName, status, onCli
                   textAlign:'center',
                 }}>
                 <div>
-                    <Meta title = {"Due Date " + moment(dueDate).format('MM-DD-YY')} description = {"This is th task"}/>
+                    <Meta title = {"Due Date " + moment(dueDate).format('DD-MMM-YY')} description = {"This is th task"}/>
                     {/* <Meta description="This is the task name"/> */}
                  </div>
                 </div>
