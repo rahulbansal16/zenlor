@@ -1,7 +1,8 @@
-import {Form, Input, Radio, Space, Button, Image, Typography} from "antd"
+import {Form, Input, Radio, Space, Button, Image, Typography, Timeline} from "antd"
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { updateTaskStatus, fetchTask } from "../firebase";
+import CONSTANTS from "../CONSTANTS";
+import { updateTaskStatus, fetchTask, fetchTaskRemarks } from "../firebase";
 const {Title} = Typography
 
 const formItemLayout = {
@@ -47,6 +48,25 @@ const TaskHeader = ({taskName}) => {
     }}>
       {/* <Image width="20%" height="20%" src={"https://firebasestorage.googleapis.com/v0/b/zenlor.appspot.com/o/stylecodes%2Fanusha_8923%2FqAHJ6vkeZ1kS.png?alt=media&token=ddf65e53-3125-4385-9e0a-ee50dc7f5a3b"}></Image> */}
       <Title style = {{ width:'100%'}} level={5}>{taskName}</Title>
+    </div>
+  )
+}
+
+const RemarksTimeline = ({companyId, styleCodeId, taskId}) => {
+  const [pastRemarks , setPastRemarks] = useState([])
+  useEffect( () => {
+    const getData = async () => {
+      const remarks = await fetchTaskRemarks(companyId, styleCodeId, taskId)
+      setPastRemarks(remarks)
+  }
+  getData()
+  }, [companyId, styleCodeId, taskId])
+  return (
+    <div className="mx-8 txt-al-left">
+      <Title level={5} className="margin-bottom-20 txt-al-left">Past Remarks</Title>
+      <Timeline mode="center">
+        {pastRemarks.map( pastRemark => <Timeline.Item key={pastRemark.id}>{pastRemark.progressUpdate}</Timeline.Item>)}
+      </Timeline>
     </div>
   )
 }
@@ -120,6 +140,7 @@ const Task = ({styleCodeId, taskId}) => {
                     </Space>
                 </Form.Item>
             </Form>
+            <RemarksTimeline companyId={CONSTANTS.companyId} styleCodeId = {styleCodeId} taskId = {taskId}/>
         </div>
     )
 }
