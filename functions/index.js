@@ -1,5 +1,5 @@
 const functions = require("firebase-functions");
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 
 admin.initializeApp();
 
@@ -9,15 +9,31 @@ admin.initializeApp();
 
 // in case of ForEach there is an issue while handing the internal promises
 exports.fetchTasks = functions.https.onCall(async (data, context) => {
-        const {companyId} = data;
-        let totalTask = []
-        const styleCodesSnapshot = await admin.firestore().collection("company").doc(companyId).collection('style_codes').where('status', "==", "active").get()
-        for (let styleCodeSnapshot of styleCodesSnapshot.docs){
-            const {buyerName, fabricUrl, styleCode} = styleCodeSnapshot.data()
-            const tasksSnapshots =  await styleCodeSnapshot.ref.collection('tasks').where('status', `!=`, "complete").get()
-            for (let tasksSnapshot of tasksSnapshots.docs){
-                totalTask.push({...tasksSnapshot.data(), id: tasksSnapshot.id, styleCodeId: styleCodeSnapshot.id, buyerName, fabricUrl, styleCode})
-            }
-        }
-        return totalTask
+  const { companyId } = data;
+  let totalTask = [];
+  const styleCodesSnapshot = await admin
+    .firestore()
+    .collection("company")
+    .doc(companyId)
+    .collection("style_codes")
+    .where("status", "==", "active")
+    .get();
+  for (let styleCodeSnapshot of styleCodesSnapshot.docs) {
+    const { buyerName, fabricUrl, styleCode } = styleCodeSnapshot.data();
+    const tasksSnapshots = await styleCodeSnapshot.ref
+      .collection("tasks")
+      .where("status", `!=`, "complete")
+      .get();
+    for (let tasksSnapshot of tasksSnapshots.docs) {
+      totalTask.push({
+        ...tasksSnapshot.data(),
+        id: tasksSnapshot.id,
+        styleCodeId: styleCodeSnapshot.id,
+        buyerName,
+        fabricUrl,
+        styleCode,
+      });
+    }
+  }
+  return totalTask;
 });
