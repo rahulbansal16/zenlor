@@ -1,6 +1,6 @@
 import firebase from "firebase/app";
-import 'firebase/storage';
-import 'firebase/analytics';
+import "firebase/storage";
+import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/functions";
@@ -9,81 +9,109 @@ import { useEffect, useState, useContext, createContext } from "react";
 import CONSTANTS from "./CONSTANTS";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAbXZfE3-8LgoKqqUOWElAR4aQnkuKAVwo",
-    authDomain: "zenlor.firebaseapp.com",
-    projectId: "zenlor",
-    storageBucket: "zenlor.appspot.com",
-    messagingSenderId: "495989491032",
-    appId: "1:495989491032:web:63242d32f3d2587c3d512d",
-    measurementId: "G-M2GZD60DKZ"
-  };
+  apiKey: "AIzaSyAbXZfE3-8LgoKqqUOWElAR4aQnkuKAVwo",
+  authDomain: "zenlor.firebaseapp.com",
+  projectId: "zenlor",
+  storageBucket: "zenlor.appspot.com",
+  messagingSenderId: "495989491032",
+  appId: "1:495989491032:web:63242d32f3d2587c3d512d",
+  measurementId: "G-M2GZD60DKZ",
+};
 
 firebase.initializeApp(firebaseConfig);
 
 export const auth = firebase.auth();
-export const analytics = firebase.analytics()
+export const analytics = firebase.analytics();
 export const functions = firebase.functions();
-export const storage = firebase.storage().ref()
+export const storage = firebase.storage().ref();
 firebase.auth().useDeviceLanguage();
 export const firestore = firebase.firestore();
 export const db = firestore;
 firebase.firestore().settings({
   ignoreUndefinedProperties: true,
-})
+});
 //
 // The style code needs to be fetched from the database
 //
 export const fetchStyleCode = async (companyId, populateStyleCodes) => {
   // anusha_8923
-  const styleCodeRef = await db.collection('company').doc(companyId).collection('style_codes').orderBy('dueDate', 'desc')
-  return new Promise( (resolve, reject) => {
-    styleCodeRef.onSnapshot( snapshot => {
-      let styleCodes = []
-      snapshot.docs.forEach( d => {
-          console.log('Fetching the existing notification', d.data())
-          styleCodes.push(d.data())
-      })
-      resolve(styleCodes)
-     })
-  })
-}
+  const styleCodeRef = await db
+    .collection("company")
+    .doc(companyId)
+    .collection("style_codes")
+    .orderBy("dueDate", "desc");
+  return new Promise((resolve, reject) => {
+    styleCodeRef.onSnapshot((snapshot) => {
+      let styleCodes = [];
+      snapshot.docs.forEach((d) => {
+        console.log("Fetching the existing notification", d.data());
+        styleCodes.push(d.data());
+      });
+      resolve(styleCodes);
+    });
+  });
+};
 
 export const updateTaskStatus = (styleCodeId, taskId, value) => {
-  return db.collection('company')
-  .doc(CONSTANTS.companyId)
-  .collection('style_codes')
-  .doc(styleCodeId)
-  .collection('tasks')
-  .doc(taskId).update(value, {
-    merge: true
-  })
-}
+  return db
+    .collection("company")
+    .doc(CONSTANTS.companyId)
+    .collection("style_codes")
+    .doc(styleCodeId)
+    .collection("tasks")
+    .doc(taskId)
+    .update(value, {
+      merge: true,
+    });
+};
 
 export const fetchTask = (styleCodeId, taskId) => {
-  return db.collection('company')
-  .doc(CONSTANTS.companyId)
-  .collection('style_codes')
-  .doc(styleCodeId)
-  .collection('tasks')
-  .doc(taskId).get()
-}
+  return db
+    .collection("company")
+    .doc(CONSTANTS.companyId)
+    .collection("style_codes")
+    .doc(styleCodeId)
+    .collection("tasks")
+    .doc(taskId)
+    .get();
+};
 
 export const createStyleCode = (value) => {
-  console.log('The value is', value)
-  const {companyId, buyerName, dueDate, status, sizeSet, garmentCategory, styleCodeId} = value
-  const styleCodeInternalId = generateUId('sc:' + getTimeStamp(), 15);
+  console.log("The value is", value);
+  const {
+    companyId,
+    buyerName,
+    dueDate,
+    status,
+    sizeSet,
+    garmentCategory,
+    styleCodeId,
+  } = value;
+  const styleCodeInternalId = generateUId("sc:" + getTimeStamp(), 15);
   const createdAt = getTimeStamp();
-  console.log('The values are  ', {companyId, buyerName, dueDate, status, sizeSet, garmentCategory, styleCodeId})
+  console.log("The values are  ", {
+    companyId,
+    buyerName,
+    dueDate,
+    status,
+    sizeSet,
+    garmentCategory,
+    styleCodeId,
+  });
   return new Promise(async (resolve, reject) => {
-    await db.collection('company').doc(companyId).collection('style_codes').doc(styleCodeInternalId).set({
-      ...value,
-      createdAt,
-      id: styleCodeInternalId
-    })
-    resolve(styleCodeInternalId)
-  })
-}
-
+    await db
+      .collection("company")
+      .doc(companyId)
+      .collection("style_codes")
+      .doc(styleCodeInternalId)
+      .set({
+        ...value,
+        createdAt,
+        id: styleCodeInternalId,
+      });
+    resolve(styleCodeInternalId);
+  });
+};
 
 // export const AuthContext = createContext()
 
@@ -229,7 +257,7 @@ export const createStyleCode = (value) => {
 //     user_name,
 //     status,
 //     type,
-//     tags, 
+//     tags,
 //     backgroundColor
 // }) => {
 //     let story = {
