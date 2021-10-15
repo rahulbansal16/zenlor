@@ -53,6 +53,21 @@ export const fetchStyleCode = async (companyId, populateStyleCodes) => {
 };
 
 export const updateTaskStatus = (styleCodeId, taskId, value) => {
+  const createdAt = getTimeStamp();
+  const remarksId = generateUId("re:" + createdAt, 10);
+  db.collection("company")
+  .doc(CONSTANTS.companyId)
+  .collection("style_codes")
+  .doc(styleCodeId)
+  .collection("tasks")
+  .doc(taskId)
+  .collection("remarks")
+  .doc(remarksId)
+  .set({
+    id: remarksId,
+    createdAt,
+    ...value
+  })
   return db
     .collection("company")
     .doc(CONSTANTS.companyId)
