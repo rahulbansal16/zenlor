@@ -132,7 +132,7 @@ const Task = ({ styleCodeId, taskId }) => {
         scrollToFirstError
       >
         <Form.Item
-          label="Task Status"
+          label="1. Task Status"
           name="status"
           rules={[
             {
@@ -147,7 +147,7 @@ const Task = ({ styleCodeId, taskId }) => {
           </Radio.Group>
         </Form.Item>
         <Form.Item
-          label="Progress Update"
+          label="2. Progress Update"
           name="progressUpdate"
           rules={[
             {
