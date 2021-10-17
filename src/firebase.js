@@ -1,4 +1,5 @@
 import firebase from "firebase/app";
+// import { Timestamp } from "@firebase/firestore";
 import "firebase/storage";
 import "firebase/analytics";
 import "firebase/auth";
@@ -148,6 +149,29 @@ export const createStyleCode = (value) => {
     resolve(styleCodeInternalId);
   });
 };
+
+export const createTask = (value) => {
+  console.log("The value is", value);
+  const {
+    companyId,
+    name,
+    dueDate,
+    styleCodeId,
+  } = value;
+  const createdAt = getTimeStamp();
+  return db
+      .collection("company")
+      .doc(companyId)
+      .collection("style_codes")
+      .doc(styleCodeId)
+      .collection("tasks")
+      .doc()
+      .set({
+        ...value,
+        dueDate: dueDate.valueOf(),
+        createdAt,
+      });
+}
 
 // export const AuthContext = createContext()
 
