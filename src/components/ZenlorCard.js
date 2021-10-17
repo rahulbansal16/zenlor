@@ -17,7 +17,7 @@ const ZenlorCard = ({
       bordered={true}
       //  onClick = {onClick}
       hoverable
-      title={styleCode.toUpperCase() + "  ||  " + buyerName}
+      title={(styleCode || "").toUpperCase() + "  ||  " + buyerName}
       style={{
         width: "100%",
       }}
