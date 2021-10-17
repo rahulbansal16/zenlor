@@ -43,6 +43,7 @@ const PostIcon = () => {
 const Home = () => {
   const [styleCodes, setStyleCodes] = useState([]);
   const [showLoader, setShowLoader]  = useState(true)
+  const history = useHistory()
 
   useEffect(() => {
     fetchStyleCode(CONSTANTS.companyId).then((responseStyleCodes) => {
@@ -58,7 +59,9 @@ const Home = () => {
     return (
       <div>
         <Space align="center" size="middle" wrap>
-        {styleCodes.map((styleCode) => <ZenlorCard key = {styleCode.id} {...styleCode}/> )}
+        {styleCodes.map((styleCode) => <ZenlorCard onClick = { () => {
+            history.push(`/stylecode/${styleCode.id}/task/edit`)
+        }} key = {styleCode.id} {...styleCode}/> )}
         </Space>
       </div>
     );
