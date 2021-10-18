@@ -79,14 +79,14 @@ import { createTask } from "../firebase";
         align="left"
         onFinish={onFinish}
         initialValues={{
-          taskName: "",
+          name: "",
           dueDate:""
         }}
         scrollToFirstError
       >
         <Form.Item
           label="1. Task Name"
-          name="taskName"
+          name="name"
           rules={[
             {
               required: true,
