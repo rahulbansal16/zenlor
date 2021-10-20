@@ -8,6 +8,7 @@ import {
   Typography,
   Timeline,
 } from "antd";
+import moment from "moment";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import CONSTANTS from "../CONSTANTS";
@@ -174,7 +175,7 @@ const RemarksTimeline = ({ companyId, styleCodeId, taskId }) => {
       <Timeline mode="center">
         {pastRemarks.map((pastRemark) => (
           <Timeline.Item key={pastRemark.id}>
-            {pastRemark.progressUpdate}
+            { "At " + moment(pastRemark.createdAt).format("DD-MMM,hh:mm a") + " :- "+ pastRemark.progressUpdate}
           </Timeline.Item>
         ))}
       </Timeline>
