@@ -35,5 +35,6 @@ exports.fetchTasks = functions.https.onCall(async (data, context) => {
       });
     }
   }
+  totalTask = totalTask.sort( (a, b) => a.dueDate - b.dueDate)
   return totalTask;
 });
