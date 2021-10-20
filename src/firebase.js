@@ -23,7 +23,7 @@ firebase.initializeApp(firebaseConfig);
 
 export const auth = firebase.auth();
 export const analytics = firebase.analytics();
-export const functions = firebase.functions();
+export const functions = firebase.app().functions('asia-south1');
 export const storage = firebase.storage().ref();
 firebase.auth().useDeviceLanguage();
 export const firestore = firebase.firestore();

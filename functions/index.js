@@ -8,7 +8,7 @@ admin.initializeApp();
 // Fetch all such task initially and post that we can populate the db or store in the database
 
 // in case of ForEach there is an issue while handing the internal promises
-exports.fetchTasks = functions.https.onCall(async (data, context) => {
+exports.fetchTasks = functions.region('asia-south1').https.onCall(async (data, context) => {
   const { companyId } = data;
   let totalTask = [];
   const styleCodesSnapshot = await admin
