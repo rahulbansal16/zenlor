@@ -106,6 +106,7 @@ const Task = ({ styleCodeId, taskId }) => {
           </Radio.Group>
         </Form.Item>
         <Form.Item
+          autocomplete="false"
           label="2. Progress Update"
           name="progressUpdate"
           rules={[
@@ -115,7 +116,7 @@ const Task = ({ styleCodeId, taskId }) => {
             },
           ]}
         >
-          <Input />
+          <Input autoComplete="off" autocomplete="off"/>
         </Form.Item>
 
         <Form.Item {...tailFormItemLayout}>
