@@ -11,6 +11,9 @@ const TaskDelay = ({dueDate}) => {
         if (diff >0){
             return diff + " day delay"
         }
+        else if (diff === 0){
+            return "on time"
+        }
         return Math.abs(diff) + " day early"
     }
 
