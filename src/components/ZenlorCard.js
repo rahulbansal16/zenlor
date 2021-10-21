@@ -1,7 +1,8 @@
-import { Card, Image, Button } from "antd";
+import { Card, Image, Button, Tag } from "antd";
 import { RightOutlined} from '@ant-design/icons';
 import zenlor from "../assets/zenlor.png";
 import moment from "moment";
+import TaskDelay from "./TaskDelay";
 
 const ZenlorCard = ({
   buyerName,
@@ -54,7 +55,8 @@ const ZenlorCard = ({
               height: "100%",
             }}
           >
-            <div>{moment(dueDate).format("DD-MMM-YY")}</div>
+            <TaskDelay dueDate = {dueDate}/>
+            {/* <div><Tag color="red">{moment(dueDate).format("DD-MMM-YY")}</Tag></div> */}
             <div>{description}</div>
             <Button type="primary">Update <RightOutlined /></Button>
             {/* <Meta description = {moment(dueDate).format('DD-MMM-YY')} title = {description}/> */}
