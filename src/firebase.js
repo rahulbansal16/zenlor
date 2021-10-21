@@ -108,6 +108,7 @@ export const fetchTaskRemarks = async (companyId, styleCodeId, taskId) => {
         console.log("Fetching the existing remarks", d.data());
         remarks.push(d.data());
       });
+      remarks = remarks.reverse()
       resolve(remarks);
     });
   });
