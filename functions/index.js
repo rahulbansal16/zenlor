@@ -1,5 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const moment = require("moment")
 
 admin.initializeApp();
 
@@ -10,6 +11,8 @@ admin.initializeApp();
 // in case of ForEach there is an issue while handing the internal promises
 exports.fetchTasks = functions.region('asia-northeast3').https.onCall(async (data, context) => {
   const { companyId } = data;
+  const tomorrow = moment().subtract(0, "days").endOf("day").valueOf()
+  console.log("The tomorrow date is", tomorrow)
   let totalTask = [];
   const styleCodesSnapshot = await admin
     .firestore()
@@ -35,6 +38,7 @@ exports.fetchTasks = functions.region('asia-northeast3').https.onCall(async (dat
       });
     }
   }
+  totalTask = totalTask.filter( task => task.dueDate <= tomorrow)
   totalTask = totalTask.sort( (a, b) => a.dueDate - b.dueDate)
   return totalTask;
 });
