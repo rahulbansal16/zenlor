@@ -10,7 +10,7 @@ admin.initializeApp();
 
 // in case of ForEach there is an issue while handing the internal promises
 exports.fetchTasks = functions.region('asia-northeast3').https.onCall(async (data, context) => {
-  const { companyId } = data;
+  const { companyId, status } = data;
   const tomorrow = moment().subtract(0, "days").endOf("day").valueOf()
   console.log("The tomorrow date is", tomorrow)
   let totalTask = [];
@@ -25,7 +25,7 @@ exports.fetchTasks = functions.region('asia-northeast3').https.onCall(async (dat
     const { buyerName, fabricUrl, styleCode } = styleCodeSnapshot.data();
     const tasksSnapshots = await styleCodeSnapshot.ref
       .collection("tasks")
-      .where("status", `!=`, "complete")
+      .where("status", `==`, status || "incomplete")
       .get();
     for (let tasksSnapshot of tasksSnapshots.docs) {
       totalTask.push({
