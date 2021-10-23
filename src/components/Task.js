@@ -58,7 +58,7 @@ const Task = ({ styleCodeId, taskId }) => {
   const onFinish = async (values) => {
     console.log(values);
     await updateTaskStatus(styleCodeId, taskId, values);
-    history.push("/tasks");
+    history.push("/");
   };
 
   useEffect(() => {

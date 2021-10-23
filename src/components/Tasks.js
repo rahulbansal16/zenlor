@@ -8,7 +8,7 @@ import { useHistory } from "react-router";
 const { Title } = Typography;
 
 
-const Tasks = () => {
+const Tasks = ({status}) => {
     const [tasks, setTasks] = useState([])
     const [showLoader, setShowLoader]  = useState(true)
     const history = useHistory()
@@ -17,7 +17,7 @@ const Tasks = () => {
     useEffect(() => {
         let fetchTasks = functions.httpsCallable('fetchTasks')
         const fetchData = async () => {
-            const tasks = await fetchTasks({companyId: CONSTANTS.companyId})
+            const tasks = await fetchTasks({companyId: CONSTANTS.companyId, status})
             console.log(tasks.data)
             setTasks(tasks.data)
             setShowLoader(false)
@@ -34,12 +34,12 @@ const Tasks = () => {
     return (
         <div>
         {showLoader && <Loader/>}
-        {tasks.length === 0 && !showLoader ? <Empty description="No Task For Today"/>: <Title style ={{width:'100%', textAlign:'center'}}align="middle" level={4}>Daily Tasks</Title>}
-        <Space align="center" size="middle" wrap>
+        {/* {tasks.length === 0 && !showLoader ? <Empty description="No Task For Today"/>: <Title style ={{width:'100%', textAlign:'center'}}align="middle" level={4}>Daily Tasks</Title>} */}
+        {/* <Space align="center" size="middle" wrap> */}
             {tasks.map((task) => <ZenlorCard key = {task.id} description={task.name} onClick = { () => {
                 onTaskClick(task.styleCodeId, task.id)
             }} {...task}/> )}
-        </Space>
+        {/* </Space> */}
         </div>
     )
 }

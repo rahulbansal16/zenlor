@@ -10,11 +10,12 @@ import { useEffect } from 'react';
 import RedirectToLogin from './components/RedirectToLogin';
 import Tasks from './components/Tasks';
 import Task from './components/Task';
+import TaskHome from './components/TaskHome';
 
 const renderPages = () => {
   return (
     <Switch>
-      <Route exact path = "/" render = { () => <Tasks/>} />
+      <Route exact path = "/" render = { () => <TaskHome/>} />
       <Route exact path = "/stylecodes" render = { () => <Home/>} />
       <Route exact path = "/stylecode" render = { () => <StyleCodeEditor/>} />
       <Route exact path = "/stylecode/:styleCodeId/task/edit" render = { (props) => <TaskEditor styleCodeId={props.match.params.styleCodeId}/>} />

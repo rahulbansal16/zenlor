@@ -21,6 +21,7 @@ const ZenlorCard = ({
       title={(styleCode || "").toUpperCase() + "  ||  " + buyerName}
       style={{
         width: "100%",
+        marginBottom:'10px'
       }}
     >
       <div
