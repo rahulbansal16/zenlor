@@ -3,7 +3,7 @@
     "background_color": "#ffffff",
     "display": "fullscreen",
     "scope": "/",
-    "start_url": "/home",
+    "start_url": "/",
     "description": "Zenlor is the operating system for Manufacturing Factories. It simplify the whole manufacturing process and makes it possible to meet the deadline",
     "name": "Zenlor | OS for Manufacturing",
     "short_name": "Zenlor",
