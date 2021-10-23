@@ -32,7 +32,10 @@ const Tasks = ({status}) => {
         history.push(`/task/${styleCodeId}/${taskCodeId}`)
     }
     return (
-        <div>
+        <div style = {{
+            paddingLeft:'6px',
+            paddingRight:'6px'
+        }}>
         {showLoader && <Loader/>}
         {/* {tasks.length === 0 && !showLoader ? <Empty description="No Task For Today"/>: <Title style ={{width:'100%', textAlign:'center'}}align="middle" level={4}>Daily Tasks</Title>} */}
         {/* <Space align="center" size="middle" wrap> */}
