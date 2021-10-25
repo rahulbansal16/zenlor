@@ -166,7 +166,7 @@ export const createTask = (value) => {
       .collection("style_codes")
       .doc(styleCodeId)
       .collection("tasks")
-      .doc()
+      .doc("task" + createdAt + generateUId("",3))
       .set({
         ...value,
         dueDate: dueDate.valueOf(),
