@@ -8,6 +8,47 @@ admin.initializeApp();
 // company/anusha_8923/style_codes/style_code_id/tasks/task_id
 // Fetch all such task initially and post that we can populate the db or store in the database
 
+// We will allow user to create Task on a particular stylecode
+const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+function generateUId(prefix,length) {
+    let result = ' ';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    result = prefix + result.trim()
+    return result.trim();
+}
+
+
+exports.createTask = functions.region('asia-northeast3').https.onRequest(async (req, res) => {
+  const companyId = "anusha_8923"
+  console.log("The request is", req.body);
+  const {styleCodeId, tasks} = req.body
+  var batch = await admin.firestore().batch()
+  for ( let task of tasks){
+    const createdAt =  new Date().getTime()
+    const {name, dueDate, status} = task
+    const docRef = admin
+    .firestore()
+    .collection("company")
+    .doc(companyId)
+    .collection("style_codes")
+    .doc(styleCodeId)
+    .collection("tasks")
+    .doc("task" + createdAt + generateUId("",3))
+    batch.set(docRef, {
+      styleCodeId,
+      status: status || "incomplete",
+      name,
+      dueDate,
+      createdAt
+    })
+  }
+  const result = await batch.commit()
+  res.send(result)
+})
 // in case of ForEach there is an issue while handing the internal promises
 exports.fetchTasks = functions.region('asia-northeast3').https.onCall(async (data, context) => {
   const { companyId, status } = data;
