@@ -16,8 +16,14 @@ const Tasks = ({status}) => {
 
     useEffect(() => {
         let fetchTasks = functions.httpsCallable('fetchTasks')
+        let completedTasks = functions.httpsCallable('completedTasks')
+
         const fetchData = async () => {
-            const tasks = await fetchTasks({companyId: CONSTANTS.companyId, status})
+            let tasks = []
+            if (status==="incomplete")
+                tasks = await fetchTasks({companyId: CONSTANTS.companyId})
+            else
+                tasks = await completedTasks({companyId: CONSTANTS.companyId })
             console.log(tasks.data)
             setTasks(tasks.data)
             setShowLoader(false)
