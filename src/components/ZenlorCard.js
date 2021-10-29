@@ -4,6 +4,19 @@ import zenlor from "../assets/zenlor.png";
 import moment from "moment";
 import TaskDelay from "./TaskDelay";
 
+const CardTitle = ({styleCode, buyerName}) => {
+  return (
+    <div style = {{display:'flex', justifyContent:'space-between'}}>
+      <div>
+        {(styleCode || "").toUpperCase()}
+      </div>
+      <div>
+        {buyerName}
+      </div>
+    </div>
+  )
+}
+
 const ZenlorCard = ({
   buyerName,
   dueDate,
@@ -18,7 +31,7 @@ const ZenlorCard = ({
       bordered={true}
       //  onClick = {onClick}
       hoverable
-      title={(styleCode || "").toUpperCase() + "  ||  " + buyerName}
+      title={<CardTitle styleCode={styleCode} buyerName={buyerName}/>}
       style={{
         width: "100%",
         marginBottom:'10px'
