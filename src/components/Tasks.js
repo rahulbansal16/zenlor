@@ -117,12 +117,11 @@ const Tasks = ({status}) => {
          style = {{
              width:'100%'
          }}
-            allowClear
             options={options}
             onSelect={onSelect}
             onSearch={handleSearch}
         >
-           <Input.Search size="large" placeholder="Search Tasks" enterButton />
+           <Input.Search size="large" allowClear placeholder="Search Tasks" enterButton />
         </AutoComplete>
         </div>
         {/* {tasks.length === 0 && !showLoader ? <Empty description="No Task For Today"/>: <Title style ={{width:'100%', textAlign:'center'}}align="middle" level={4}>Daily Tasks</Title>} */}
