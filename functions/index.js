@@ -153,7 +153,7 @@ exports.createTask = functions
         .collection("style_codes")
         .doc(styleCodeId)
         .collection("tasks")
-        .doc("task" + createdAt + generateUId("", 3));
+        .doc(generateTaskId(name));
       batch.set(docRef, {
         styleCodeId,
         status: status || "incomplete",
