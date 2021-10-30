@@ -125,10 +125,10 @@ exports.updateTaks = functions
     console.log(styleCodeId, tasks)
     var batch = await admin.firestore().batch();
     for(let task of tasks){
-      const {taskId} = task
-      const docRef = admin.firestore().collection("company").doc(companyId).collection("style_codes").doc(styleCodeId).collection("tasks").doc(taskId)
+      const {id} = task
+      const docRef = admin.firestore().collection("company").doc(companyId).collection("style_codes").doc(styleCodeId).collection("tasks").doc(id)
       batch.update(docRef, {
-        taskId,
+        id,
         ...task
       }, {merge:true});
     }
@@ -259,7 +259,12 @@ const removeDependentTask = (tasks) => {
   });
 };
 
-const getTaskId = ({ name }) => {
-  name = name.trim();
-  return standardTasks.indexOf(name) + 1;
+const getTaskId = ({ name, id }) => {
+	console.log("The name and id", name, id)
+	if (id.includes("task")){
+ 	 	name = name.trim()
+  	return standardTasks.indexOf(name) + 1
+	} else {
+		return parseInt(id.split('-')[0]) + 1
+	}
 };
