@@ -6,6 +6,7 @@ import Loader from "./Loader";
 import { useHistory } from "react-router";
 import { Input } from 'antd';
 import { AutoComplete } from 'antd';
+import moment from "moment";
 
 const Tasks = ({status}) => {
     const [tasks, setTasks] = useState([])
@@ -21,7 +22,7 @@ const Tasks = ({status}) => {
         const fetchData = async () => {
             let tasks = []
             if (status==="incomplete")
-                tasks = await fetchTasks({companyId: CONSTANTS.companyId})
+                tasks = await fetchTasks({companyId: CONSTANTS.companyId, dueDate: moment().subtract(0, "days").endOf("day").valueOf()})
             else
                 tasks = await completedTasks({companyId: CONSTANTS.companyId })
             console.log(tasks.data)
