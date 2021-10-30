@@ -1,6 +1,5 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const moment = require("moment");
 
 admin.initializeApp();
 
@@ -158,8 +157,7 @@ exports.completedTasks = functions
 exports.fetchTasks = functions
   .region("asia-northeast3")
   .https.onCall(async (data, context) => {
-    const { companyId } = data;
-    const tomorrow = moment().subtract(0, "days").endOf("day").valueOf();
+    const { companyId, dueDate} = data;
     let totalTask = [];
     const styleCodes = await getStyleCodes(companyId);
     for (let styleCodeSnapshot of styleCodes.docs) {
@@ -181,7 +179,7 @@ exports.fetchTasks = functions
       tasks = tasks.filter((task) => task.status === "incomplete");
       totalTask = totalTask.concat(tasks);
     }
-    totalTask = totalTask.filter((task) => task.dueDate <= tomorrow);
+    totalTask = totalTask.filter((task) => task.dueDate <= dueDate);
     totalTask = totalTask.sort((a, b) => a.dueDate - b.dueDate);
     return totalTask;
   });
