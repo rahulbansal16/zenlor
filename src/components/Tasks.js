@@ -9,7 +9,7 @@ import { AutoComplete } from 'antd';
 import moment from "moment";
 import { getTimeStampAhead } from "../util";
 
-const Tasks = ({status, taskTillDate}) => {
+const Tasks = ({status, taskTillDate, shouldRemoveDependentTask}) => {
     const [tasks, setTasks] = useState([])
     const [results, setResults] = useState([])
     const [showLoader, setShowLoader]  = useState(true)
@@ -23,7 +23,7 @@ const Tasks = ({status, taskTillDate}) => {
         const fetchData = async () => {
             let tasks = []
             if (status==="incomplete")
-                tasks = await fetchTasks({companyId: CONSTANTS.companyId, removeDependentTask:true, dueDate: taskTillDate || getTimeStampAhead(0)})
+                tasks = await fetchTasks({companyId: CONSTANTS.companyId, shouldRemoveDependentTask: shouldRemoveDependentTask, dueDate: taskTillDate || getTimeStampAhead(0)})
             else
                 tasks = await completedTasks({companyId: CONSTANTS.companyId })
             console.log(tasks.data)

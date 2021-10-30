@@ -12,7 +12,7 @@ const TaskHome = () => {
     return (
         <Tabs defaultActiveKey = "incomplete" centered onChange={tabChangeHnadler}>
             <TabPane tab = "Incomplete Tasks" key="incomplete">
-                <Tasks status={"incomplete"}/>
+                <Tasks status={"incomplete"} shouldRemoveDependentTask={true}/>
             </TabPane>
             <TabPane tab = "Completed Tasks" key="complete">
                 <Tasks status={"complete"}/>

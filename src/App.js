@@ -21,7 +21,7 @@ const renderPages = () => {
       <Route exact path = "/stylecode" render = { () => <StyleCodeEditor/>} />
       <Route exact path = "/stylecode/:styleCodeId/task/edit" render = { (props) => <TaskEditor styleCodeId={props.match.params.styleCodeId}/>} />
       <Route exact path ="/task/:styleCodeId/:taskId" render = { (props) => <Task styleCodeId={props.match.params.styleCodeId} taskId={props.match.params.taskId}/>} />
-      <Route exact path ="/tasks" render = { () => <Tasks status = {"incomplete"} taskTillDate={getTimeStampAhead(200)}/>}/>
+      <Route exact path ="/tasks" render = { () => <Tasks status = {"incomplete"} shouldRemoveDependentTask={false} taskTillDate={getTimeStampAhead(200)}/>}/>
       <Route exact path = "/login" render = { () => <Login/>} />
     </Switch>
 
