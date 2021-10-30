@@ -54,6 +54,7 @@ const Task = ({ styleCodeId, taskId }) => {
   const [form] = Form.useForm();
   const history = useHistory();
   const [task, setTask] = useState({});
+  const [remarkRequired, setRemarkRequired] = useState(true)
 
   const onFinish = async (values) => {
     console.log(values);
@@ -102,8 +103,10 @@ const Task = ({ styleCodeId, taskId }) => {
           ]}
         >
           <Radio.Group>
-            <Radio value="incomplete">Incomplete</Radio>
-            <Radio value="complete">Complete</Radio>
+            <Radio value="incomplete" onClick={() => setRemarkRequired(true)}>Incomplete</Radio>
+            <Radio value="complete" onClick={() => {
+              console.log("Clicked the complete")
+              setRemarkRequired(false)}}>Complete</Radio>
           </Radio.Group>
         </Form.Item>
         <Form.Item
@@ -112,7 +115,7 @@ const Task = ({ styleCodeId, taskId }) => {
           name="progressUpdate"
           rules={[
             {
-              required: true,
+              required: remarkRequired,
               message: "Please add the remarks",
             },
           ]}
