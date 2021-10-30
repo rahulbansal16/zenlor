@@ -7,8 +7,9 @@ import { useHistory } from "react-router";
 import { Input } from 'antd';
 import { AutoComplete } from 'antd';
 import moment from "moment";
+import { getTimeStampAhead } from "../util";
 
-const Tasks = ({status}) => {
+const Tasks = ({status, taskTillDate}) => {
     const [tasks, setTasks] = useState([])
     const [results, setResults] = useState([])
     const [showLoader, setShowLoader]  = useState(true)
@@ -22,7 +23,7 @@ const Tasks = ({status}) => {
         const fetchData = async () => {
             let tasks = []
             if (status==="incomplete")
-                tasks = await fetchTasks({companyId: CONSTANTS.companyId, dueDate: moment().subtract(0, "days").endOf("day").valueOf()})
+                tasks = await fetchTasks({companyId: CONSTANTS.companyId, dueDate: taskTillDate || getTimeStampAhead(0)})
             else
                 tasks = await completedTasks({companyId: CONSTANTS.companyId })
             console.log(tasks.data)

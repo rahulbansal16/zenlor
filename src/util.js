@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const getTimeStamp = () => {
     return new Date().getTime()
 }
@@ -53,3 +55,7 @@ export function between(min, max) {
       Math.random() * (max - min) + min
     )
   }
+
+export function getTimeStampAhead(day){
+    return moment().add(day, "days").endOf("day").valueOf()
+}
