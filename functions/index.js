@@ -156,6 +156,7 @@ exports.createTask = functions
         .doc(generateTaskId(name));
       batch.set(docRef, {
         styleCodeId,
+		id: generateTaskId(name),
         status: status || "incomplete",
         name,
         dueDate,
