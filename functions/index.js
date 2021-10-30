@@ -157,7 +157,7 @@ exports.completedTasks = functions
 exports.fetchTasks = functions
   .region("asia-northeast3")
   .https.onCall(async (data, context) => {
-    const { companyId, dueDate} = data;
+    const { companyId, dueDate, removeDependentTask} = data;
     let totalTask = [];
     const styleCodes = await getStyleCodes(companyId);
     for (let styleCodeSnapshot of styleCodes.docs) {
@@ -175,7 +175,8 @@ exports.fetchTasks = functions
           styleCode,
         };
       });
-      tasks = removeDependentTask(tasks);
+      if (removeDependentTask)
+        tasks = removeDependentTask(tasks);
       tasks = tasks.filter((task) => task.status === "incomplete");
       totalTask = totalTask.concat(tasks);
     }
