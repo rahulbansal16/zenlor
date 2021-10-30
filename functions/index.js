@@ -116,6 +116,26 @@ const generateTaskId = (taskName) => {
   return index.toString() + "-" + filtered.join("-");
 };
 
+// [{ name, dueDate, taskId }]
+exports.updateTaks = functions
+  .region("asia-northeast3")
+  .https.onRequest( async (req, res) => {
+    const companyId = "anusha_8923";
+    const { styleCodeId, tasks } = req.body;
+    console.log(styleCodeId, tasks)
+    var batch = await admin.firestore().batch();
+    for(let task of tasks){
+      const {taskId} = task
+      const docRef = admin.firestore().collection("company").doc(companyId).collection("style_codes").doc(styleCodeId).collection("tasks").doc(taskId)
+      batch.update(docRef, {
+        taskId,
+        ...task
+      }, {merge:true});
+    }
+    const result = await batch.commit();
+    res.send(result);
+  })
+
 exports.createTask = functions
   .region("asia-northeast3")
   .https.onRequest(async (req, res) => {
@@ -157,7 +177,7 @@ exports.completedTasks = functions
 exports.fetchTasks = functions
   .region("asia-northeast3")
   .https.onCall(async (data, context) => {
-    const { companyId, dueDate, removeDependentTask} = data;
+    const { companyId, dueDate, shouldRemoveDependentTask} = data;
     let totalTask = [];
     const styleCodes = await getStyleCodes(companyId);
     for (let styleCodeSnapshot of styleCodes.docs) {
@@ -175,7 +195,7 @@ exports.fetchTasks = functions
           styleCode,
         };
       });
-      if (removeDependentTask)
+      if (shouldRemoveDependentTask)
         tasks = removeDependentTask(tasks);
       tasks = tasks.filter((task) => task.status === "incomplete");
       totalTask = totalTask.concat(tasks);
