@@ -172,7 +172,9 @@ exports.completedTasks = functions
   .https.onCall(async (data, context) => {
     const { companyId } = data;
     const styleCodes = await getStyleCodes(companyId);
-    return await getTasks(styleCodes, "complete");
+    let tasks = await getTasks(styleCodes, "complete");
+    tasks = tasks.sort((a, b) => a.dueDate - b.dueDate);
+		return tasks.slice(5)
   });
 
 exports.fetchTasks = functions
