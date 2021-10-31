@@ -76,7 +76,10 @@ export const updateTaskStatus = (styleCodeId, taskId, value) => {
     .doc(styleCodeId)
     .collection("tasks")
     .doc(taskId)
-    .update(value, {
+    .update(
+      {...value,
+        modifiedAt: getTimeStamp()
+      }, {
       merge: true,
     });
 };
