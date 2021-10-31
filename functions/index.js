@@ -129,7 +129,8 @@ exports.updateTaks = functions
       const docRef = admin.firestore().collection("company").doc(companyId).collection("style_codes").doc(styleCodeId).collection("tasks").doc(id)
       batch.update(docRef, {
         id,
-        ...task
+        ...task,
+				dueDates: admin.firestore.FieldValue.arrayUnion(task['dueDate'])
       }, {merge:true});
     }
     const result = await batch.commit();
@@ -156,7 +157,8 @@ exports.createTask = functions
         .doc(generateTaskId(name));
       batch.set(docRef, {
         styleCodeId,
-		id: generateTaskId(name),
+				id: generateTaskId(name),
+				dueDates:[dueDate],
         status: status || "incomplete",
         name,
         dueDate,
