@@ -1,20 +1,26 @@
 import { useEffect, useState } from "react";
 import ZenlorCard from "./ZenlorCard";
 import Loader from "./Loader";
-import { useHistory } from "react-router";
+import { useHistory, useLocation} from "react-router";
 import { Input } from 'antd';
-import { AutoComplete } from 'antd';
 
 const Tasks = ({tasks}) => {
     const [results, setResults] = useState(tasks)
+    const {search} = useLocation()
     const [showLoader, setShowLoader]  = useState(tasks.length === 0)
     const history = useHistory()
-    const [options, setOptions] = useState([]);
 
      useEffect(() => {
         setResults(tasks)
         setShowLoader(tasks.length === 0)
     }, [tasks])
+
+    useEffect( () => {
+        const q=new URLSearchParams(search).get("q");
+        console.log("The value o f the q is", q)
+        if(q)
+            onSelect(q)
+    },[tasks])
 
     const onTaskClick = (styleCodeId, taskCodeId) => {
         if (!styleCodeId || !taskCodeId)
@@ -23,24 +29,10 @@ const Tasks = ({tasks}) => {
         history.push(`/task/${styleCodeId}/${taskCodeId}`)
     }
 
-    const OptionCard = ({styleCode, buyerName, name}) => {
-        return (
-            <div>
-            <div style = {{display:'flex', justifyContent:'space-between'}}>
-                <div>{styleCode}</div>
-                <div>{buyerName}</div>
-            </div>
-                <div>{name}</div>
-            </div>
-        )
-    }
-
     const filterTasks = (term) => {
         if (term.length === 0 || term === ""){
-            setResults(tasks)
-            return []
+            return tasks
         }
-
         term = term.trim()
         const keys = term.toUpperCase().split(' ')
         const scoredTasks =  tasks.map(task  => {
@@ -71,24 +63,20 @@ const Tasks = ({tasks}) => {
         return sortedTasks;
     }
 
-    const handleSearch = (value) => {
-        // const results = tasks.filter(  task => value.split().every() )
-        console.log('The search query is ', value)
-        console.log("The sortedTasks are", filterTasks(value))
-        const result = filterTasks(value)
-        setOptions( result.map( item => {
-            const {styleCode, buyerName, name} = item
-            return {
-                    value: styleCode + " " + buyerName + " " + name,
-                    label:(<OptionCard styleCode = {styleCode} buyerName={buyerName} name = {name}/>)
-                }
-        }) )
-    };
-
     const onSelect = (value) => {
         console.log('onSelect', value);
         setResults(filterTasks(value))
     };
+
+    const updateSearchQuery = (query) => {
+        const params = new URLSearchParams()
+        if (query) {
+          params.append("q", query)
+        } else {
+          params.delete("q")
+        }
+        history.push({search: params.toString()})
+     }
 
     return (
         <div style = {{
@@ -97,16 +85,12 @@ const Tasks = ({tasks}) => {
         }}>
         {showLoader && <Loader/>}
         <div>
-        <AutoComplete
-         style = {{
-             width:'100%'
-         }}
-            options={options}
-            onSelect={onSelect}
-            onSearch={handleSearch}
-        >
-           <Input.Search size="large" allowClear placeholder="Search Tasks" enterButton />
-        </AutoComplete>
+           <Input.Search size="large" allowClear value={new URLSearchParams(search).get("q")} placeholder="Search Tasks" enterButton onChange={(e)=>
+           {
+                console.log("Search",e.target.value)
+                updateSearchQuery(e.target.value)
+                onSelect(e.target.value)
+            }} />
         </div>
         {/* {tasks.length === 0 && !showLoader ? <Empty description="No Task For Today"/>: <Title style ={{width:'100%', textAlign:'center'}}align="middle" level={4}>Daily Tasks</Title>} */}
             {results.map((task) => <ZenlorCard key = {task.styleCode+task.id} description={task.name} onClick = { () => {
