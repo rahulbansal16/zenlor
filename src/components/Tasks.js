@@ -127,7 +127,7 @@ const Tasks = ({status, taskTillDate, shouldRemoveDependentTask}) => {
         </AutoComplete>
         </div>
         {/* {tasks.length === 0 && !showLoader ? <Empty description="No Task For Today"/>: <Title style ={{width:'100%', textAlign:'center'}}align="middle" level={4}>Daily Tasks</Title>} */}
-            {results.map((task) => <ZenlorCard key = {task.id} description={task.name} onClick = { () => {
+            {results.map((task) => <ZenlorCard key = {task.styleCode+task.id} description={task.name} onClick = { () => {
                 onTaskClick(task.styleCodeId, task.id)
             }} {...task}/> )}
         </div>
