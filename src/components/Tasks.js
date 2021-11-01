@@ -1,38 +1,20 @@
 import { useEffect, useState } from "react";
 import ZenlorCard from "./ZenlorCard";
-import { functions } from "../firebase";
-import CONSTANTS from "../CONSTANTS"
 import Loader from "./Loader";
 import { useHistory } from "react-router";
 import { Input } from 'antd';
 import { AutoComplete } from 'antd';
-import moment from "moment";
-import { getTimeStampAhead } from "../util";
 
-const Tasks = ({status, taskTillDate, shouldRemoveDependentTask}) => {
-    const [tasks, setTasks] = useState([])
-    const [results, setResults] = useState([])
-    const [showLoader, setShowLoader]  = useState(true)
+const Tasks = ({tasks}) => {
+    const [results, setResults] = useState(tasks)
+    const [showLoader, setShowLoader]  = useState(tasks.length === 0)
     const history = useHistory()
     const [options, setOptions] = useState([]);
 
-    useEffect(() => {
-        let fetchTasks = functions.httpsCallable('fetchTasks')
-        let completedTasks = functions.httpsCallable('completedTasks')
-
-        const fetchData = async () => {
-            let tasks = []
-            if (status==="incomplete")
-                tasks = await fetchTasks({companyId: CONSTANTS.companyId, shouldRemoveDependentTask: shouldRemoveDependentTask, dueDate: taskTillDate || getTimeStampAhead(0)})
-            else
-                tasks = await completedTasks({companyId: CONSTANTS.companyId })
-            console.log(tasks.data)
-            setTasks(tasks.data)
-            setResults(tasks.data)
-            setShowLoader(false)
-        }
-        fetchData()
-    }, [])
+     useEffect(() => {
+        setResults(tasks)
+        setShowLoader(tasks.length === 0)
+    }, [tasks])
 
     const onTaskClick = (styleCodeId, taskCodeId) => {
         if (!styleCodeId || !taskCodeId)
