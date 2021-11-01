@@ -120,7 +120,7 @@ const Task = ({ styleCodeId, taskId }) => {
             },
           ]}
         >
-          <Input autoComplete="off" autocomplete="off"/>
+          <Input autoComplete="off" autocomplete="off" placeHolder="Add Remarks Here"/>
         </Form.Item>
 
         <Form.Item {...tailFormItemLayout}>
