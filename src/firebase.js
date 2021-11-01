@@ -55,8 +55,9 @@ export const fetchStyleCode = async (companyId, populateStyleCodes) => {
 
 export const updateTaskStatus = (styleCodeId, taskId, value) => {
   const createdAt = getTimeStamp();
-  const remarksId = generateUId("re:" + createdAt, 10);
-  db.collection("company")
+  if (value['progressUpdate']){
+    const remarksId = generateUId("re:" + createdAt, 10);
+    db.collection("company")
     .doc(CONSTANTS.companyId)
     .collection("style_codes")
     .doc(styleCodeId)
@@ -69,6 +70,7 @@ export const updateTaskStatus = (styleCodeId, taskId, value) => {
       createdAt,
       ...value,
     });
+  }
   return db
     .collection("company")
     .doc(CONSTANTS.companyId)
