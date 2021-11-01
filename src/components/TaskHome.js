@@ -4,18 +4,17 @@ import Tasks from './Tasks';
 import { Tabs } from 'antd';
 const { TabPane } = Tabs;
 
-const TaskHome = () => {
-    const [selected, setSelected] = useState("incomplete")
+const TaskHome = ({inCompleteTasks, completeTasks}) => {
     const tabChangeHnadler = (key) => {
         console.log('The key is', key)
     }
     return (
         <Tabs defaultActiveKey = "incomplete" centered onChange={tabChangeHnadler}>
             <TabPane tab = "Incomplete Tasks" key="incomplete">
-                <Tasks status={"incomplete"} shouldRemoveDependentTask={true}/>
+                <Tasks tasks={inCompleteTasks}/>
             </TabPane>
             <TabPane tab = "Completed Tasks" key="complete">
-                <Tasks status={"complete"}/>
+                <Tasks tasks={completeTasks}/>
             </TabPane>
         </Tabs>
     )
