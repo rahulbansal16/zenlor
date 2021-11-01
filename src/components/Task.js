@@ -176,7 +176,7 @@ const RemarksTimeline = ({ companyId, styleCodeId, taskId }) => {
         Past Remarks
       </Title>
       <Timeline mode="center">
-        {pastRemarks.map((pastRemark) => (
+        {pastRemarks.map((pastRemark) => ( pastRemark.progressUpdate &&
           <Timeline.Item key={pastRemark.id}>
             { "On " + moment(pastRemark.createdAt).format("DD-MMM,hh:mm a") + " :- "+ pastRemark.progressUpdate}
           </Timeline.Item>
