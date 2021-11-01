@@ -11,6 +11,7 @@ const Tasks = ({tasks}) => {
     const history = useHistory()
 
      useEffect(() => {
+         console.log("In the useEffect")
         setResults(tasks)
         setShowLoader(tasks.length === 0)
     }, [tasks])
