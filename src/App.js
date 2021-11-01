@@ -39,7 +39,7 @@ function App() {
 
   const fetchIncompleteTasks = async () => {
     let fetchTasks = functions.httpsCallable('fetchTasks')
-    let tasks = await fetchTasks({companyId: CONSTANTS.companyId, shouldRemoveDependentTask: true, dueDate: getTimeStampAhead(0)})
+    let tasks = await fetchTasks({companyId: CONSTANTS.companyId, shouldRemoveDependentTask: true, dueDate: getTimeStampAhead(220)})
     setIncompleteTasks(tasks.data)
   }
 
