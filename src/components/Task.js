@@ -116,7 +116,7 @@ const Task = ({ styleCodeId, taskId }) => {
           rules={[
             {
               required: remarkRequired,
-              message: "Please add the remarks",
+              message: "Add Remarks Here",
             },
           ]}
         >
