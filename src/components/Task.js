@@ -10,9 +10,11 @@ import {
 } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import CONSTANTS from "../CONSTANTS";
 import { updateTaskStatus, fetchTask, fetchTaskRemarks } from "../firebase";
+import { updateTaskStatusAction } from "../redux/actions";
 const { Title } = Typography;
 
 const formItemLayout = {
@@ -55,11 +57,14 @@ const Task = ({ styleCodeId, taskId }) => {
   const history = useHistory();
   const [task, setTask] = useState({});
   const [remarkRequired, setRemarkRequired] = useState(true)
+  const dispatch = useDispatch()
 
   const onFinish = async (values) => {
     console.log(values);
     await updateTaskStatus(styleCodeId, taskId, values);
-    history.push("/");
+    history.goBack()
+    // history.push("/");
+    dispatch(updateTaskStatusAction(styleCodeId ,taskId, values))
   };
 
   useEffect(() => {

@@ -13,6 +13,8 @@ import Task from './components/Task';
 import TaskHome from './components/TaskHome';
 import { getTimeStampAhead } from './util';
 import CONSTANTS from './CONSTANTS';
+import { useDispatch } from 'react-redux';
+import { fetchIncompleteTasksActions } from './redux/actions';
 
 const renderPages = (inCompleteTasks, completeTasks) => {
   return (
@@ -32,6 +34,8 @@ function App() {
 
   const [completeTasks, setCompleteTasks] = useState([])
   const [incompleteTasks, setIncompleteTasks] = useState([])
+  const dispatch = useDispatch()
+
   useEffect( () => {
     fetchIncompleteTasks()
     fetchCompleteTasks()
@@ -40,7 +44,8 @@ function App() {
   const fetchIncompleteTasks = async () => {
     let fetchTasks = functions.httpsCallable('fetchTasks')
     let tasks = await fetchTasks({companyId: CONSTANTS.companyId, shouldRemoveDependentTask: true, dueDate: getTimeStampAhead(220)})
-    setIncompleteTasks(tasks.data)
+    // setIncompleteTasks(tasks.data)
+    dispatch(fetchIncompleteTasksActions(tasks.data))
   }
 
   const fetchCompleteTasks = async () => {

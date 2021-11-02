@@ -2,9 +2,11 @@ import { Menu } from 'antd';
 import { useState } from 'react';
 import Tasks from './Tasks';
 import { Tabs } from 'antd';
+import { useSelector } from 'react-redux';
 const { TabPane } = Tabs;
 
-const TaskHome = ({inCompleteTasks, completeTasks}) => {
+const TaskHome = ({completeTasks}) => {
+    const inCompleteTasks = useSelector(state => state.taskReducer.inCompleteTasks)
     const tabChangeHnadler = (key) => {
         console.log('The key is', key)
     }
