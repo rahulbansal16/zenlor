@@ -137,6 +137,47 @@ exports.updateTaks = functions
     res.send(result);
   })
 
+exports.updateTasks1 = functions
+  .region("asia-northeast3")
+  .https.onRequest( async (req, res) => {
+    const companyId = "anusha_8923";
+    const { styleCodeId, tasks } = req.body;
+    console.log(styleCodeId, tasks)
+    const doc = await admin.firestore().collection("company").doc(companyId).collection("style_codes").doc(styleCodeId).get()
+    const oldTasks = doc.data()["tasks"];
+    const result = await admin.firestore().collection("company").doc(companyId).collection("style_codes").doc(styleCodeId).update({
+      tasks: mergeOldAndNewTasks(oldTasks, tasks)
+    }, {
+      merge:true
+    })
+    res.send(result);
+  })
+
+const mergeOldAndNewTasks = (oldTasks, newTasks) => {
+
+  const hash = {}
+  for (let task of newTasks){
+    hash[task.id] = task
+  }
+
+  let result = []
+  for (let oldTask of oldTasks){
+    const {id} = oldTask
+    const task = hash[id]
+    if (task === undefined){
+      result.push(oldTask)
+      continue
+    }
+    if (task["dueDate"]){
+      oldTask["dueDates"] = [ ...oldTask["dueDates"] ,task["dueDate"] ]
+    }
+    oldTask = {...oldTask, ...task}
+    result.push(oldTask)
+  }
+  return result
+
+}
+
 exports.createTask = functions
   .region("asia-northeast3")
   .https.onRequest(async (req, res) => {
@@ -168,6 +209,35 @@ exports.createTask = functions
     const result = await batch.commit();
     res.send(result);
   });
+
+
+exports.createTask1 = functions
+.region("asia-northeast3")
+.https.onRequest(async (req, res) => {
+  const companyId = "anusha_8923";
+  console.log("The request is", req.body);
+  const { styleCodeId, tasks } = req.body;
+  const tasksEntry = []
+  for (let task of tasks) {
+    const createdAt = new Date().getTime();
+    const { name, dueDate, status } = task;
+    tasksEntry.push({
+      styleCodeId,
+      id: generateTaskId(name),
+      dueDates:[dueDate],
+      status: status || "incomplete",
+      name,
+      dueDate,
+      createdAt,
+    })
+  }
+  const result = await admin.firestore().collection("company").doc(companyId).collection("style_codes").doc(styleCodeId).update({
+    tasks: admin.firestore.FieldValue.arrayUnion(...tasksEntry)
+  }, {
+    merge:true
+  })
+  res.send(result);
+});
 
 exports.completedTasks = functions
   .region("asia-northeast3")
