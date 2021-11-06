@@ -137,6 +137,22 @@ exports.updateTaks = functions
     res.send(result);
   })
 
+exports.updateTasksOnCall = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  const companyId = "anusha_8923"
+  const {styleCodeId, tasks} = data
+  const doc = await admin.firestore().collection("company").doc(companyId).collection("style_codes").doc(styleCodeId).get()
+  const oldTasks = doc.data()["tasks"];
+  const result = await admin.firestore().collection("company").doc(companyId).collection("style_codes").doc(styleCodeId).update({
+    tasks: mergeOldAndNewTasks(oldTasks, tasks)
+  }, {
+    merge:true
+  })
+  return result
+})
+
 exports.updateTasks1 = functions
   .region("asia-northeast3")
   .https.onRequest( async (req, res) => {
