@@ -322,16 +322,14 @@ const getStyleCodes = (companyId) => {
 };
 
 const getTasks = async (styleCodes, status) => {
-  let tasks = [];
+  // console.log("The value of the getTasks are", status, styleCodes)
+  let totalTasks = [];
   for (let styleCodeSnapshot of styleCodes.docs) {
-    const { buyerName, fabricUrl, styleCode } = styleCodeSnapshot.data();
-    const tasksSnapshots = await styleCodeSnapshot.ref
-      .collection("tasks")
-      .where("status", `==`, status || "incomplete")
-      .get();
-    let styleCodeTask = tasksSnapshots.docs.map((doc) => {
+    const { buyerName, fabricUrl, styleCode, tasks } = styleCodeSnapshot.data();
+    const styleCodeTasks = tasks.filter( task => task.status === (status || "incomplete"))
+    let styleCodeTask = styleCodeTasks.map((doc) => {
       return {
-        ...doc.data(),
+        ...doc,
         id: doc.id,
         styleCodeId: styleCodeSnapshot.id,
         buyerName,
@@ -339,9 +337,9 @@ const getTasks = async (styleCodes, status) => {
         styleCode,
       };
     });
-    tasks = tasks.concat(styleCodeTask);
+    totalTasks = totalTasks.concat(styleCodeTask);
   }
-  return tasks;
+  return totalTasks;
 };
 
 const removeDependentTask = (tasks) => {
