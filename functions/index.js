@@ -249,6 +249,37 @@ exports.completedTasks = functions
 		return tasks.slice(5)
   });
 
+
+exports.migrateTaskDocToArray = functions.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  // sc:1635756759467sFYW5JoBW5Z4gQt
+  const styleCodes = await getStyleCodes("anusha_8923");
+  for (let styleCodeSnapshot of styleCodes.docs) {
+    const { buyerName, fabricUrl, styleCode } = styleCodeSnapshot.data();
+    const tasksSnapshots = await styleCodeSnapshot.ref
+      .collection("tasks")
+      .get();
+      let tasks = tasksSnapshots.docs.map((doc) => {
+        return {
+          ...doc.data(),
+          id: doc.id,
+          styleCodeId: styleCodeSnapshot.id,
+          buyerName,
+          fabricUrl,
+          styleCode,
+        };
+    });
+    console.log("The tasks are", tasks)
+    const result = await admin.firestore().collection("company").doc("anusha_8923").collection("style_codes").doc(styleCodeSnapshot.id).update({
+        tasks
+    }, {
+      merge:true
+    })
+    console.log("The result is", result)
+  }
+})
+
 exports.fetchTasks = functions
   .region("asia-northeast3")
   .https.onCall(async (data, context) => {
