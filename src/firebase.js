@@ -54,36 +54,54 @@ export const fetchStyleCode = async (companyId, populateStyleCodes) => {
 };
 
 export const updateTaskStatus = (styleCodeId, taskId, value) => {
+  // updateTasks1
   const createdAt = getTimeStamp();
-  if (value['progressUpdate']){
-    const remarksId = generateUId("re:" + createdAt, 10);
-    db.collection("company")
-    .doc(CONSTANTS.companyId)
-    .collection("style_codes")
-    .doc(styleCodeId)
-    .collection("tasks")
-    .doc(taskId)
-    .collection("remarks")
-    .doc(remarksId)
-    .set({
-      id: remarksId,
-      createdAt,
-      ...value,
-    });
-  }
-  return db
-    .collection("company")
-    .doc(CONSTANTS.companyId)
-    .collection("style_codes")
-    .doc(styleCodeId)
-    .collection("tasks")
-    .doc(taskId)
-    .update(
-      {...value,
-        modifiedAt: getTimeStamp()
-      }, {
-      merge: true,
-    });
+  let updateTasksOnCall = functions.httpsCallable('updateTasksOnCall')
+  const remarksId = generateUId("re:" + createdAt, 10);
+  return updateTasksOnCall({
+    styleCodeId,
+    tasks:[
+      {
+        id: taskId,
+        status: value["status"],
+        remark: {
+            id: remarksId,
+            createdAt,
+            progressUpdate:value["progressUpdate"]
+          }
+      }
+    ]
+  })
+  // const createdAt = getTimeStamp();
+  // if (value['progressUpdate']){
+  //   const remarksId = generateUId("re:" + createdAt, 10);
+  //   db.collection("company")
+  //   .doc(CONSTANTS.companyId)
+  //   .collection("style_codes")
+  //   .doc(styleCodeId)
+  //   .collection("tasks")
+  //   .doc(taskId)
+  //   .collection("remarks")
+  //   .doc(remarksId)
+  //   .set({
+  //     id: remarksId,
+  //     createdAt,
+  //     ...value,
+  //   });
+  // }
+  // return db
+  //   .collection("company")
+  //   .doc(CONSTANTS.companyId)
+  //   .collection("style_codes")
+  //   .doc(styleCodeId)
+  //   .collection("tasks")
+  //   .doc(taskId)
+  //   .update(
+  //     {...value,
+  //       modifiedAt: getTimeStamp()
+  //     }, {
+  //     merge: true,
+  //   });
 };
 
 export const fetchTask = (styleCodeId, taskId) => {
