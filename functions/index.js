@@ -287,13 +287,11 @@ exports.fetchTasks = functions
     let totalTask = [];
     const styleCodes = await getStyleCodes(companyId);
     for (let styleCodeSnapshot of styleCodes.docs) {
-      const { buyerName, fabricUrl, styleCode } = styleCodeSnapshot.data();
-      const tasksSnapshots = await styleCodeSnapshot.ref
-        .collection("tasks")
-        .get();
-      let tasks = tasksSnapshots.docs.map((doc) => {
+      const { buyerName, fabricUrl, styleCode, tasks } = styleCodeSnapshot.data();
+      let styleCodeTasks = tasks.filter( task => task.status === "incomplete")
+      styleCodeTasks = styleCodeTasks.map((doc) => {
         return {
-          ...doc.data(),
+          ...doc,
           id: doc.id,
           styleCodeId: styleCodeSnapshot.id,
           buyerName,
@@ -302,9 +300,9 @@ exports.fetchTasks = functions
         };
       });
       if (shouldRemoveDependentTask)
-        tasks = removeDependentTask(tasks);
-      tasks = tasks.filter((task) => task.status === "incomplete");
-      totalTask = totalTask.concat(tasks);
+      styleCodeTasks = removeDependentTask(styleCodeTasks);
+      styleCodeTasks = styleCodeTasks.filter((task) => task.status === "incomplete");
+      totalTask = totalTask.concat(styleCodeTasks);
     }
     totalTask = totalTask.filter((task) => task.dueDate <= dueDate);
     totalTask = totalTask.sort((a, b) => a.dueDate - b.dueDate);
