@@ -187,7 +187,7 @@ const mergeOldAndNewTasks = (oldTasks, newTasks) => {
     if (task["dueDate"]){
       oldTask["dueDates"] = [ ...(oldTask["dueDates"] || []) ,task["dueDate"] ]
     }
-    if(task["remarks"]){
+    if(task["remark"]){
       oldTask["remarks"] = [ ...(oldTask["remarks"] || []) , task["remark"] ]
     }
     oldTask = {...oldTask, ...task}
