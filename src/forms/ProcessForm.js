@@ -1,4 +1,5 @@
 import {Form, Input, InputNumber, Button, Space, Select} from "antd"
+import { formItemLayout, tailFormItemLayout} from "./dataEntry/FormLayout";
 import { useState } from "react";
 import { useHistory } from "react-router";
 import StyleCodeInput from "./StyleCodeInput";
@@ -12,42 +13,6 @@ const process = {
     washing: [{name: "Sending", value:"sending"}, {name: "Receiving", value: "receiving"}],
     packing: [{name: "Received From Washing", value: "received_from_washing"}, {name: "Pre Inspection", value: "pre_inspection"}]
 }
-
-const formItemLayout = {
-    labelCol: {
-      xs: {
-        span: 20,
-        // offset:2
-      },
-      sm: {
-        span: 20,
-      },
-    },
-    wrapperCol: {
-      xs: {
-        span: 20,
-        // offset:2
-      },
-      sm: {
-        span: 20,
-        // offset:2
-      },
-    },
-  };
-
-  const tailFormItemLayout = {
-    wrapperCol: {
-      xs: {
-        span: 24,
-        // offset: 2,
-      },
-      sm: {
-        span: 24,
-        // offset: 2,
-      },
-    },
-  };
-
 
 const ProcessForm = ({department}) => {
     const [form] = Form.useForm();
