@@ -1,7 +1,4 @@
-import { useState } from "react"
-import {Form, Input, InputNumber, Button, Space} from "antd"
-import StyleCodeInput from "./StyleCodeInput"
-import { useHistory, useLocation  } from "react-router";
+import { useLocation  } from "react-router";
 import { functions } from "../firebase";
 import CuttingForm from "./dataEntry/CuttingForm";
 import SewingForm from "./dataEntry/SewingForm";

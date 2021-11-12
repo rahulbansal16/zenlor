@@ -1,4 +1,4 @@
-import {Form, Input, InputNumber, Button, Space, Select} from "antd"
+import {Form, Button, Space, Select} from "antd"
 import { formItemLayout, tailFormItemLayout} from "./dataEntry/FormLayout";
 import { useState } from "react";
 import { useHistory } from "react-router";
