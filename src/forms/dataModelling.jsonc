@@ -1,0 +1,33 @@
+{
+    "cutting":[
+        {
+            "id":23423423,
+            "styleCodeId":"WNSH123",
+            "fabricIssued":12,
+            "garmentCut":23,
+            "createdOn": "DEC-12-2021"
+        },
+        {
+
+        }
+    ],
+    "sewing": [
+        {
+            "id":1232,
+            "styleCodeId":"WNSH123",
+            "line":1,
+            "type":"loading",
+            "qtyReceivedFromSewing":232,
+            "createdOn": "DEC-12-2021"
+        },
+        {
+            "id":23423423,
+            "styleCodeId":"WNSH123",
+            "line":1,
+            "type":"output",
+            "doneQty":232,
+            "createdOn": "DEC-12-2021",
+            "modifiedOn":"DEC-12-2021"
+        }
+    ]
+}
