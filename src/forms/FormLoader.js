@@ -39,6 +39,7 @@ const FormLoader = ({department}) => {
         console.log("The body is", body)
         await createData(body)
         history.push(`/${department}`)
+        window.location.reload();
     }
     return (
         <div>
