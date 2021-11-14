@@ -3,10 +3,18 @@ import { useSelector } from "react-redux"
 import PlusButton from "../components/PlusButton"
 import UpdateCard from "./UpdateCard"
 
-const Home = ({department}) => {
+const filterData = (state, department, lineNumber)  => {
+    const departmentData = state.taskReducer[department] || []
+    if (lineNumber){
+        return departmentData.filter( data => data.lineNumber === lineNumber)
+    }
+    return departmentData
+}
+
+const Home = ({department, lineNumber}) => {
 
     console.log("The department is", department)
-    const updates = useSelector( state => state.taskReducer[department] || [])
+    const updates = useSelector( state => filterData(state, department, lineNumber))
     console.log("The updates are", updates)
 
     return (
