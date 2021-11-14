@@ -14,10 +14,11 @@ const initialState = {
 const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
-            const {cutting} = action.payload
+            const {cutting, styleCodes} = action.payload
             return {
                 ...state,
-                cutting: [...cutting]
+                cutting: [...cutting],
+                styleCodes: [...styleCodes]
             }
         }
         // case UPDATE_TASK_STATUS:{
