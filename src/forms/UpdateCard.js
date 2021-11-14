@@ -1,7 +1,8 @@
 import { Card } from "antd"
 
-const UpdateCard = ({styleCodeName, updatedAt}) => {
+const UpdateCard = ({styleCodeId, styleCode, updatedAt}) => {
     return <Card
+        key = {styleCodeId}
         bordered={true}
         hoverable
         style={{
@@ -9,7 +10,7 @@ const UpdateCard = ({styleCodeName, updatedAt}) => {
             marginBottom:'10px'
           }}
     >
-        {styleCodeName}
+        {styleCode}
 
     </Card>
 }

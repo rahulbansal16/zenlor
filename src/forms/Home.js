@@ -1,22 +1,17 @@
-import { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 import PlusButton from "../components/PlusButton"
 import UpdateCard from "./UpdateCard"
 
-const Home = ({department = "cutting"}) => {
+const Home = ({department}) => {
 
-    const [updates, setUpdates] = useState([1,2])
-
-    useEffect( () => {
-    }, [department])
-
-    const fetchUpdates = (department) => {
-        return
-    }
+    console.log("The department is", department)
+    const updates = useSelector( state => state.taskReducer[department] || [])
+    console.log("The updates are", updates)
 
     return (
         <div>
             {department.toUpperCase()}
-            {updates.map( update  => <UpdateCard styleCodeName={"WNGN12"}/>)}
+            {updates.map( ({styleCode, styleCodeId})  => <UpdateCard styleCode={styleCode} styleCodeId = {styleCodeId}/>)}
             <PlusButton url = {`/${department}/process/form`}/>
         </div>
     )

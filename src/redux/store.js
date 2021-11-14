@@ -3,8 +3,12 @@ import rootReducer from "./reducers";
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 const initialState = {
-    inCompleteTasks:[],
-    completeTasks:[]
+    cutting:[],
+    sewing: [],
+    packing: [],
+    kajjaandbuttoning: [],
+    washing: [],
+    styleCodes: []
 }
 
 export default createStore(rootReducer, initialState
