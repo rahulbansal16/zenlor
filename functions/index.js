@@ -31,9 +31,9 @@ exports.addData = functions
     const doc = await admin.firestore().collection("data").doc("anusha_8923").get()
     console.log("The doc is", doc.data())
     const departmentData = [entry, ...(doc.data()[department])]
-    await admin.firestore().collection("data").doc("anusha_8923").set({
-      department: departmentData
-    } ,{merge: true})
+    let obj = {}
+    obj[department] = departmentData
+    await admin.firestore().collection("data").doc("anusha_8923").set(obj ,{merge: true})
     return departmentData
 })
 
