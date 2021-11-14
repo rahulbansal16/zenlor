@@ -1,3 +1,4 @@
+import { Empty } from "antd"
 import { useSelector } from "react-redux"
 import PlusButton from "../components/PlusButton"
 import UpdateCard from "./UpdateCard"
@@ -12,6 +13,7 @@ const Home = ({department}) => {
         <div>
             {department.toUpperCase()}
             {updates.map( ({styleCode, styleCodeId})  => <UpdateCard styleCode={styleCode} styleCodeId = {styleCodeId}/>)}
+            {updates.length === 0 && <Empty/>}
             <PlusButton url = {`/${department}/process/form`}/>
         </div>
     )
