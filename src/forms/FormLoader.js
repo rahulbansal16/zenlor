@@ -35,7 +35,8 @@ const FormLoader = ({department}) => {
         console.log("Calling onFinish", value)
         console.log("Will submit the values now")
         let createData = functions.httpsCallable('addData')
-        const body = { styleCode, process, department, ...value}
+        const body = { department, json: {...value, styleCode, process}}
+        console.log("The body is", body)
         await createData(body)
         history.push(`/${department}`)
     }
