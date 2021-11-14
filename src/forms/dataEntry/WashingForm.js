@@ -1,5 +1,7 @@
 import {Form, InputNumber, Button, Space} from "antd"
 import { useHistory  } from "react-router";
+import { useState } from "react";
+
 import { formItemLayout, tailFormItemLayout } from "./FormLayout";
 
 // StyleCode Name on the Top
@@ -15,6 +17,9 @@ const dataInput = {
 }
 const WashingForm = ({initialValues, process, onFinish}) => {
     const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false)
+
+
     const history = useHistory()
     return (
         <div>
@@ -30,6 +35,7 @@ const WashingForm = ({initialValues, process, onFinish}) => {
                 labelAlign="left"
                 onFinish={(data) => {
                     console.log(data);
+                    setLoading(true)
                     onFinish(data)
                 }}
             >
@@ -40,7 +46,7 @@ const WashingForm = ({initialValues, process, onFinish}) => {
                     }]}><InputNumber inputMode="numeric"/></Form.Item>)}                <Form.Item {...tailFormItemLayout}>
                     <Space>
                         <Button onClick = {() => history.goBack()}>Back</Button>
-                        <Button type="primary" htmlType="submit">Register</Button>
+                        <Button type="primary" htmlType="submit" loading={loading}>Register</Button>
                     </Space>
                 </Form.Item>
             </Form>

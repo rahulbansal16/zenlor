@@ -1,4 +1,6 @@
 import {Form, InputNumber, Button, Space} from "antd"
+import { useState } from "react";
+
 import { useHistory  } from "react-router";
 import { formItemLayout, tailFormItemLayout } from "./FormLayout";
 
@@ -14,6 +16,7 @@ const dataInput = {
 }
 const SewingForm = ({initialValues, process, onFinish}) => {
     const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false)
     const history = useHistory()
 
     return (
@@ -29,6 +32,7 @@ const SewingForm = ({initialValues, process, onFinish}) => {
                 labelAlign="left"
                 onFinish={(data) => {
                     console.log(data);
+                    setLoading(true)
                     onFinish(data)
                 }}
             >
@@ -39,7 +43,7 @@ const SewingForm = ({initialValues, process, onFinish}) => {
                     }]}><InputNumber inputMode="numeric"/></Form.Item>)}                <Form.Item {...tailFormItemLayout}>
                     <Space>
                         <Button onClick = {() => history.goBack()}>Back</Button>
-                        <Button type="primary" htmlType="submit">Register</Button>
+                        <Button type="primary" htmlType="submit" loading={loading}>Register</Button>
                     </Space>
                 </Form.Item>
             </Form>
