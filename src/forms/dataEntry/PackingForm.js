@@ -5,7 +5,7 @@ import { formItemLayout, tailFormItemLayout } from "./FormLayout";
 
 // StyleCode Name on the Top
 const dataInput = {
-    received_from_sewing: [{
+    received_from_washing: [{
         label: "Enter Washing Received Quantity",
         name: "washingReceivedQuantity"
     }],
