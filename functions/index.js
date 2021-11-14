@@ -32,7 +32,7 @@ exports.addData = functions
     console.log("The doc is", doc.data())
     const departmentData = [entry, ...(doc.data()[department])]
     await admin.firestore().collection("data").doc("anusha_8923").set({
-      cutting: departmentData
+      department: departmentData
     } ,{merge: true})
     return departmentData
 })
