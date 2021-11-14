@@ -37,8 +37,10 @@ const PackingForm = ({initialValues, process, onFinish}) => {
                 }}
             >
                 {dataInput[process].map (
-                    ({label, name}) => <Form.Item label={label} name = {name}><InputNumber inputMode="numeric"/></Form.Item>)}
-                <Form.Item {...tailFormItemLayout}>
+                    ({label, name}) => <Form.Item label={label} name = {name} key={name} rules={[{
+                        required: true,
+                        message: "Please Enter a value"
+                    }]}><InputNumber inputMode="numeric"/></Form.Item>)}                <Form.Item {...tailFormItemLayout}>
                     <Space>
                         <Button onClick = {() => history.goBack()}>Back</Button>
                         <Button type="primary" htmlType="submit">Register</Button>
