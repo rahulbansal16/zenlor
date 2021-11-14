@@ -1,4 +1,4 @@
-import { useLocation  } from "react-router";
+import { useHistory, useLocation  } from "react-router";
 import { functions } from "../firebase";
 import CuttingForm from "./dataEntry/CuttingForm";
 import SewingForm from "./dataEntry/SewingForm";
@@ -27,14 +27,17 @@ const FormLoader = ({department}) => {
     const search = useLocation().search
     const styleCode = new URLSearchParams(search).get("styleCode");
     const process = new URLSearchParams(search).get("process")
+    const history = useHistory()
 
     console.log("The styleCode is", styleCode, process)
 
     const onFinish = async (value) => {
         console.log("Calling onFinish", value)
         console.log("Will submit the values now")
-        let createData = functions.httpsCallable('createData')
-        await createData(value)
+        let createData = functions.httpsCallable('addData')
+        const body = { styleCode, process, department, ...value}
+        await createData(body)
+        history.push(`/${department}`)
     }
     return (
         <div>
