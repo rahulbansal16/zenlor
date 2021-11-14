@@ -45,10 +45,15 @@ const ProcessForm = ({department}) => {
                     onFinish(data)
                 }}
                 >
-                    <Form.Item label="1. Enter the StyleCode">
-                        <StyleCodeInput onSelectCb={setStyleCode} styleCodes={[]}/>
+                    <Form.Item label="1. Enter the StyleCode" required>
+                        <StyleCodeInput onSelectCb={setStyleCode}/>
                     </Form.Item>
-                    <Form.Item label="2. Choose Process" name="process">
+                    <Form.Item label="2. Choose Process" name="process" rules={[
+                        {
+                            required: true,
+                            message: 'Please Choose the Process.'
+                        }
+                    ]}>
                         <Select
                             placeholder="Select Process"
                             onChange={()=>{}}
