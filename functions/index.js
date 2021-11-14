@@ -23,12 +23,14 @@ exports.addData = functions
   .region("asia-northeast3")
   .https.onCall( async (body, context) => {
     const { department, json} = body
+    console.log("The body is", body)
     const id = generateUId("", 15)
     const createdAt = getCurrentTime()
     const modifiedAt = getCurrentTime()
     const entry  = {...json, createdAt, modifiedAt, id}
     const doc = await admin.firestore().collection("data").doc("anusha_8923").get()
-    const departmentData = [entry, ...doc.data()[department]]
+    console.log("The doc is", doc.data())
+    const departmentData = [entry, ...(doc.data()[department])]
     await admin.firestore().collection("data").doc("anusha_8923").set({
       cutting: departmentData
     } ,{merge: true})
