@@ -1,26 +1,42 @@
-import {AutoComplete} from "antd"
+import {AutoComplete, Select} from "antd"
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 // StyleCode Name on the Top
 
-const StyleCodeInput = ({styleCodes, onSelectCb}) => {
+const StyleCodeInput = ({onSelectCb}) => {
+
+    const styleCodes = useSelector( state => state.taskReducer.styleCodes)
 
     const [options, setOptions] = useState([]);
-    const [results, setResults] = useState([])
 
     useEffect( () => {
-        let p = [{name:"wksh", id:121}, {name:"xzy", id:345}]
-        setResults(p)
+        // console.log("The result is")
+        setOptions(styleCodes.map( item => {
+            const {id, name} = item
+            return {
+                    value: name,
+                    label:name,
+                    text:name
+                }
+        } ))
     }, [styleCodes])
+    // const [results, setResults] = useState([])
+
+    // useEffect( () => {
+    //     let p = [{name:"wksh", id:121}, {name:"xzy", id:345}]
+    //     setResults(p)
+    //     handleSearch(" ")
+    // }, [styleCodes])
 
     const filterOptions = (term) => {
 
-        if (term.length === 0 || term === ""){
-            return []
-        }
+        // if (term.length === 0 || term === ""){
+        //     return []
+        // }
         term = term.trim()
         term = term.toUpperCase()
-        const scoredTasks =  results.map(styleCode  => {
+        const scoredTasks =  styleCodes.map(styleCode  => {
             const {id, name} = styleCode
             let score = 0
             if (name.includes(term) || name.includes(term.toLowerCase())){
@@ -56,7 +72,8 @@ const StyleCodeInput = ({styleCodes, onSelectCb}) => {
         onSelectCb(value)
     };
     return <div>
-            <AutoComplete
+            <Select
+                showSearch
                 label="Enter code"
                 dropdownMatchSelectWidth={252}
                 style={{ width: 300 }}
@@ -64,7 +81,7 @@ const StyleCodeInput = ({styleCodes, onSelectCb}) => {
                 placeholder="Enter StyleCode"
                 onSelect={onSelect}
                 onSearch={handleSearch}
-            ></AutoComplete>
+            ></Select>
     </div>
 }
 export default StyleCodeInput
