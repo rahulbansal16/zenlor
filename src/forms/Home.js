@@ -26,7 +26,7 @@ const Home = ({department}) => {
             {department.toUpperCase()}
             {updates.map( ({styleCode, styleCodeId})  => <UpdateCard styleCode={styleCode} styleCodeId = {styleCodeId}/>)}
             {updates.length === 0 && <Empty/>}
-            <PlusButton url = {`/${department}/process/form`}/>
+            <PlusButton url = {`/${department}/process/form&lineNumber=${lineNumber}`}/>
         </div>
     )
 }

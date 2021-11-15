@@ -42,7 +42,7 @@ const FormLoader = ({department}) => {
         const body = { department, json: {...value, styleCode, process, lineNumber}}
         console.log("The body is", body)
         await createData(body)
-        history.push(`/${department}`)
+        history.push(`/${department}?lineNumber=${lineNumber}`)
         window.location.reload();
     }
     return (
