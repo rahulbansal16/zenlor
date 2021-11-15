@@ -1,7 +1,7 @@
 import {Form, Button, Space, Select} from "antd"
 import { formItemLayout, tailFormItemLayout} from "./dataEntry/FormLayout";
 import { useState } from "react";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import StyleCodeInput from "./StyleCodeInput";
 const { Option } = Select;
 
@@ -16,6 +16,9 @@ const process = {
 
 const ProcessForm = ({department}) => {
     const [form] = Form.useForm();
+    const search = useLocation().search
+    const lineNumber = new URLSearchParams(search).get("lineNumber");
+
     const [styleCode, setStyleCode] = useState()
     const history = useHistory()
 
@@ -24,7 +27,7 @@ const ProcessForm = ({department}) => {
         const {styleCode, process} = value
         history.push({
             pathname:`/${department}/form`,
-            search:`styleCode=${styleCode||123}&process=${process}`
+            search:`styleCode=${styleCode||123}&process=${process}&lineNumber=${lineNumber||1}`
         })
     }
 

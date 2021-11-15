@@ -1,5 +1,6 @@
 import { Empty } from "antd"
 import { useSelector } from "react-redux"
+import { useLocation } from "react-router"
 import PlusButton from "../components/PlusButton"
 import UpdateCard from "./UpdateCard"
 
@@ -11,7 +12,10 @@ const filterData = (state, department, lineNumber)  => {
     return departmentData
 }
 
-const Home = ({department, lineNumber}) => {
+const Home = ({department}) => {
+
+    const search = useLocation().search
+    const lineNumber = new URLSearchParams(search).get("lineNumber");
 
     console.log("The department is", department)
     const updates = useSelector( state => filterData(state, department, lineNumber))

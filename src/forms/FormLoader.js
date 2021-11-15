@@ -27,6 +27,7 @@ const FormLoader = ({department}) => {
     const search = useLocation().search
     const styleCode = new URLSearchParams(search).get("styleCode");
     const process = new URLSearchParams(search).get("process")
+    let lineNumber = new URLSearchParams(search).get("lineNumber")
     const history = useHistory()
 
     console.log("The styleCode is", styleCode, process)
@@ -35,7 +36,10 @@ const FormLoader = ({department}) => {
         console.log("Calling onFinish", value)
         console.log("Will submit the values now")
         let createData = functions.httpsCallable('addData')
-        const body = { department, json: {...value, styleCode, process}}
+        if (lineNumber === "null" || !lineNumber || lineNumber === null){
+            lineNumber = undefined
+        }
+        const body = { department, json: {...value, styleCode, process, lineNumber}}
         console.log("The body is", body)
         await createData(body)
         history.push(`/${department}`)
@@ -43,7 +47,7 @@ const FormLoader = ({department}) => {
     }
     return (
         <div>
-            {department + " FormLoader"}
+            {department.toUpperCase() + " " + process.toUpperCase()}
             {loadForm(department, process, onFinish)}
         </div>
     )
