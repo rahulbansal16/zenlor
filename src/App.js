@@ -29,7 +29,7 @@ function App() {
   const fetchData = async () => {
     const result = await getData();
     console.log("The result is ", result.data());
-    dispatch(fetchDataAction(result.data()))
+    dispatch(fetchDataAction({...result.data(), isFetching:false}))
   }
 
   return (
