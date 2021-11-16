@@ -8,13 +8,14 @@ const initialState = {
     packing: [],
     kajjaandbuttoning: [],
     washing: [],
-    styleCodes: []
+    styleCodes: [],
+    isFetching: true
 }
 
 const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
-            const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing} = action.payload
+            const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching} = action.payload
             return {
                 ...state,
                 cutting: [...cutting],
@@ -22,7 +23,8 @@ const taskReducer = (state = initialState, action) => {
                 styleCodes: [...styleCodes],
                 sewing: [...sewing],
                 kajjaandbuttoning: [...kajjaandbuttoning],
-                packing: [...packing]
+                packing: [...packing],
+                isFetching
             }
         }
         // case UPDATE_TASK_STATUS:{

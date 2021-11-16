@@ -3,6 +3,7 @@ import { formItemLayout, tailFormItemLayout} from "./dataEntry/FormLayout";
 import { useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import StyleCodeInput from "./StyleCodeInput";
+import DepartmentHeader from "./DepartmentHeader";
 const { Option } = Select;
 
 
@@ -31,7 +32,8 @@ const ProcessForm = ({department}) => {
         })
     }
 
-    return (
+    return (<div>
+                <DepartmentHeader department={department} lineNumber={lineNumber}/>
                 <Form
                 {...formItemLayout}
                 style = {{
@@ -70,6 +72,7 @@ const ProcessForm = ({department}) => {
                         <Button type="primary" htmlType="submit" className = "wd-45">Next</Button>
                     </div>
             </Form>
+            </div>
     )
 }
 export default ProcessForm
