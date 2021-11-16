@@ -1,7 +1,9 @@
 import { Empty } from "antd"
+import { useState } from "react"
 import { useSelector } from "react-redux"
 import { useLocation } from "react-router"
 import PlusButton from "../components/PlusButton"
+import DepartmentHeader from "./DepartmentHeader"
 import UpdateCard from "./UpdateCard"
 
 const filterData = (state, department, lineNumber)  => {
@@ -23,10 +25,10 @@ const Home = ({department}) => {
 
     return (
         <div>
-            {department.toUpperCase()}
+            <DepartmentHeader department={department} lineNumber={lineNumber}/>
             {updates.map( ({styleCode, styleCodeId})  => <UpdateCard styleCode={styleCode} styleCodeId = {styleCodeId}/>)}
             {updates.length === 0 && <Empty/>}
-            <PlusButton url = {`/${department}/process/form&lineNumber=${lineNumber}`}/>
+            <PlusButton url = {`/${department}/process/form?lineNumber=${lineNumber||1}`}/>
         </div>
     )
 }

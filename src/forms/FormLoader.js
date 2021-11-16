@@ -5,6 +5,8 @@ import SewingForm from "./dataEntry/SewingForm";
 import KBForm from "./dataEntry/KBForm";
 import WashingForm from "./dataEntry/WashingForm";
 import PackingForm from "./dataEntry/PackingForm";
+import DepartmentHeader from "./DepartmentHeader";
+import ProcessHeader from "./ProcessHeader";
 
 const loadForm = (department, process, onFinish) => {
     switch(department){
@@ -47,7 +49,9 @@ const FormLoader = ({department}) => {
     }
     return (
         <div>
-            {department.toUpperCase() + " " + process.toUpperCase()}
+            <DepartmentHeader department={department} lineNumber={lineNumber}/>
+            <ProcessHeader process={process}/>
+            {/* {department.toUpperCase() + " " + process.toUpperCase()} */}
             {loadForm(department, process, onFinish)}
         </div>
     )

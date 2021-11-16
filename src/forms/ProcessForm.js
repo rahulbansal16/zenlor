@@ -67,7 +67,7 @@ const ProcessForm = ({department}) => {
                     </Form.Item>
                     <Form.Item {...tailFormItemLayout}>
                     <Space>
-                        <Button onClick = {() => history.goBack()}>Back</Button>
+                        <Button danger onClick = {() => history.goBack()}>Back</Button>
                         <Button type="primary" htmlType="submit">Next</Button>
                     </Space>
                 </Form.Item>

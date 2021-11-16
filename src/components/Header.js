@@ -1,5 +1,5 @@
 const Header = () => {
-    return (<h1 style={{marginBottom:'0px'}}>
+    return (<h1 style={{marginBottom:'5px'}}>
         Anusha Textiles
     </h1>)
 }
