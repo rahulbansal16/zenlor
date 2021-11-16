@@ -73,6 +73,7 @@ const StyleCodeInput = ({onSelectCb}) => {
     };
     return <div>
             <Select
+                autoFocus
                 showSearch
                 label="Enter code"
                 dropdownMatchSelectWidth={252}
