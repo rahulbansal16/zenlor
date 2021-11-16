@@ -11,8 +11,8 @@ const PlusButton = ({url}) => {
         style={{ backgroundColor: "green",
         position:'fixed',
         borderRadius:'24px',
-        bottom: '40px',
-        right:'20px'
+        bottom: '110px',
+        right:'40px'
 
         }}
        onClick={
