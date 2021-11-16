@@ -40,6 +40,7 @@ const ProcessForm = ({department}) => {
                     marginLeft:'8px',
                     marginRight:'8px'
                 }}
+                className="mg-y"
                 size="large"
                 name="styleCodeEditor"
                 align="left"
@@ -64,7 +65,7 @@ const ProcessForm = ({department}) => {
                             onChange={()=>{}}
                             allowClear
                           >
-                              {process[department].map( (item,idx) => <Option value = {item.value}>{item.name}</Option>)}
+                              {process[department].map( (item,idx) => <Option size="large" value = {item.value}>{item.name}</Option>)}
                         </Select>
                     </Form.Item>
                     <div  className = "fx-sp-bt wd-100">

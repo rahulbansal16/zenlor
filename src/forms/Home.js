@@ -29,7 +29,9 @@ const Home = ({department}) => {
         <div>
             <DepartmentHeader department={department} lineNumber={lineNumber}/>
             {isFetching && <Loader/>}
-            {!isFetching && updates.map( ({styleCode, styleCodeId})  => <UpdateCard styleCode={styleCode} styleCodeId = {styleCodeId}/>)}
+            <div className="mg-y">
+                {!isFetching && updates.map( ({styleCode, styleCodeId})  => <UpdateCard styleCode={styleCode} styleCodeId = {styleCodeId}/>)}
+            </div>
             {!isFetching && updates.length === 0 && <Empty/>}
             <PlusButton url = {`/${department}/process/form?lineNumber=${lineNumber||1}`}/>
         </div>

@@ -52,7 +52,9 @@ const FormLoader = ({department}) => {
             <DepartmentHeader department={department} lineNumber={lineNumber}/>
             <ProcessHeader process={process}/>
             {/* {department.toUpperCase() + " " + process.toUpperCase()} */}
-            {loadForm(department, process, onFinish)}
+            <div className = "mg-y">
+                {loadForm(department, process, onFinish)}
+            </div>
         </div>
     )
 
