@@ -42,7 +42,6 @@ const FormLayout = ({initialValues, formFields, onFinish}) => {
   const [loading, setLoading] = useState(false)
   const history = useHistory()
   return (
-      <div>
           <Form
               {...formItemLayout}
               style = {{
@@ -64,14 +63,11 @@ const FormLayout = ({initialValues, formFields, onFinish}) => {
                       required: true,
                       message: "Please Enter a value"
                   }]}><InputNumber inputMode="numeric"/></Form.Item>)}
-              <Form.Item {...tailFormItemLayout}>
-                  <Space>
-                      <Button onClick = {() => history.goBack()}>Back</Button>
-                      <Button type="primary" htmlType="submit" loading={loading}>Register</Button>
-                  </Space>
-              </Form.Item>
+                  <div className = "wd-100 fx-sp-bt">
+                      <Button danger onClick = {() => history.goBack()} className="wd-45">Back</Button>
+                      <Button type="primary" htmlType="submit" loading={loading} className="wd-45">Register</Button>
+                  </div>
           </Form>
-      </div>
   )
 
 }

@@ -31,7 +31,7 @@ const ProcessForm = ({department}) => {
         })
     }
 
-    return (<div>
+    return (
                 <Form
                 {...formItemLayout}
                 style = {{
@@ -65,13 +65,11 @@ const ProcessForm = ({department}) => {
                               {process[department].map( (item,idx) => <Option value = {item.value}>{item.name}</Option>)}
                         </Select>
                     </Form.Item>
-                    <Form.Item {...tailFormItemLayout}>
-                    <Space>
-                        <Button danger onClick = {() => history.goBack()}>Back</Button>
-                        <Button type="primary" htmlType="submit">Next</Button>
-                    </Space>
-                </Form.Item>
+                    <div  className = "fx-sp-bt wd-100">
+                        <Button danger onClick = {() => history.goBack()} className = "wd-45">Back</Button>
+                        <Button type="primary" htmlType="submit" className = "wd-45">Next</Button>
+                    </div>
             </Form>
-    </div>)
+    )
 }
 export default ProcessForm
