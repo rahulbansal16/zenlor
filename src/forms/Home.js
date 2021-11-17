@@ -30,7 +30,7 @@ const Home = ({department}) => {
             <DepartmentHeader department={department} lineNumber={lineNumber}/>
             {isFetching && <Loader/>}
             <div className="mg-y">
-                {!isFetching && updates.map( ({styleCode, styleCodeId})  => <UpdateCard styleCode={styleCode} styleCodeId = {styleCodeId}/>)}
+                {!isFetching && updates.map( ({styleCode, styleCodeId, process, createdAt})  => <UpdateCard styleCode={styleCode} styleCodeId = {styleCodeId} process={process} createdAt={createdAt}/>)}
             </div>
             {!isFetching && updates.length === 0 && <Empty/>}
             <PlusButton url = {`/${department}/process/form?lineNumber=${lineNumber||1}`}/>
