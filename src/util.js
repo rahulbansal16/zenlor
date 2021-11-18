@@ -61,5 +61,5 @@ export function getTimeStampAhead(day){
 }
 
 export function getCurrentTime(){
-    return moment().locale().format("MMM DD YY, h:mm:ss a")
+    return moment().format("MMM DD YY, h:mm:ss a")
   }
