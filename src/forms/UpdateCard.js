@@ -24,7 +24,7 @@ const UpdateCard = ({styleCodeId, styleCode, createdAt, updatedAt, process, data
             values.push(data[key])
             output.push(
                 <div className="fx-sp-bt">
-                    <div id ="key">{key}</div>
+                    <div id ="key" style={{fontWeight:20}}>{key}</div>
                     <div>{data[key]}</div>
                 </div>
                 )
@@ -42,7 +42,7 @@ const UpdateCard = ({styleCodeId, styleCode, createdAt, updatedAt, process, data
           }}
     >
         <div>
-            <div className="txt-al-left">
+            <div className="txt-al-left" style={{fontWeight:20}}>
                 Updated At {createdAt}
             </div>
             {printValue(data)}
