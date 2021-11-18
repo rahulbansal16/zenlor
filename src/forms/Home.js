@@ -8,7 +8,8 @@ import DepartmentHeader from "./DepartmentHeader"
 import UpdateCard from "./UpdateCard"
 
 const filterData = (state, department, lineNumber)  => {
-    const departmentData = state.taskReducer[department] || []
+    let departmentData = state.taskReducer[department] || []
+    departmentData = departmentData.filter( ({status}) => status === "active")
     if (lineNumber){
         return departmentData.filter( data => data.lineNumber === lineNumber)
     }

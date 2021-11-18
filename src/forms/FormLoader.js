@@ -49,7 +49,7 @@ const FormLoader = ({initialValues, department, header = () => {}}) => {
           id,
           createdAt: getCurrentTime(),
           modifiedAt: getCurrentTime(),
-          json: { values, styleCode, process, lineNumber, t:77 },
+          json: { values, styleCode, process, lineNumber},
         };
         console.log("The body is", body)
         if (!id){
