@@ -7,6 +7,7 @@ import WashingForm from "./dataEntry/WashingForm";
 import PackingForm from "./dataEntry/PackingForm";
 import DepartmentHeader from "./DepartmentHeader";
 import ProcessHeader from "./ProcessHeader";
+import { getCurrentTime } from "../util";
 
 const loadForm = (department, process, onFinish) => {
     switch(department){
@@ -41,7 +42,12 @@ const FormLoader = ({department}) => {
         if (lineNumber === "null" || !lineNumber || lineNumber === null){
             lineNumber = undefined
         }
-        const body = { department, json: {...value, styleCode, process, lineNumber}}
+        const body = {
+          department,
+          createdAt: getCurrentTime(),
+          modifiedAt: getCurrentTime(),
+          json: { ...value, styleCode, process, lineNumber },
+        };
         console.log("The body is", body)
         await createData(body)
         history.push(`/${department}?lineNumber=${lineNumber}`)

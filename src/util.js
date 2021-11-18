@@ -59,3 +59,7 @@ export function between(min, max) {
 export function getTimeStampAhead(day){
     return moment().add(day, "days").endOf("day").valueOf()
 }
+
+export function getCurrentTime(){
+    return moment().locale().format("MMM DD YY, h:mm:ss a")
+  }
