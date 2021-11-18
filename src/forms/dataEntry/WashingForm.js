@@ -12,7 +12,7 @@ const dataInput = {
     }],
 }
 const WashingForm = ({initialValues, process, onFinish}) => {
-    return (<FormLayout formFields = {dataInput[process]} onFinish = {onFinish}/>)
+    return (<FormLayout initialValues = {initialValues} formFields = {dataInput[process]} onFinish = {onFinish}/>)
 }
 
 export default WashingForm

@@ -25,7 +25,7 @@ const loadForm = (initialValues, department, process, onFinish) => {
             return <></>
     }
 }
-const FormLoader = ({initialValues, department}) => {
+const FormLoader = ({initialValues, department, header = () => {}}) => {
 
     const search = useLocation().search
     const styleCode = new URLSearchParams(search).get("styleCode");
@@ -40,6 +40,7 @@ const FormLoader = ({initialValues, department}) => {
         console.log("Calling onFinish", values)
         console.log("Will submit the values now")
         let createData = functions.httpsCallable('addData')
+        let updateData = functions.httpsCallable('updateData')
         if (lineNumber === "null" || !lineNumber || lineNumber === null){
             lineNumber = undefined
         }
@@ -48,10 +49,15 @@ const FormLoader = ({initialValues, department}) => {
           id,
           createdAt: getCurrentTime(),
           modifiedAt: getCurrentTime(),
-          json: { values, styleCode, process, lineNumber },
+          json: { values, styleCode, process, lineNumber, t:77 },
         };
         console.log("The body is", body)
-        await createData(body)
+        if (!id){
+            await createData(body)
+        } else {
+            console.log('The body is', body)
+            await updateData(body)
+        }
         history.push(`/${department}?lineNumber=${lineNumber}`)
         window.location.reload();
     }
@@ -59,7 +65,7 @@ const FormLoader = ({initialValues, department}) => {
         <div>
             <DepartmentHeader department={department} lineNumber={lineNumber}/>
             <ProcessHeader process={process}/>
-            {/* {department.toUpperCase() + " " + process.toUpperCase()} */}
+            {header()}
             <div className = "mg-y">
                 {loadForm(initialValues, department, process, onFinish)}
             </div>

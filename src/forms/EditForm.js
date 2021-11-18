@@ -3,14 +3,27 @@ import { useHistory, useLocation } from "react-router"
 import FormLoader from "./FormLoader"
 
 const EditForm = ({department}) => {
+
     const location = useLocation()
-    console.log("The state is", location.state)
+    const search = useLocation().search
+    const id = new URLSearchParams(search).get("id");
+
+    const onDeleteHandler = () => {
+        console.log("Deleting the update for the id", id, department);
+    }
+
+    const deleteButton = () => {
+        return (
+            <div>
+                <Button danger onClick = {onDeleteHandler}> Delete</Button>
+            </div>
+        )
+    }
     // location.state
 
     return (
         <div>
-            <Button>fdfd</Button>
-            <FormLoader initialValues={location.state} department = {department}></FormLoader>
+            <FormLoader initialValues={location.state} department = {department} header={deleteButton} ></FormLoader>
         </div>
     )
 }
