@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const moment = require("moment");
+// const moment = require("moment");
 
 admin.initializeApp();
 
@@ -15,18 +15,16 @@ function generateUId(prefix, length) {
   return result.trim().toLowerCase();
 }
 
-const getCurrentTime = () => {
-  return moment().locale("en-in").format("MMM DD YY, h:mm:ss a")
-}
+// const getCurrentTime = () => {
+//   return moment().locale("en-in").format("MMM DD YY, h:mm:ss a")
+// }
 
 exports.addData = functions
   .region("asia-northeast3")
   .https.onCall( async (body, context) => {
-    const { department, json} = body
+    const { department, json, createdAt, modifiedAt} = body
     console.log("The body is", body)
     const id = generateUId("", 15)
-    const createdAt = getCurrentTime()
-    const modifiedAt = getCurrentTime()
     const entry  = {...json, createdAt, modifiedAt, id}
     const doc = await admin.firestore().collection("data").doc("anusha_8923").get()
     console.log("The doc is", doc.data())
@@ -42,8 +40,7 @@ exports.updateData = functions
 .region("asia-northeast3")
 .https
 .onCall( async (data, context) => {
-  const { department, json} = data
-  const modifiedAt = getCurrentTime()
+  const { department, json, modifiedAt} = data
   const entry  = {...json, modifiedAt}
   const doc = await admin.firestore().collection("data").doc("anusha_8923").get()
   let departmentData = doc.data()[department]
