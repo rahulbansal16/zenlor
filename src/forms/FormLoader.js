@@ -35,8 +35,8 @@ const FormLoader = ({department}) => {
 
     console.log("The styleCode is", styleCode, process)
 
-    const onFinish = async (value) => {
-        console.log("Calling onFinish", value)
+    const onFinish = async (values) => {
+        console.log("Calling onFinish", values)
         console.log("Will submit the values now")
         let createData = functions.httpsCallable('addData')
         if (lineNumber === "null" || !lineNumber || lineNumber === null){
@@ -46,7 +46,7 @@ const FormLoader = ({department}) => {
           department,
           createdAt: getCurrentTime(),
           modifiedAt: getCurrentTime(),
-          json: { ...value, styleCode, process, lineNumber },
+          json: { values, styleCode, process, lineNumber },
         };
         console.log("The body is", body)
         await createData(body)
