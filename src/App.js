@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import './App.less';
 import Header from './components/Header';
 import { getData } from "./firebase";
+import EditForm from "./forms/EditForm";
 import FormLoader from './forms/FormLoader';
 import Home from "./forms/Home";
 import ProcessForm from './forms/ProcessForm';
@@ -13,6 +14,7 @@ const renderPages = () => {
   return (
     <Switch>
       <Route exact path="/:department" render = { (props) => <Home department={props.match.params.department}/>}/>
+      <Route exact path="/:department/form/edit" render = { (props) => <EditForm department = {props.match.params.department} />} />
       <Route exact path="/:department/form" render = { (props) => <FormLoader department = {props.match.params.department} />} />
       <Route exact path="/:department/process/form" render = { (props) => <ProcessForm department = {props.match.params.department} />} />
     </Switch>

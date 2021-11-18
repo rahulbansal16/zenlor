@@ -15,7 +15,7 @@ const dataInput = {
     }]
 }
 const PackingForm = ({initialValues, process, onFinish}) => {
-    return (<FormLayout formFields = {dataInput[process]} onFinish = {onFinish}/>)
+    return (<FormLayout initialValues = {initialValues} formFields = {dataInput[process]} onFinish = {onFinish}/>)
 }
 
 export default PackingForm

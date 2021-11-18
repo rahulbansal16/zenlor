@@ -48,6 +48,7 @@ const FormLayout = ({initialValues, formFields, onFinish}) => {
                   marginLeft:'8px',
                   marginRight:'8px'
               }}
+              initialValues={initialValues}
               size="large"
               name="styleCodeEditor"
               align="left"

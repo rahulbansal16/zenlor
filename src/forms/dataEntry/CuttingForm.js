@@ -13,7 +13,7 @@ const dataInput = {
 }
 const CuttingForm = ({initialValues, process, onFinish}) => {
     return (
-        <FormLayout formFields = {dataInput[process]} onFinish = {onFinish}/>
+        <FormLayout initialValues={initialValues} formFields = {dataInput[process]} onFinish = {onFinish}/>
     )
 }
 

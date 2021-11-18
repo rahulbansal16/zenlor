@@ -1,5 +1,6 @@
-import create from "@ant-design/icons/lib/components/IconFont"
 import { Card } from "antd"
+import { useHistory} from "react-router"
+import { appendToPath } from "../util"
 
 const CardTitle = ({styleCode, process}) => {
     return (
@@ -14,7 +15,17 @@ const CardTitle = ({styleCode, process}) => {
     )
   }
 
-const UpdateCard = ({styleCodeId, styleCode, createdAt, updatedAt, process, data}) => {
+const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, data, lineNumber}) => {
+    const history = useHistory()
+    const onClick = () => {
+        history.push({
+            pathname: appendToPath(history, '/form/edit'),
+            search: `?process=${process}&styleCode=${styleCode}&lineNumber=${lineNumber}&id=${id}`,
+            state: {
+                ...data
+            }
+        })
+    }
     const printValue = (data) => {
         let keys =[]
         let values = []
@@ -35,6 +46,7 @@ const UpdateCard = ({styleCodeId, styleCode, createdAt, updatedAt, process, data
         key = {styleCodeId}
         title = {<CardTitle styleCode={styleCode} process={process}/>}
         bordered={true}
+        onClick = {onClick}
         hoverable
         style={{
             width: "100%",

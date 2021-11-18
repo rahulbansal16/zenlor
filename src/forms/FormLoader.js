@@ -9,28 +9,29 @@ import DepartmentHeader from "./DepartmentHeader";
 import ProcessHeader from "./ProcessHeader";
 import { getCurrentTime } from "../util";
 
-const loadForm = (department, process, onFinish) => {
+const loadForm = (initialValues, department, process, onFinish) => {
     switch(department){
         case "cutting":
-            return <CuttingForm onFinish = {onFinish} process = {process} />
+            return <CuttingForm initialValues={initialValues} onFinish = {onFinish} process = {process} />
         case "sewing":
-            return <SewingForm onFinish = {onFinish} process = {process}/>
+            return <SewingForm initialValues={initialValues} onFinish = {onFinish} process = {process}/>
         case "kajjaandbuttoning":
-            return <KBForm onFinish = {onFinish} process = {process} />
+            return <KBForm initialValues={initialValues} onFinish = {onFinish} process = {process} />
         case "washing":
-            return <WashingForm onFinish = {onFinish} process = {process} />
+            return <WashingForm initialValues = {initialValues} onFinish = {onFinish} process = {process} />
         case "packing":
-            return <PackingForm onFinish = {onFinish} process = {process} />
+            return <PackingForm initialValues = {initialValues} onFinish = {onFinish} process = {process} />
         default:
             return <></>
     }
 }
-const FormLoader = ({department}) => {
+const FormLoader = ({initialValues, department}) => {
 
     const search = useLocation().search
     const styleCode = new URLSearchParams(search).get("styleCode");
     const process = new URLSearchParams(search).get("process")
     let lineNumber = new URLSearchParams(search).get("lineNumber")
+    const id = new URLSearchParams(search).get("id")
     const history = useHistory()
 
     console.log("The styleCode is", styleCode, process)
@@ -44,6 +45,7 @@ const FormLoader = ({department}) => {
         }
         const body = {
           department,
+          id,
           createdAt: getCurrentTime(),
           modifiedAt: getCurrentTime(),
           json: { values, styleCode, process, lineNumber },
@@ -59,7 +61,7 @@ const FormLoader = ({department}) => {
             <ProcessHeader process={process}/>
             {/* {department.toUpperCase() + " " + process.toUpperCase()} */}
             <div className = "mg-y">
-                {loadForm(department, process, onFinish)}
+                {loadForm(initialValues, department, process, onFinish)}
             </div>
         </div>
     )
