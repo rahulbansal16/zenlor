@@ -14,7 +14,23 @@ const CardTitle = ({styleCode, process}) => {
     )
   }
 
-const UpdateCard = ({styleCodeId, styleCode, createdAt, updatedAt, process}) => {
+const UpdateCard = ({styleCodeId, styleCode, createdAt, updatedAt, process, data}) => {
+    const printValue = (data) => {
+        let keys =[]
+        let values = []
+        let output = []
+        for (let key in data){
+            keys.push(key)
+            values.push(data[key])
+            output.push(
+                <div className="fx-sp-bt">
+                    <div id ="key">{key}</div>
+                    <div>{data[key]}</div>
+                </div>
+                )
+        }
+        return output
+    }
     return <Card
         key = {styleCodeId}
         title = {<CardTitle styleCode={styleCode} process={process}/>}
@@ -25,7 +41,12 @@ const UpdateCard = ({styleCodeId, styleCode, createdAt, updatedAt, process}) => 
             marginBottom:'10px'
           }}
     >
-        Task Updated At {createdAt}
+        <div>
+            <div className="txt-al-left">
+                Updated At {createdAt}
+            </div>
+            {printValue(data)}
+        </div>
     </Card>
 }
 
