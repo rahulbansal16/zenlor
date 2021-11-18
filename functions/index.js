@@ -25,7 +25,7 @@ exports.addData = functions
     const { department, json, createdAt, modifiedAt} = body
     console.log("The body is", body)
     const id = generateUId("", 15)
-    const entry  = {...json, createdAt, modifiedAt, id}
+    const entry  = {...json, createdAt, modifiedAt, id, status: 'active'}
     const doc = await admin.firestore().collection("data").doc("anusha_8923").get()
     console.log("The doc is", doc.data())
     const departmentData = [entry, ...(doc.data()[department])]
@@ -40,12 +40,12 @@ exports.updateData = functions
 .region("asia-northeast3")
 .https
 .onCall( async (data, context) => {
-  const { department, json, modifiedAt} = data
-  const entry  = {...json, modifiedAt}
+  const { department,id, json, modifiedAt, status} = data
+  const entry  = {...json, modifiedAt, status: status || "active"}
   const doc = await admin.firestore().collection("data").doc("anusha_8923").get()
   let departmentData = doc.data()[department]
   departmentData = departmentData.map( item => {
-    if (item.id !== json.id){
+    if (item.id !== id){
       return item
     }
     return {
