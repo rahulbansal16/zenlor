@@ -53,9 +53,8 @@ exports.updateData = functions
       ...entry
     }
   })
-  await admin.firestore().collection("data").doc("anusha_8923").set({
-    cutting: departmentData
-  } ,{merge: true})
-
+  let obj = {}
+  obj[department] = departmentData
+  await admin.firestore().collection("data").doc("anusha_8923").set(obj ,{merge: true})
   return departmentData
 })
