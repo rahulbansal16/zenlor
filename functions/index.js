@@ -58,3 +58,13 @@ exports.updateData = functions
   await admin.firestore().collection("data").doc("anusha_8923").set(obj ,{merge: true})
   return departmentData
 })
+
+exports.insertStyleCode = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  const {styleCodes} = data
+  return await admin.firestore().collection("data").doc("anusha_8923").set({
+    styleCodes
+  } ,{merge: true})
+})
