@@ -79,7 +79,7 @@ const StyleCodeInput = ({onSelectCb}) => {
                 dropdownMatchSelectWidth={252}
                 style={{ width: 300 }}
                 options={options}
-                placeholder="Enter StyleCode"
+                placeholder="Start Typing"
                 onSelect={onSelect}
                 onSearch={handleSearch}
             ></Select>

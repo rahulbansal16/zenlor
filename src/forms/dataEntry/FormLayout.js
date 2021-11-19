@@ -66,7 +66,7 @@ const FormLayout = ({initialValues, formFields, onFinish}) => {
                   }]}><InputNumber inputMode="numeric" autoFocus={ idx === 0} /></Form.Item>)}
                   <div className = "wd-100 fx-sp-bt">
                       <Button danger onClick = {() => history.goBack()} className="wd-45">Back</Button>
-                      <Button type="primary" htmlType="submit" loading={loading} className="wd-45">Register</Button>
+                      <Button type="primary" htmlType="submit" loading={loading} className="wd-45">Submit</Button>
                   </div>
           </Form>
   )

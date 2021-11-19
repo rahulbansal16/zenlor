@@ -51,7 +51,7 @@ const ProcessForm = ({department}) => {
                     onFinish(data)
                 }}
                 >
-                    <Form.Item label="1. Enter the StyleCode" required>
+                    <Form.Item label="1. Choose the StyleCode" required>
                         <StyleCodeInput onSelectCb={setStyleCode}/>
                     </Form.Item>
                     <Form.Item label="2. Choose Process" name="process" rules={[
@@ -69,7 +69,7 @@ const ProcessForm = ({department}) => {
                         </Select>
                     </Form.Item>
                     <div  className = "fx-sp-bt wd-100">
-                        <Button danger onClick = {() => history.goBack()} className = "wd-45">Back</Button>
+                        <Button danger onClick = {() => history.goBack()} className = "wd-45">Cancel</Button>
                         <Button type="primary" htmlType="submit" className = "wd-45">Next</Button>
                     </div>
             </Form>
