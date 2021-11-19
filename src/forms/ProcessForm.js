@@ -62,6 +62,7 @@ const ProcessForm = ({department}) => {
                     ]}>
                         <Select
                             placeholder="Select Process"
+                            size="large"
                             onChange={()=>{}}
                             allowClear
                           >
