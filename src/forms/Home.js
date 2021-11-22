@@ -1,11 +1,13 @@
-import { Empty } from "antd"
+import { Button, Empty } from "antd"
 import { useState } from "react"
 import { useSelector } from "react-redux"
-import { useLocation } from "react-router"
+import { useHistory, useLocation } from "react-router"
 import Loader from "../components/Loader"
 import PlusButton from "../components/PlusButton"
 import DepartmentHeader from "./DepartmentHeader"
 import UpdateCard from "./UpdateCard"
+import {MenuOutlined } from '@ant-design/icons';
+
 
 const filterData = (state, department, lineNumber)  => {
     let departmentData = state.taskReducer[department] || []
@@ -15,6 +17,28 @@ const filterData = (state, department, lineNumber)  => {
     }
     return departmentData
 }
+
+const DepartmentMenuButton = () => {
+  const history = useHistory();
+
+  return (
+    <Button
+      type="primary"
+      size="large"
+      onClick={() => history.push("/")}
+      style={{
+        width: "100%",
+        position: "fixed",
+        bottom: "0px",
+        left: "0px",
+      }}
+      icon={<MenuOutlined />}
+    >
+      Dept Menu
+    </Button>
+  );
+};
+
 
 const Home = ({department}) => {
 
@@ -34,6 +58,7 @@ const Home = ({department}) => {
                 {!isFetching && updates.map( ({id, styleCode, styleCodeId, process, createdAt, lineNumber, values})  => <UpdateCard key = {id} id={id} styleCode={styleCode} styleCodeId = {styleCodeId} process={process} createdAt={createdAt} data={values} lineNumber={lineNumber}/>)}
             </div>
             {!isFetching && updates.length === 0 && <Empty/>}
+            <DepartmentMenuButton/>
             <PlusButton url = {`/${department}/process/form?lineNumber=${lineNumber||1}`}/>
         </div>
     )
