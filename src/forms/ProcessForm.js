@@ -4,16 +4,32 @@ import { useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import StyleCodeInput from "./StyleCodeInput";
 import DepartmentHeader from "./DepartmentHeader";
+import {PROCESS_NAME, PROCESS_VALUE} from "../CONSTANTS"
 const { Option } = Select;
 
-
+const {CUTTING, SEWING, KAJJAANDBUTTONING, WASHING, PACKING} = PROCESS_NAME
 const process = {
-    cutting: [ {name: "Fabric In", value:"fabric_in"}, {name: "Cutting", value: "cutting"}],
-    sewing: [{name: "Loading", value: "loading" }, { name:"Line Output", value: "line_output"}],
-    kajjaandbuttoning: [{name: "Received From Sewing", value: "received_from_sewing"}, { name: "Output", value:"output" }],
-    washing: [{name: "Sending", value:"sending"}, {name: "Receiving", value: "receiving"}],
-    packing: [{name: "Received From Washing", value: "received_from_washing"}, {name: "Pre Inspection", value: "pre_inspection"}]
-}
+  cutting: [
+    { name: CUTTING.FABRIC_ISSUED, value: PROCESS_VALUE.CUTTING.FABRIC_ISSUED },
+    { name: CUTTING.OUTPUT, value: PROCESS_VALUE.CUTTING.OUTPUT },
+  ],
+  sewing: [
+    { name: SEWING.LOADING, value: PROCESS_VALUE.SEWING.LOADING },
+    { name: SEWING.OUTPUT, value: PROCESS_VALUE.SEWING.OUTPUT },
+  ],
+  kajjaandbuttoning: [
+    { name: KAJJAANDBUTTONING.RECEIVED_FROM_SEWING, value: PROCESS_VALUE.KAJJAANDBUTTONING.RECEIVED_FROM_SEWING },
+    { name: KAJJAANDBUTTONING.OUTPUT, value: PROCESS_VALUE.KAJJAANDBUTTONING.OUTPUT },
+  ],
+  washing: [
+    { name: WASHING.SENDING, value: PROCESS_VALUE.WASHING.SENDING },
+    { name: WASHING.RECEIVING, value: PROCESS_VALUE.WASHING.RECEIVING },
+  ],
+  packing: [
+    { name: PACKING.RECEIVED_FROM_WASHING, value: PROCESS_VALUE.PACKING.RECEIVED_FROM_WASHING },
+    { name: PACKING.PRE_INSPECTION, value: PROCESS_VALUE.PACKING.PRE_INSPECTION },
+  ],
+};
 
 const ProcessForm = ({department}) => {
     const [form] = Form.useForm();

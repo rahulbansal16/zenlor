@@ -1,16 +1,14 @@
 import FormLayout from "./FormLayout";
-
-// StyleCode Name on the Top
-const dataInput = {
-    fabric_in: [{
-        label: "Enter Fabric Issued Quantity",
-        name: "fabricIssued"
-    }],
-    cutting: [{
-        label: "Enter Cutting Done Quantity",
-        name: "cutQuantity"
-    }]
-}
+import { PROCESS_VALUE } from "../../CONSTANTS";
+let dataInput = {}
+dataInput[PROCESS_VALUE.CUTTING.FABRIC_ISSUED] = [{
+    label: "Enter Fabric Issued Quantity",
+    name: "fabricIssued"
+}]
+dataInput[PROCESS_VALUE.CUTTING.OUTPUT] = [{
+    label: "Enter Cutting Done Quantity",
+    name: "output"
+}]
 const CuttingForm = ({initialValues, process, onFinish}) => {
     return (
         <FormLayout initialValues={initialValues} formFields = {dataInput[process]} onFinish = {onFinish}/>
