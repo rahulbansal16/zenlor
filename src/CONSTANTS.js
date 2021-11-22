@@ -28,7 +28,7 @@ const PROCESS_NAME = {
 
 const PROCESS_VALUE = {
     CUTTING : {         
-        FABRIC_ISSUED: "fabric_issued",
+        FABRIC_ISSUED: "Fabric Issued",
         OUTPUT: "output"
     },
     SEWING: {
