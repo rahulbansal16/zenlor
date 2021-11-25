@@ -60,6 +60,10 @@ export function getTimeStampAhead(day){
     return moment().add(day, "days").endOf("day").valueOf()
 }
 
+export function getTimeStampFromDate(date){
+    return moment(date).format("MMM DD YY, h:mm:ss a").valueOf()
+}
+
 export const appendToPath= (history, path) => {
     return `${history.location.pathname+path}`
 }
