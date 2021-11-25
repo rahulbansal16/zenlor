@@ -1,6 +1,7 @@
 import firebase from 'firebase';
-import React, { useReducer } from 'react';
+import React from 'react';
 import FirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import { useSelector } from 'react-redux';
 // import { Header, Icon } from 'semantic-ui-react';
 import { auth } from '../firebase';
 
@@ -35,7 +36,8 @@ let uiConfig = {
   };
 
 const Login =  () => {
-    const user = useReducer(state => state.taskReducer.user)
+    const user = useSelector(state => state.taskReducer.user)
+    console.log("The user us ", user)
     if (user){
         return "Already Login"
     }

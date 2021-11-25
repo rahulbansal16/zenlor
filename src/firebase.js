@@ -22,6 +22,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 export const auth = firebase.auth();
+auth.setPersistence("local")
 export const analytics = firebase.analytics();
 export const functions = firebase.app().functions('asia-northeast3');
 export const storage = firebase.storage().ref();
