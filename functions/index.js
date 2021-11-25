@@ -38,6 +38,14 @@ function generateUId(prefix, length) {
 //   return moment().locale("en-in").format("MMM DD YY, h:mm:ss a")
 // }
 
+exports.addUser = functions.region("asia-northeast3").auth.user().onCreate((user) => {
+  return admin
+    .firestore()
+    .collection('users')
+    .doc(user.uid)
+    .set(JSON.parse(JSON.stringify(user)));
+});
+
 exports.addData = functions
   .region("asia-northeast3")
   .https.onCall( async (body, context) => {
