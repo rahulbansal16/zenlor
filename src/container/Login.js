@@ -1,9 +1,6 @@
-import { Header } from 'antd/lib/layout/layout';
 import firebase from 'firebase';
-import React from 'react';
+import React, { useReducer } from 'react';
 import FirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-// import {UserConsumer} from './UserProvider';
-import { withRouter } from "react-router-dom";
 // import { Header, Icon } from 'semantic-ui-react';
 import { auth } from '../firebase';
 
@@ -37,67 +34,80 @@ let uiConfig = {
     ]
   };
 
-
-class Login extends React.Component {
-
-    constructor(props){
-        super(props);
-        this.state = {
-            email:'',
-            password:''
-        }
+const Login =  () => {
+    const user = useReducer(state => state.taskReducer.user)
+    if (user){
+        return "Already Login"
     }
-
-    handleChange = (event, _data) => {
-        const {name,value} = event.target;
-        if (this.state.hasOwnProperty(name)) {
-          this.setState({ [name]: value.toLowerCase()});
-        }
-    }
-
-    componentDidMount() {
-        async function updateUserState() {
-            auth.onAuthStateChanged( async userAuth => {
-                console.log('The uesrAuth is', userAuth)
-            //   dispatch(userAuth)
-            });
-          }
-          updateUserState();
-    }
-
-    render(){
-        uiConfig["signInSuccessUrl"] = '/home'
-        return(
+    uiConfig["signInSuccessUrl"] = '/'
+    return(
             <div>
                 <FirebaseAuth style={{width:'100% !important'}}uiConfig={uiConfig} firebaseAuth={auth}/>
             </div>
-        );
-    }
+        )
+}
 
-    // googleSignIn = () => {
-    //     signInWithGoogle();
-    // }
+export default Login;
+// class Login extends React.Component {
 
-    // signInWithEmailAndPasswordHandler = (event) => {
-    //     event.preventDefault();
-    //     auth.signInWithEmailAndPassword(this.state.email, this.state.password).catch(error => {
-    //       console.error("Error signing in with password and email", error);
-    //     });
-    // };
+//     constructor(props){
+//         super(props);
+//         this.state = {
+//             email:'',
+//             password:''
+//         }
+//     }
 
-    // sendResetEmail = event => {
-    //     event.preventDefault();
-    //     auth
-    //       .sendPasswordResetEmail(this.state.email)
-    //       .then(() => {
-    //         // setEmailHasBeenSent(true);
-    //         // setTimeout(() => {setEmailHasBeenSent(false)}, 3000);
-    //       })
-    //       .catch((error) => {
-    //         console.log("Error sending up the Reset Email", error);
-    //         // setError("Error resetting password");
-    //       });
-    //   };
+//     handleChange = (event, _data) => {
+//         const {name,value} = event.target;
+//         if (this.state.hasOwnProperty(name)) {
+//           this.setState({ [name]: value.toLowerCase()});
+//         }
+//     }
 
-};
-export default withRouter(Login);
+//     componentDidMount() {
+//         async function updateUserState() {
+//             auth.onAuthStateChanged( async userAuth => {
+//                 console.log('The uesrAuth is', userAuth)
+//               dispatch(userAuth)
+//             });
+//           }
+//           updateUserState();
+//     }
+
+//     render(){
+//         uiConfig["signInSuccessUrl"] = '/'
+//         return(
+//             <div>
+//                 <FirebaseAuth style={{width:'100% !important'}}uiConfig={uiConfig} firebaseAuth={auth}/>
+//             </div>
+//         );
+//     }
+
+//     // googleSignIn = () => {
+//     //     signInWithGoogle();
+//     // }
+
+//     // signInWithEmailAndPasswordHandler = (event) => {
+//     //     event.preventDefault();
+//     //     auth.signInWithEmailAndPassword(this.state.email, this.state.password).catch(error => {
+//     //       console.error("Error signing in with password and email", error);
+//     //     });
+//     // };
+
+//     // sendResetEmail = event => {
+//     //     event.preventDefault();
+//     //     auth
+//     //       .sendPasswordResetEmail(this.state.email)
+//     //       .then(() => {
+//     //         // setEmailHasBeenSent(true);
+//     //         // setTimeout(() => {setEmailHasBeenSent(false)}, 3000);
+//     //       })
+//     //       .catch((error) => {
+//     //         console.log("Error sending up the Reset Email", error);
+//     //         // setError("Error resetting password");
+//     //       });
+//     //   };
+
+// };
+// export default withRouter(Login);

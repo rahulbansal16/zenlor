@@ -1,8 +1,9 @@
 // import { FETCH_COMPLETE_TASKS, FETCH_INCOMPLETE_TASKS, UPDATE_TASK_STATUS } from "../actionType";
 
-import { FETCH_DATA } from "../actionType"
+import { FETCH_DATA, UPDATE_AUTH } from "../actionType"
 
 const initialState = {
+    user: null,
     cutting:[],
     sewing: [],
     packing: [],
@@ -25,6 +26,13 @@ const taskReducer = (state = initialState, action) => {
                 kajjaandbuttoning: [...kajjaandbuttoning],
                 packing: [...packing],
                 isFetching
+            }
+        }
+        case UPDATE_AUTH: {
+            const {user} = action.payload
+            return {
+                ...state,
+                user
             }
         }
         // case UPDATE_TASK_STATUS:{
