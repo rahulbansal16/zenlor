@@ -39,11 +39,13 @@ function generateUId(prefix, length) {
 // }
 
 exports.addUser = functions.region("asia-northeast3").auth.user().onCreate((user) => {
+  const userInfo = JSON.parse(JSON.stringify(user))
+  userInfo["company"] = "anusha_8923";
   return admin
     .firestore()
     .collection('users')
     .doc(user.uid)
-    .set(JSON.parse(JSON.stringify(user)));
+    .set(userInfo);
 });
 
 exports.addData = functions
