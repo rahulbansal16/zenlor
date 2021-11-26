@@ -26,9 +26,24 @@ const renderPages = () => {
           </Authorization>
         } 
       </Route>
-      <Route exact path="/:department/form/edit" render = { (props) => <EditForm department = {props.match.params.department} />} />
-      <Route exact path="/:department/form" render = { (props) => <FormLoader department = {props.match.params.department} />} />
-      <Route exact path="/:department/process/form" render = { (props) => <ProcessForm department = {props.match.params.department} />} />
+      <Route exact path="/:department/form/edit">
+        { (props) => <Authorization allowedRoles={["admin", "manager"]} department = {props.match.params.department}> 
+            <EditForm department = {props.match.params.department} />
+          </Authorization>
+        } 
+      </Route>
+      <Route exact path="/:department/form">
+        { (props) => <Authorization allowedRoles={["admin", "manager"]} department = {props.match.params.department}> 
+        <FormLoader department = {props.match.params.department} />
+          </Authorization>
+        } 
+      </Route>
+      <Route exact path="/:department/process/form">
+        { (props) => <Authorization allowedRoles={["admin", "manager"]} department = {props.match.params.department}> 
+          <ProcessForm department = {props.match.params.department} />
+          </Authorization>
+        }         
+      </Route>
     </Switch>
 
   )
