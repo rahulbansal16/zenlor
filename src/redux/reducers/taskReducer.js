@@ -1,9 +1,11 @@
 // import { FETCH_COMPLETE_TASKS, FETCH_INCOMPLETE_TASKS, UPDATE_TASK_STATUS } from "../actionType";
 
-import { FETCH_DATA, UPDATE_AUTH } from "../actionType"
+import { FETCH_DATA, UPDATE_AUTH, UPDATE_ROLE } from "../actionType"
 
 const initialState = {
-    user: null,
+    user: {
+        rolesFetched: false
+    },
     cutting:[],
     sewing: [],
     packing: [],
@@ -30,6 +32,17 @@ const taskReducer = (state = initialState, action) => {
         }
         case UPDATE_AUTH: {
             const {user} = action.payload
+            return {
+                ...state,
+                user
+            }
+        }
+        case UPDATE_ROLE: {
+            const {role} = action.payload
+            const user = JSON.parse(JSON.stringify(state.user))
+            user["role"] = role
+            user["rolesFetched"] = true;
+            console.log("The user state is", user)
             return {
                 ...state,
                 user
