@@ -191,3 +191,24 @@ exports.insertStyleCode = functions
     styleCodes
   } ,{merge: true})
 })
+
+exports.getUserRole = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  if (!context.auth.uid)
+    return {
+      uid: null,
+      role: []
+    }
+
+  const uid = context.auth.uid
+  const user = await admin.firestore().collection("users").doc(uid).get()
+  console.log("The data is ", user.data())
+  const {role}  = user.data()
+  return {
+    uid,
+    role
+  }
+
+})
