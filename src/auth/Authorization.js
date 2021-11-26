@@ -2,6 +2,7 @@ import { useEffect, useReducer, useState } from "react"
 import { useSelector } from "react-redux";
 import Loader from "../components/Loader";
 import { auth } from "../firebase";
+import UnAuthorized from "./UnAuthorized";
 
 /**
  * roles = [{name: admin, department: all}, {name:'manager', department:'cutting'}]
@@ -29,7 +30,7 @@ const Authorization = ({allowedRoles, department, children}) => {
         return children
     }
 
-    return "Please Contact Your Manager"
+    return <UnAuthorized></UnAuthorized>
 
 }
 

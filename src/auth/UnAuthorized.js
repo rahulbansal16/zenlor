@@ -7,7 +7,7 @@ const history = useHistory()
     status="403"
     title="403"
     subTitle="Sorry, you are not authorized to access this page. Please Contact Your Manager."
-    extra={<Button type="primary" onClick = {()=> history.push('/')}>Back Home</Button>}
+    extra={<Button type="primary" size="large" onClick = {()=> history.push('/')}>Back Home</Button>}
   />
 }
 
