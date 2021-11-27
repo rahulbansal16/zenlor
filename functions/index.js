@@ -41,6 +41,10 @@ function generateUId(prefix, length) {
 exports.addUser = functions.region("asia-northeast3").auth.user().onCreate((user) => {
   const userInfo = JSON.parse(JSON.stringify(user))
   userInfo["company"] = "anusha_8923";
+  userInfo["role"] = [{
+    department: 'all',
+    name: 'admin'
+  }]
   return admin
     .firestore()
     .collection('users')
