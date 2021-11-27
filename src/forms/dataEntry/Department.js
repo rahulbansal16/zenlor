@@ -1,13 +1,26 @@
+import { useSelector } from "react-redux"
 import { useHistory } from "react-router"
 
 const { Button, Space } = require("antd")
 
 const Department = () => {
+    const user = useSelector(state => state.taskReducer.user)
+
     const history = useHistory()
 
     const onClick = (path) => {
         history.push(path)
     }
+
+    if (!user)
+        return <div>
+            <div>Please Login To continue</div>
+            <Button 
+            type="primary"
+            size="large"
+            onClick = { () => history.push("/login")}>Login</Button>
+        </div>
+
 
     return (
         <div className="mg-x-8">
