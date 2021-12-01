@@ -218,3 +218,13 @@ exports.getUserRole = functions
   }
 
 })
+
+exports.addDepartment = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  const { departments }= data;
+  await admin.firestore().collection("data").doc("anusha_8923").set({
+    departments
+  } ,{merge: true})
+})

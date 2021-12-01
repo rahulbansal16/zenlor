@@ -29,5 +29,67 @@
             "createdOn": "DEC-12-2021",
             "modifiedOn":"DEC-12-2021"
         }
-    ]
+    ],
+
+    "departments": [{
+        "name": "cutting",
+        "lines":[1],
+        "process":["fabric issued", "output"],
+        "form": {
+            "fabric issued": {
+            },
+            "output": {
+            }
+        }
+    },{
+        "name": "sewing",
+        "lines": [1, 2, 3],
+        "process":["loading", "output"],
+        "form": {
+            "loading": {
+
+            },
+            "output": {
+
+            }
+        }
+    },{
+        "name": "kajjaandbuttoning",
+        "lines": [1],
+        "process": ["Received From Sewing", "output"],
+        "form": {
+            "Received From Sewing": {
+
+            },
+            "Output": {
+
+            }
+        }
+    },{
+        "name": "washing",
+        "lines": [1],
+        "process": ["Sending", "Receiving"],
+        "form": {
+            "Sending": {
+
+            },
+            "Receiving": {
+
+            }
+        }
+    },{
+        "name": "packing",
+        "lines": [1],
+        "process": ["Received From Washing", "Pre Inspection"]
+
+    }]
 }
+
+
+// deparments = [{
+//  name: "Sewing", // Same as URL
+//  lines: [1, 2, 3, 4] // There will be multiple lines over here which can be used to build the things
+//  process: ["in", "out", ""] // There can be multiple Forms it might be over engineering to build them.
+//  form: { in: { }, out: { }, power: {}}
+// } "cutting", "packing", "washing",]
+// FormMap : {  }
