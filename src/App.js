@@ -59,8 +59,6 @@ function App() {
         const data = await getUserRole()
         const {role, company} =  data.data;
         fetchData(company)
-        // console.log("The role is", data);
-        console.log("The rolee is", role)
         dispatch(udpateRole(role))
       }
     });
