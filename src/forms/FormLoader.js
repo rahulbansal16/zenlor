@@ -8,6 +8,7 @@ import PackingForm from "./dataEntry/PackingForm";
 import DepartmentHeader from "./DepartmentHeader";
 import ProcessHeader from "./ProcessHeader";
 import { getCurrentTime } from "../util";
+import { useSelector } from "react-redux";
 
 const loadForm = (initialValues, department, process, onFinish) => {
     switch(department){
@@ -27,6 +28,7 @@ const loadForm = (initialValues, department, process, onFinish) => {
 }
 const FormLoader = ({initialValues, department, header = () => {}}) => {
 
+    const company = useSelector(state => state.taskReducer.user.company)
     const search = useLocation().search
     const styleCode = new URLSearchParams(search).get("styleCode");
     const process = new URLSearchParams(search).get("process")
@@ -46,6 +48,7 @@ const FormLoader = ({initialValues, department, header = () => {}}) => {
         }
         const body = {
           department,
+          companyId: company,
           id,
           createdAt: getCurrentTime(),
           modifiedAt: getCurrentTime(),

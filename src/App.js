@@ -59,7 +59,7 @@ function App() {
         const data = await getUserRole()
         const {role, company} =  data.data;
         fetchData(company)
-        dispatch(udpateRole(role))
+        dispatch(udpateRole(role, company))
       }
     });
   }, [dispatch])

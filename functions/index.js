@@ -55,11 +55,11 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate((user
 exports.addData = functions
   .region("asia-northeast3")
   .https.onCall( async (body, context) => {
-    const { department, json, createdAt, modifiedAt} = body
+    const { department, json, createdAt, modifiedAt, companyId} = body
     console.log("The body is", body)
     const id = generateUId("", 15)
     const entry  = {...json, createdAt, modifiedAt, id, status: 'active'}
-    const doc = await admin.firestore().collection("data").doc("anusha_8923").get()
+    const doc = await admin.firestore().collection("data").doc( companyId || "anusha_8923").get()
     console.log("The doc is", doc.data())
     const departmentData = [entry, ...(doc.data()[department])]
     // let obj ={
@@ -67,7 +67,7 @@ exports.addData = functions
     // }
     let obj = {}
     obj[department] = departmentData
-    await admin.firestore().collection("data").doc("anusha_8923").set(obj ,{merge: true})
+    await admin.firestore().collection("data").doc( companyId || "anusha_8923").set(obj ,{merge: true})
     return departmentData
 })
 
@@ -169,9 +169,9 @@ exports.updateData = functions
 .region("asia-northeast3")
 .https
 .onCall( async (data, context) => {
-  const { department,id, json, modifiedAt, status} = data
+  const { department,id, json, modifiedAt, status, companyId} = data
   const entry  = {...json, modifiedAt, status: status || "active"}
-  const doc = await admin.firestore().collection("data").doc("anusha_8923").get()
+  const doc = await admin.firestore().collection("data").doc( companyId ||"anusha_8923").get()
   let departmentData = doc.data()[department]
   departmentData = departmentData.map( item => {
     if (item.id !== id){
@@ -184,7 +184,7 @@ exports.updateData = functions
   })
   let obj = {}
   obj[department] = departmentData
-  await admin.firestore().collection("data").doc("anusha_8923").set(obj ,{merge: true})
+  await admin.firestore().collection("data").doc(companyId || "anusha_8923").set(obj ,{merge: true})
   return departmentData
 })
 

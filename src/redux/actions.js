@@ -7,7 +7,7 @@ export const updateAuth = (user) => ({
     type: UPDATE_AUTH,
     payload: {user}
 })
-export const udpateRole = (role) => ({
+export const udpateRole = (role, company) => ({
     type: UPDATE_ROLE,
-    payload: {role}
+    payload: {role, company}
 })
