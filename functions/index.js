@@ -211,10 +211,11 @@ exports.getUserRole = functions
   const uid = context.auth.uid
   const user = await admin.firestore().collection("users").doc(uid).get()
   console.log("The data is ", user.data())
-  const {role}  = user.data()
+  const {role, company}  = user.data()
   return {
     uid,
-    role
+    role,
+    company
   }
 
 })
