@@ -57,8 +57,9 @@ function App() {
       if (userAuth){ 
         let getUserRole = functions.httpsCallable('getUserRole')
         const data = await getUserRole()
+        const {role, company} =  data.data;
+        fetchData(company)
         // console.log("The role is", data);
-        const {role} =  data.data;
         console.log("The rolee is", role)
         dispatch(udpateRole(role))
       }
@@ -66,11 +67,11 @@ function App() {
   }, [dispatch])
 
   useEffect(() => {
-    fetchData()
+    // fetchData()
   }, [])
 
-  const fetchData = async () => {
-    const result = await getData();
+  const fetchData = async (companyId) => {
+    const result = await getData(companyId);
     console.log("The result is ", result.data());
     dispatch(fetchDataAction({...result.data(), isFetching:false}))
   }

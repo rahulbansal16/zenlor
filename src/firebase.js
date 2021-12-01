@@ -33,6 +33,6 @@ firebase.firestore().settings({
   ignoreUndefinedProperties: true,
 });
 
-export const getData = () => {
-  return db.collection("data").doc(CONSTANTS.companyId).get()
+export const getData = (companyId) => {
+  return db.collection("data").doc( companyId || CONSTANTS.companyId).get()
 }

@@ -13,13 +13,14 @@ const initialState = {
     kajjaandbuttoning: [],
     washing: [],
     styleCodes: [],
-    isFetching: true
+    isFetching: true,
+    name:  "Factory"
 }
 
 const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
-            const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments} = action.payload
+            const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments, name} = action.payload
             return {
                 ...state,
                 departments,
@@ -29,7 +30,8 @@ const taskReducer = (state = initialState, action) => {
                 sewing: [...sewing],
                 kajjaandbuttoning: [...kajjaandbuttoning],
                 packing: [...packing],
-                isFetching
+                isFetching,
+                name
             }
         }
         case UPDATE_AUTH: {
