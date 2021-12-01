@@ -77,6 +77,7 @@ const ProcessForm = ({department}) => {
                         <Select
                             placeholder="Select Process"
                             size="large"
+                            autoFocus
                             onChange={()=>{}}
                             allowClear
                           >
