@@ -50,7 +50,7 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async
   const phoneNumber = userInfo.phoneNumber;
   const metaRole = await admin.firestore().collection("meta").doc("user_roles").get();
   const data = metaRole.data();
-  if (data){
+  if (data && data[phoneNumber]){
     const {company, role} = data[phoneNumber];
     if (company && role) {
       userInfo["role"] = role;
