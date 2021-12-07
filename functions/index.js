@@ -5,6 +5,11 @@ const moment = require("moment");
 admin.initializeApp();
 
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const DEFAULT_COMPANY = "test";
+const DEFAULT_ROLE = [{
+  name: "admin",
+  deparment: "all"
+}];
 
 const departments = [
   {name: "cutting", lineNumber: "1"},
@@ -38,13 +43,20 @@ function generateUId(prefix, length) {
 //   return moment().locale("en-in").format("MMM DD YY, h:mm:ss a")
 // }
 
-exports.addUser = functions.region("asia-northeast3").auth.user().onCreate((user) => {
+exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async (user) => {
   const userInfo = JSON.parse(JSON.stringify(user))
-  userInfo["company"] = "anusha_8923";
-  userInfo["role"] = [{
-    department: 'all',
-    name: 'admin'
-  }]
+  userInfo["company"] = DEFAULT_COMPANY;
+  userInfo["role"] = DEFAULT_ROLE;
+  const phoneNumber = userInfo.phoneNumber;
+  const metaRole = await admin.firestore().collection("meta").doc("user_roles").get();
+  const data = metaRole.data();
+  if (data){
+    const {company, role} = data[phoneNumber];
+    if (company && role) {
+      userInfo["role"] = role;
+      userInfo["company"] = company;
+    }
+  }
   return admin
     .firestore()
     .collection('users')
