@@ -8,7 +8,7 @@ const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567
 const DEFAULT_COMPANY = "test";
 const DEFAULT_ROLE = [{
   name: "admin",
-  deparment: "all"
+  department: "all"
 }];
 
 const departments = [
