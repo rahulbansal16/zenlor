@@ -50,11 +50,15 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async
   const phoneNumber = userInfo.phoneNumber;
   const metaRole = await admin.firestore().collection("meta").doc("user_roles").get();
   const data = metaRole.data();
+  console.log("The metaRole is", data);
   if (data && data[phoneNumber]){
     const {company, role} = data[phoneNumber];
     if (company && role) {
+      console.log("Setting up the role and company as", role, company);
       userInfo["role"] = role;
       userInfo["company"] = company;
+    } else {
+      console.log("Setting up the default role and company", DEFAULT_ROLE, DEFAULT_COMPANY);
     }
   }
   return admin
@@ -240,4 +244,18 @@ exports.addDepartment = functions
   await admin.firestore().collection("data").doc("anusha_8923").set({
     departments
   } ,{merge: true})
+})
+
+exports.addForm = functions
+.region("asia-northeast3")
+.https
+.onRequest( async ( request, response) => {
+  const {company, form} = request.body;
+  console.log("Adding the form to the ", company, form);
+  await admin.firestore().collection("data").doc(company).set({
+   form    
+  }, {
+    merge: true
+  })
+  response.body(form)
 })
