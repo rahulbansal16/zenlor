@@ -73,7 +73,7 @@ exports.addData = functions
     const entry  = {...json, createdAt, modifiedAt, id, status: 'active'}
     const doc = await admin.firestore().collection("data").doc( companyId || "anusha_8923").get()
     console.log("The doc is", doc.data())
-    const departmentData = [entry, ...(doc.data()[department])]
+    const departmentData = [entry, ...(doc.data()[department] || [])]
     // let obj ={
     //   [department]: departmentData
     // }
@@ -184,7 +184,7 @@ exports.updateData = functions
   const { department,id, json, modifiedAt, status, companyId} = data
   const entry  = {...json, modifiedAt, status: status || "active"}
   const doc = await admin.firestore().collection("data").doc( companyId ||"anusha_8923").get()
-  let departmentData = doc.data()[department]
+  let departmentData = doc.data()[department] || []
   departmentData = departmentData.map( item => {
     if (item.id !== id){
       return item
