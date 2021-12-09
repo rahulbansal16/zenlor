@@ -5,36 +5,20 @@ import { useHistory, useLocation } from "react-router";
 import StyleCodeInput from "./StyleCodeInput";
 import DepartmentHeader from "./DepartmentHeader";
 import {PROCESS_NAME, PROCESS_VALUE} from "../CONSTANTS"
+import { useSelector } from "react-redux";
 const { Option } = Select;
 
 const {CUTTING, SEWING, KAJJAANDBUTTONING, WASHING, PACKING} = PROCESS_NAME
-const process = {
-  cutting: [
-    { name: CUTTING.FABRIC_ISSUED, value: PROCESS_VALUE.CUTTING.FABRIC_ISSUED },
-    { name: CUTTING.OUTPUT, value: PROCESS_VALUE.CUTTING.OUTPUT },
-  ],
-  sewing: [
-    { name: SEWING.LOADING, value: PROCESS_VALUE.SEWING.LOADING },
-    { name: SEWING.OUTPUT, value: PROCESS_VALUE.SEWING.OUTPUT },
-  ],
-  kajjaandbuttoning: [
-    { name: KAJJAANDBUTTONING.RECEIVED_FROM_SEWING, value: PROCESS_VALUE.KAJJAANDBUTTONING.RECEIVED_FROM_SEWING },
-    { name: KAJJAANDBUTTONING.OUTPUT, value: PROCESS_VALUE.KAJJAANDBUTTONING.OUTPUT },
-  ],
-  washing: [
-    { name: WASHING.SENDING, value: PROCESS_VALUE.WASHING.SENDING },
-    { name: WASHING.RECEIVING, value: PROCESS_VALUE.WASHING.RECEIVING },
-  ],
-  packing: [
-    { name: PACKING.RECEIVED_FROM_WASHING, value: PROCESS_VALUE.PACKING.RECEIVED_FROM_WASHING },
-    { name: PACKING.PRE_INSPECTION, value: PROCESS_VALUE.PACKING.PRE_INSPECTION },
-  ],
-};
 
 const ProcessForm = ({department}) => {
     const [form] = Form.useForm();
     const search = useLocation().search
     const lineNumber = new URLSearchParams(search).get("lineNumber");
+    const process = useSelector( state => {
+      const departmentsData = state.taskReducer.form;
+      const departmentData = departmentsData.filter( data => data.name === department)[0]
+      return departmentData["process"]
+    })
 
     const [styleCode, setStyleCode] = useState()
     const history = useHistory()
@@ -81,7 +65,7 @@ const ProcessForm = ({department}) => {
                             onChange={()=>{}}
                             allowClear
                           >
-                              {process[department].map( (item,idx) => <Option size="large" value = {item.value}>{item.name}</Option>)}
+                              {process.map( (item,idx) => <Option size="large" value = {item}>{item}</Option>)}
                         </Select>
                     </Form.Item>
                     <Form.Item label="1. Choose the StyleCode" required>

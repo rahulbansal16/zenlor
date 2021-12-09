@@ -1,34 +1,25 @@
 import { useHistory, useLocation  } from "react-router";
 import { functions } from "../firebase";
-import CuttingForm from "./dataEntry/CuttingForm";
-import SewingForm from "./dataEntry/SewingForm";
-import KBForm from "./dataEntry/KBForm";
-import WashingForm from "./dataEntry/WashingForm";
-import PackingForm from "./dataEntry/PackingForm";
 import DepartmentHeader from "./DepartmentHeader";
 import ProcessHeader from "./ProcessHeader";
 import { getCurrentTime } from "../util";
 import { useSelector } from "react-redux";
+import FormLayout from "./dataEntry/FormLayout";
+import FourNotFour from "../auth/FourNotFour";
 
-const loadForm = (initialValues, department, process, onFinish) => {
-    switch(department){
-        case "cutting":
-            return <CuttingForm initialValues={initialValues} onFinish = {onFinish} process = {process} />
-        case "sewing":
-            return <SewingForm initialValues={initialValues} onFinish = {onFinish} process = {process}/>
-        case "kajjaandbuttoning":
-            return <KBForm initialValues={initialValues} onFinish = {onFinish} process = {process} />
-        case "washing":
-            return <WashingForm initialValues = {initialValues} onFinish = {onFinish} process = {process} />
-        case "packing":
-            return <PackingForm initialValues = {initialValues} onFinish = {onFinish} process = {process} />
-        default:
-            return <></>
+const loadForm = (initialValues, department, process, onFinish, departmentsData) => {
+    const departmentData = departmentsData.filter( departmentData => departmentData.name === department)
+    if (departmentData && departmentData.length > 0){
+        return <FormLayout initialValues={initialValues} formFields = {departmentData[0]["form"][process.toLowerCase()]} onFinish = {onFinish}/>
+    } else  {
+        <FourNotFour/>
     }
+    
 }
 const FormLoader = ({initialValues, department, header = () => {}}) => {
 
     const company = useSelector(state => state.taskReducer.user.company)
+    const form = useSelector( state => state.taskReducer.form)
     const search = useLocation().search
     const styleCode = new URLSearchParams(search).get("styleCode");
     const process = new URLSearchParams(search).get("process")
@@ -70,7 +61,7 @@ const FormLoader = ({initialValues, department, header = () => {}}) => {
             <ProcessHeader process={process}/>
             {header()}
             <div className = "mg-y">
-                {loadForm(initialValues, department, process, onFinish)}
+                {loadForm(initialValues, department, process, onFinish, form)}
             </div>
         </div>
     )

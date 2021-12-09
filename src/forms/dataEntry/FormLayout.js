@@ -60,7 +60,7 @@ const FormLayout = ({initialValues, formFields, onFinish}) => {
               }}
           >
               {formFields.map (
-                  ({label, name}, idx) => <Form.Item label={label} name = {name} key={name} rules={[{
+                  ({label, field:name}, idx) => <Form.Item label={label} name = {name} key={name} rules={[{
                       required: true,
                       message: "Please Enter a value"
                   }]}><InputNumber inputMode="numeric" autoFocus={ idx === 0}  size="large" /></Form.Item>)}
