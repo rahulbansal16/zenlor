@@ -14,13 +14,104 @@ const initialState = {
     washing: [],
     styleCodes: [],
     isFetching: true,
-    name:  "Factory"
+    name:  "Factory",
+    form: [{
+        "name": "cutting",
+        "lines":[1],
+        "process":["fabric issued", "output"],
+        "form": {
+            "fabric issued": [
+                {
+                    "label":"Enter Fabric Issued Quantity",
+                    "field":"fabricIssued"
+                }
+            ],
+            "output": [
+                {
+                    "label":"Enter Cutting Done Quantity",
+                    "field": "output"
+                }
+            ]
+        }
+    },{
+        "name": "sewing",
+        "lines": [1, 2, 3],
+        "process":["loading", "output"],
+        "form": {
+            "loading": [
+                {
+                    "label": "Enter Loading Received Quantity",
+                    "field": "loadingReceivedQuantity"
+                }
+            ],
+            "output": [
+                {
+                    "label":"Enter Sewing Done Quantity",
+                    "field": "output"
+                }
+            ]
+        }
+    },{
+        "name": "kajjaandbuttoning",
+        "lines": [1],
+        "process": ["received from sewing", "output"],
+        "form": {
+            "received from sewing": [
+                {
+                    "label": "Enter Sewing Received Quantity",
+                    "field":"sewingReceivedQuantity"
+                }
+            ],
+            "output": [
+                {
+                    "label": "Enter Kaja & Buttoning Done Quantity",
+                    "field":"output"
+                }
+            ]
+        }
+    },{
+        "name": "washing",
+        "lines": [1],
+        "process": ["sending", "receiving"],
+        "form": {
+            "sending": [
+                {
+                    "label": "Enter Washing Sent Quantity",
+                    "field": "washingSentQuantity"
+                }
+            ],
+            "receiving": [
+                {
+                    "label": "Enter Washing Received Quantity",
+                    "field": "washingReceivedQuantity"
+                }
+            ]
+        }
+    },{
+        "name": "packing",
+        "lines": [1],
+        "process": ["received from washing", "pre inspection"],
+        "form": {
+            "received from washing" : [{
+                "label": "Enter Washing Received Quantity",
+                "field": "washingReceivedQuantity"
+            }],
+            "pre inspection": [{
+                "label": "Enter Packed Quantity",
+                "field": "packedQuantity"
+            }, {
+                "label": "Enter Rejected Quantity",
+                "field":"rejectedQuantity"
+            }]
+        }
+
+    }]
 }
 
 const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
-            const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments, name} = action.payload
+            const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments, name, form} = action.payload
             return {
                 ...state,
                 departments,
@@ -31,7 +122,8 @@ const taskReducer = (state = initialState, action) => {
                 kajjaandbuttoning: [...kajjaandbuttoning],
                 packing: [...packing],
                 isFetching,
-                name
+                name,
+                form: form  || state.form
             }
         }
         case UPDATE_AUTH: {
