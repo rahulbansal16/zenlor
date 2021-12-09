@@ -114,15 +114,16 @@ const taskReducer = (state = initialState, action) => {
             const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments, name, form} = action.payload
             return {
                 ...state,
-                departments,
-                cutting: [...cutting],
-                washing: [...washing],
-                styleCodes: [...styleCodes],
-                sewing: [...sewing],
-                kajjaandbuttoning: [...kajjaandbuttoning],
-                packing: [...packing],
-                isFetching,
-                name,
+                ...action.payload,
+                // departments,
+                // cutting: [...cutting],
+                // washing: [...washing],
+                // styleCodes: [...styleCodes],
+                // sewing: [...sewing],
+                // kajjaandbuttoning: [...kajjaandbuttoning],
+                // packing: [...packing],
+                // isFetching,
+                // name,
                 form: form  || state.form
             }
         }
