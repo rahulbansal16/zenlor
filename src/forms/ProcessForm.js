@@ -16,7 +16,7 @@ const ProcessForm = ({department}) => {
     const lineNumber = new URLSearchParams(search).get("lineNumber");
     const process = useSelector( state => {
       const departmentsData = state.taskReducer.form;
-      const departmentData = departmentsData.filter( data => data.name === department)[0]
+      const departmentData = departmentsData.filter( data => data.id === department)[0]
       return departmentData["process"]
     })
 

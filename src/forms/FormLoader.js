@@ -8,7 +8,7 @@ import FormLayout from "./dataEntry/FormLayout";
 import FourNotFour from "../auth/FourNotFour";
 
 const loadForm = (initialValues, department, process, onFinish, departmentsData) => {
-    const departmentData = departmentsData.filter( departmentData => departmentData.name === department)
+    const departmentData = departmentsData.filter( departmentData => departmentData.id === department)
     if (departmentData && departmentData.length > 0){
         return <FormLayout initialValues={initialValues} formFields = {departmentData[0]["form"][process.toLowerCase()]} onFinish = {onFinish}/>
     } else  {
@@ -16,7 +16,7 @@ const loadForm = (initialValues, department, process, onFinish, departmentsData)
     }
     
 }
-const FormLoader = ({initialValues, department, header = () => {}}) => {
+const FormLoader = ({initialValues, department: departmentId, header = () => {}}) => {
 
     const company = useSelector(state => state.taskReducer.user.company)
     const form = useSelector( state => state.taskReducer.form)
@@ -38,7 +38,7 @@ const FormLoader = ({initialValues, department, header = () => {}}) => {
             lineNumber = undefined
         }
         const body = {
-          department,
+          department: departmentId,
           companyId: company,
           id,
           createdAt: getCurrentTime(),
@@ -52,16 +52,16 @@ const FormLoader = ({initialValues, department, header = () => {}}) => {
             console.log('The body is', body)
             await updateData(body)
         }
-        history.push(`/${department}?lineNumber=${lineNumber}`)
+        history.push(`/${departmentId}?lineNumber=${lineNumber}`)
         window.location.reload();
     }
     return (
         <div>
-            <DepartmentHeader department={department} lineNumber={lineNumber}/>
+            <DepartmentHeader department={departmentId} lineNumber={lineNumber}/>
             <ProcessHeader process={process}/>
             {header()}
             <div className = "mg-y">
-                {loadForm(initialValues, department, process, onFinish, form)}
+                {loadForm(initialValues, departmentId, process, onFinish, form)}
             </div>
         </div>
     )
