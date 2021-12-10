@@ -58,7 +58,7 @@ const FormLoader = ({initialValues, department: departmentId, header = () => {}}
     return (
         <div>
             <DepartmentHeader department={departmentId} lineNumber={lineNumber}/>
-            <ProcessHeader process={process}/>
+            <ProcessHeader process={process} styleCode={styleCode}/>
             {header()}
             <div className = "mg-y">
                 {loadForm(initialValues, departmentId, process, onFinish, form)}
