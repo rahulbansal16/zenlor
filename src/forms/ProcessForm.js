@@ -72,16 +72,17 @@ const ProcessForm = ({ department }) => {
           <Radio.Group>
             <Space direction="vertical">
               {process.map((item, idx) => (
-                <Radio value={item}>{item}</Radio>
+                <Radio value={item}>{item.toUpperCase()}</Radio>
               ))}
             </Space>
           </Radio.Group>
         </Form.Item>
         <Form.Item
-          label="1. Choose the StyleCode"
+          label="2. Choose the StyleCode"
           name="styleCodeInput"
           rules={[
             {
+                required: true,
               validator: checkStyleCode,
             },
           ]}
