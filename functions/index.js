@@ -71,11 +71,22 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async
 exports.addData = functions
   .region("asia-northeast3")
   .https.onCall( async (body, context) => {
-    const { department, json, createdAt, modifiedAt, companyId} = body
+
+    if (!context.auth.uid)
+    return {
+      message: "Not permitted to update the Data"
+    }
+
+    const uid = context.auth.uid
+    const user = await admin.firestore().collection("users").doc(uid).get()
+    console.log("The data is ", user.data())
+    const {company}  = user.data()
+
+    const { department, json, createdAt, modifiedAt} = body
     console.log("The body is", body)
     const id = generateUId("", 15)
     const entry  = {...json, createdAt, modifiedAt, id, status: 'active'}
-    const doc = await admin.firestore().collection("data").doc( companyId || "anusha_8923").get()
+    const doc = await admin.firestore().collection("data").doc(company).get()
     console.log("The doc is", doc.data())
     const departmentData = [entry, ...(doc.data()[department] || [])]
     // let obj ={
@@ -83,7 +94,7 @@ exports.addData = functions
     // }
     let obj = {}
     obj[department] = departmentData
-    await admin.firestore().collection("data").doc( companyId || "anusha_8923").set(obj ,{merge: true})
+    await admin.firestore().collection("data").doc(company).set(obj ,{merge: true})
     return departmentData
 })
 
@@ -178,7 +189,6 @@ const generateData = (departmentData ,department, line) => {
    fileData = `\n${department} and lineNumber ${line}\n` + fileData
   return fileData
 }
-
 
 
 exports.updateData = functions
