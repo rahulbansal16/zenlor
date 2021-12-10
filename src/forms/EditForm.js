@@ -1,4 +1,5 @@
 import { Button } from "antd"
+import { useSelector } from "react-redux"
 import { useHistory, useLocation } from "react-router"
 import { functions } from "../firebase"
 import { getCurrentTime } from "../util"
@@ -11,12 +12,14 @@ const EditForm = ({department}) => {
     const search = useLocation().search
     const id = new URLSearchParams(search).get("id");
     const lineNumber = new URLSearchParams(search).get("lineNumber")
+    const company = useSelector( state => state.taskReducer.user.company)
 
     const onDeleteHandler = async () => {
         console.log("Deleting the update for the id", id, department);
         let updateData = functions.httpsCallable('updateData')
         const body = {
             department,
+            companyId: company,
             id,
             status:"deleted",
             modifiedAt: getCurrentTime(),
