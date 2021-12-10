@@ -257,5 +257,5 @@ exports.addForm = functions
   }, {
     merge: true
   })
-  response.body(form)
+  response.send(form)
 })

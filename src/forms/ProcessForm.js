@@ -32,6 +32,13 @@ const ProcessForm = ({department}) => {
         })
     }
 
+    const checkStyleCode = (value) => {
+        if (!styleCode)
+            return Promise.reject(new Error('Please Select the StyleCode'));
+        else 
+            return Promise.resolve();
+      };
+
     return (<div>
                 <DepartmentHeader department={department} lineNumber={lineNumber}/>
                 <Form
@@ -68,7 +75,9 @@ const ProcessForm = ({department}) => {
                               {process.map( (item,idx) => <Option size="large" value = {item}>{item}</Option>)}
                         </Select>
                     </Form.Item>
-                    <Form.Item label="1. Choose the StyleCode" required>
+                    <Form.Item label="1. Choose the StyleCode" name="styleCodeInput" rules = {[{
+                        validator: checkStyleCode,
+                    }]}>
                         <StyleCodeInput onSelectCb={setStyleCode}/>
                     </Form.Item>
                     <div  className = "fx-sp-bt wd-100">
