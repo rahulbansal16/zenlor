@@ -185,9 +185,20 @@ exports.updateData = functions
 .region("asia-northeast3")
 .https
 .onCall( async (data, context) => {
-  const { department,id, json, modifiedAt, status, companyId} = data
+
+  if (!context.auth.uid)
+    return {
+      message: "Not permitted to update the Data"
+    }
+
+  const uid = context.auth.uid
+  const user = await admin.firestore().collection("users").doc(uid).get()
+  console.log("The data is ", user.data())
+  const {company}  = user.data()
+
+  const { department,id, json, modifiedAt, status} = data
   const entry  = {...json, modifiedAt, status: status || "active"}
-  const doc = await admin.firestore().collection("data").doc( companyId ||"anusha_8923").get()
+  const doc = await admin.firestore().collection("data").doc( company || DEFAULT_COMPANY).get()
   let departmentData = doc.data()[department] || []
   departmentData = departmentData.map( item => {
     if (item.id !== id){
@@ -200,7 +211,7 @@ exports.updateData = functions
   })
   let obj = {}
   obj[department] = departmentData
-  await admin.firestore().collection("data").doc(companyId || "anusha_8923").set(obj ,{merge: true})
+  await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).set(obj ,{merge: true})
   return departmentData
 })
 

@@ -1,5 +1,4 @@
 import { Button } from "antd"
-import { useSelector } from "react-redux"
 import { useHistory, useLocation } from "react-router"
 import { functions } from "../firebase"
 import { getCurrentTime } from "../util"
