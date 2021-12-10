@@ -1,10 +1,14 @@
+import { Button } from "antd";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router"
+
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import './App.less';
 import Authorization from "./auth/Authorization";
 import Logout from "./auth/Logout";
 import Header from './components/Header';
+import Loader from "./components/Loader";
 import Login from "./container/Login";
 import { auth, functions, getData } from "./firebase";
 import Department from "./forms/dataEntry/Department";
@@ -50,7 +54,11 @@ const renderPages = () => {
 }
 function App() {
   const dispatch = useDispatch()
+  const user = useSelector(state => state.taskReducer.user)
+  const isFetching = useSelector( state => state.taskReducer.isFetching)
+  const history = useHistory()
 
+  
   useEffect( () => {
     auth.onAuthStateChanged( async userAuth => {
       dispatch(updateAuth(userAuth))
@@ -73,6 +81,20 @@ function App() {
     console.log("The result is ", result.data());
     dispatch(fetchDataAction({...result.data(), isFetching:false}))
   }
+
+  if (!user)
+  return <div>
+      <div>Please Login To continue</div>
+      <Button 
+      type="primary"
+      size="large"
+      onClick = { () => history.push("/login")}>Login</Button>
+  </div>
+
+  if (isFetching){
+      return <Loader/>
+  }
+
 
   return (
     <div className="App">
