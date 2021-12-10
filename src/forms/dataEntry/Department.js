@@ -1,11 +1,18 @@
 import { useSelector } from "react-redux"
 import { useHistory } from "react-router"
+import Loader from "../../components/Loader"
 
 const { Button} = require("antd")
 const Department = () => {
 
     const user = useSelector(state => state.taskReducer.user)
     const departmentsData = useSelector( state => state.taskReducer.form)
+    const isFetching = useSelector( state => state.taskReducer.isFetching)
+    const history = useHistory()
+
+    if (isFetching){
+        return <Loader/>
+    }
     let departments = []
     for ( let departmentData of departmentsData){
         const {name, lines, id} = departmentData;
@@ -18,9 +25,6 @@ const Department = () => {
         }
     }
     console.log("The departments are", departments);
-
-    const history = useHistory()
-
     const onClick = (path) => {
         history.push(path)
     }
