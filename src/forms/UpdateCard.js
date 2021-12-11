@@ -57,7 +57,7 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, 
         actions={
             [
                 // <Button danger className="wd-100"size="medium">Delete</Button>,
-                <Button icon={<EditOutlined />} type="link" className="wd-100"size="medium" onClick={onClick}>Update</Button>
+                <Button size="large" icon={<EditOutlined />} type="link" className="wd-100"size="medium" onClick={onClick}>Update</Button>
             ]
         }
         style={{
