@@ -303,7 +303,7 @@ const getAggregate = async (company) => {
 
   for (let department of departments){
     const {id: departmentId} = department;
-    for (let update of factoryData[departmentId]){
+    for (let update of (factoryData[departmentId] || [])){
 
       if (update.status !== "active")
         continue;
