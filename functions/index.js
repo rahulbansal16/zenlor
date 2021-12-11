@@ -378,13 +378,13 @@ exports.addMetaRole = functions
   console.log("The company and roles are ",company, roles)
   let obj = {}
   for (let role of roles){
-    const {phoneNumber, department} = role
+    const {phoneNumber, departments} = role
     obj["+91"+phoneNumber] = {
       company,
-      role: [{
+      role: departments.map(department => ({
         department,
         name: department === "all"?"admin":"manager"
-      }]
+      }))
     }
   }
   await admin.firestore().collection("meta").doc("user_roles").set(obj,{
