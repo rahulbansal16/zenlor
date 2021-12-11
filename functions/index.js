@@ -280,3 +280,70 @@ exports.addForm = functions
   })
   response.send(form)
 })
+
+const getCompany = async (data, context) => {
+  const uid = context.auth.uid
+  const user = await admin.firestore().collection("users").doc(uid).get()
+  console.log("The data is ", user.data())
+  return user.data();
+}
+
+const getDepartments = form => {
+  return form.map( department =>  ({id: department.id, process: department.process, lines: department.lines }))
+}
+
+
+/**
+ * 
+ *  {
+ * 
+ *  stylecode-department-line-process: { fabricIssued:212}
+ * }
+ * 
+ */
+exports.dataInsights = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+
+  if (!context.auth.uid){
+    return {
+      message: "Not allowed"
+    }
+  }
+
+  let result = {};
+  const {company} = getCompany(data, context);
+  const dataDoc = await admin.firestore().collection("data").doc(company).get();
+  const factoryData = dataDoc.data();
+  const departments = getDepartments(factoryData["form"])
+  console.log("The departments are", departments);
+
+  for (let department of departments){
+    const {id: departmentId} = department;
+    for (let update of factoryData[departmentId]){
+
+      if (update.status !== "active")
+        continue;
+
+      const {values, lineNumber, process, styleCode} = update;
+      const processKey = process.toLowerCase()
+      const key = `${styleCode.toLowerCase()}-${departmentId.toLowerCase()}-${lineNumber}-${processKey}`
+      if (!result[key]){
+        result[key] = {...values}
+      } else {
+        let total = {}
+        for ( const fieldKey in values) {
+          total[fieldKey] = values[fieldKey] + (result[key][fieldKey] || 0)
+        }
+        result[key] = {
+          ...result[key],
+          ...total
+        }
+        console.log("The total is", total)
+      }
+    }
+  }
+  return result;
+
+})
