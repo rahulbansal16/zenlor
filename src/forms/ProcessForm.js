@@ -6,6 +6,8 @@ import DateSelector from "../components/DateSelector";
 import { formItemLayout } from "./dataEntry/FormLayout";
 import DepartmentHeader from "./DepartmentHeader";
 import StyleCodeInput from "./StyleCodeInput";
+import { RightOutlined,CloseCircleOutlined} from "@ant-design/icons";
+
 
 const ProcessForm = ({ department }) => {
   const [form] = Form.useForm();
@@ -93,10 +95,10 @@ const ProcessForm = ({ department }) => {
           <StyleCodeInput onSelectCb={setStyleCode} />
         </Form.Item>
         <div className="fx-sp-bt wd-100">
-          <Button danger onClick={() => history.goBack()} className="wd-45">
+          <Button icon={<CloseCircleOutlined />} danger onClick={() => history.goBack()} className="wd-45">
             Cancel
           </Button>
-          <Button type="primary" htmlType="submit" className="wd-45">
+          <Button icon ={<RightOutlined />}type="primary" htmlType="submit" className="wd-45">
             Next
           </Button>
         </div>
