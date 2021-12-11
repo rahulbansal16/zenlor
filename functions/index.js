@@ -293,27 +293,9 @@ const getDepartments = form => {
 }
 
 
-/**
- * 
- *  {
- * 
- *  stylecode-department-line-process: { fabricIssued:212}
- * }
- * 
- */
-exports.dataInsights = functions
-.region("asia-northeast3")
-.https
-.onCall( async (data, context) => {
-
-  if (!context.auth.uid){
-    return {
-      message: "Not allowed"
-    }
-  }
-
+const getAggregate = async (company) => {
+  console.log("The company is", company)
   let result = {};
-  const {company} = getCompany(data, context);
   const dataDoc = await admin.firestore().collection("data").doc(company).get();
   const factoryData = dataDoc.data();
   const departments = getDepartments(factoryData["form"])
@@ -344,6 +326,42 @@ exports.dataInsights = functions
       }
     }
   }
+  console.log("The result is", result)
   return result;
+}
+/**
+ * 
+ *  {
+ * 
+ *  stylecode-department-line-process: { fabricIssued:212}
+ * }
+ * 
+ */
+exports.dataInsights = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  if (!context.auth.uid){
+    return {
+      message: "Not allowed"
+    }
+  }
+  const {company} = getCompany(data, context);
+  return getAggregate(company || "test")
+})
 
+exports.getData = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  if (!context.auth.uid){
+    return {
+      message: "Not allowed"
+    }
+  }
+  const {company} = getCompany(data, context);
+  const companyDoc = await admin.firestore().collection("data").doc(company).get()
+  const companyData = companyDoc.data();
+  companyData["aggregate"] = {...await getAggregate(company)}
+  return companyData
 })
