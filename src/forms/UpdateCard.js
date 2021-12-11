@@ -41,7 +41,7 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, 
                 <div className="fx-sp-bt">
                     <div id ="key" style={{fontWeight:20}}>{key}</div>
                     <div><div>
-                        {data[key]}/{total[key]}
+                        {data[key]} | {total[key]}
                         </div>
                     </div>
                 </div>
