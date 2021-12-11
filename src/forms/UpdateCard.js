@@ -1,6 +1,8 @@
-import { Card } from "antd"
+import { Button, Card } from "antd"
 import { useHistory} from "react-router"
 import { appendToPath } from "../util"
+import { useState } from "react"
+import { EditOutlined} from "@ant-design/icons";
 
 const CardTitle = ({styleCode, process}) => {
     return (
@@ -18,6 +20,7 @@ const CardTitle = ({styleCode, process}) => {
 const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, data, total, lineNumber}) => {
     console.log("The total is", total)
     const history = useHistory()
+    const [loading, setLoading] = useState(false);
     const onClick = () => {
         history.push({
             pathname: appendToPath(history, '/form/edit'),
@@ -50,8 +53,13 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, 
         key = {styleCodeId}
         title = {<CardTitle styleCode={styleCode} process={process}/>}
         bordered={true}
-        onClick = {onClick}
         hoverable
+        actions={
+            [
+                // <Button danger className="wd-100"size="medium">Delete</Button>,
+                <Button icon={<EditOutlined />} type="link" className="wd-100"size="medium" onClick={onClick}>Update</Button>
+            ]
+        }
         style={{
             width: "100%",
             marginBottom:'10px'
