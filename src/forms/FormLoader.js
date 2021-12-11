@@ -6,6 +6,7 @@ import { getCurrentTime } from "../util";
 import { useSelector } from "react-redux";
 import FormLayout from "./dataEntry/FormLayout";
 import FourNotFour from "../auth/FourNotFour";
+import moment from "moment";
 
 const loadForm = (initialValues, department, process, onFinish, departmentsData) => {
     const departmentData = departmentsData.filter( departmentData => departmentData.id === department)
@@ -23,6 +24,7 @@ const FormLoader = ({initialValues, department: departmentId, header = () => {}}
     const search = useLocation().search
     const styleCode = new URLSearchParams(search).get("styleCode");
     const process = new URLSearchParams(search).get("process")
+    const day = new URLSearchParams(search).get("day");
     let lineNumber = new URLSearchParams(search).get("lineNumber")
     const id = new URLSearchParams(search).get("id")
     const history = useHistory()
@@ -41,7 +43,10 @@ const FormLoader = ({initialValues, department: departmentId, header = () => {}}
           department: departmentId,
           companyId: company,
           id,
-          createdAt: getCurrentTime(),
+        //   createdAt is for the date for which entry is made, Read it as entryForDate
+          createdAt: moment().subtract(day, "days").format("MMM DD YY, h:mm:ss a"),
+        //   enteredAt is intended for 
+          enteredAt: getCurrentTime() ,
           modifiedAt: getCurrentTime(),
           json: { values, styleCode, process, lineNumber},
         };

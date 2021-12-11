@@ -82,10 +82,10 @@ exports.addData = functions
     console.log("The data is ", user.data())
     const {company}  = user.data()
 
-    const { department, json, createdAt, modifiedAt} = body
+    const { department, json, createdAt, modifiedAt, enteredAt} = body
     console.log("The body is", body)
     const id = generateUId("", 15)
-    const entry  = {...json, createdAt, modifiedAt, id, status: 'active'}
+    const entry  = {...json, createdAt, modifiedAt, id, status: 'active', enteredAt}
     const doc = await admin.firestore().collection("data").doc(company).get()
     console.log("The doc is", doc.data())
     const departmentData = [entry, ...(doc.data()[department] || [])]

@@ -2,6 +2,7 @@ import { Button, Form, Radio, Space } from "antd";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router";
+import DateSelector from "../components/DateSelector";
 import { formItemLayout } from "./dataEntry/FormLayout";
 import DepartmentHeader from "./DepartmentHeader";
 import StyleCodeInput from "./StyleCodeInput";
@@ -19,6 +20,7 @@ const ProcessForm = ({ department }) => {
   });
 
   const [styleCode, setStyleCode] = useState();
+  const [day, setDay] = useState(0);
   const history = useHistory();
 
   const onFinish = (value) => {
@@ -28,7 +30,7 @@ const ProcessForm = ({ department }) => {
       pathname: `/${department}/form`,
       search: `styleCode=${styleCode || 123}&process=${process}&lineNumber=${
         lineNumber || 1
-      }`,
+      }&day=${day}`,
     });
   };
 
@@ -41,6 +43,7 @@ const ProcessForm = ({ department }) => {
   return (
     <div>
       <DepartmentHeader department={department} lineNumber={lineNumber} />
+      <DateSelector onChange={setDay}/>
       <Form
         {...formItemLayout}
         style={{
