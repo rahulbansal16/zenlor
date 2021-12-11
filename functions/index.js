@@ -346,7 +346,7 @@ exports.dataInsights = functions
       message: "Not allowed"
     }
   }
-  const {company} = getCompany(data, context);
+  const {company} = await getCompany(data, context);
   return getAggregate(company || "test")
 })
 
@@ -359,7 +359,8 @@ exports.getData = functions
       message: "Not allowed"
     }
   }
-  const {company} = getCompany(data, context);
+  const {company} = await getCompany(data, context);
+  console.log("The company is", company);
   const companyDoc = await admin.firestore().collection("data").doc(company).get()
   const companyData = companyDoc.data();
   companyData["aggregate"] = {...await getAggregate(company)}

@@ -15,7 +15,8 @@ const CardTitle = ({styleCode, process}) => {
     )
   }
 
-const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, data, lineNumber}) => {
+const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, data, total, lineNumber}) => {
+    console.log("The total is", total)
     const history = useHistory()
     const onClick = () => {
         history.push({
@@ -36,7 +37,10 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, 
             output.push(
                 <div className="fx-sp-bt">
                     <div id ="key" style={{fontWeight:20}}>{key}</div>
-                    <div>{data[key]}</div>
+                    <div><div>
+                        {data[key]}/{total[key]}
+                        </div>
+                    </div>
                 </div>
                 )
         }

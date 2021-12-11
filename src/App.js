@@ -6,7 +6,7 @@ import Authorization from "./auth/Authorization";
 import Logout from "./auth/Logout";
 import Header from './components/Header';
 import Login from "./container/Login";
-import { auth, functions, getData } from "./firebase";
+import { auth, functions} from "./firebase";
 import Department from "./forms/dataEntry/Department";
 import EditForm from "./forms/EditForm";
 import FormLoader from './forms/FormLoader';
@@ -69,9 +69,10 @@ function App() {
   }, [])
 
   const fetchData = async (companyId) => {
+    let getData = functions.httpsCallable('getData')
     const result = await getData(companyId);
-    console.log("The result is ", result.data());
-    dispatch(fetchDataAction({...result.data(), isFetching:false}))
+    console.log("The result is ", result.data);
+    dispatch(fetchDataAction({...result.data, isFetching:false}))
   }
 
   return (
