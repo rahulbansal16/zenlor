@@ -366,3 +366,29 @@ exports.getData = functions
   companyData["aggregate"] = {...await getAggregate(company)}
   return companyData
 })
+
+/**
+ * { company, roles:[ { phoneNumber, department } ]}
+ */ 
+exports.addMetaRole = functions
+.region("asia-northeast3")
+.https 
+.onRequest(async (request, response) => {
+  const {company, roles } = request.body;
+  console.log("The company and roles are ",company, roles)
+  let obj = {}
+  for (let role of roles){
+    const {phoneNumber, department} = role
+    obj["+91"+phoneNumber] = {
+      company,
+      role: [{
+        department,
+        name: department === "all"?"admin":"manager"
+      }]
+    }
+  }
+  await admin.firestore().collection("meta").doc("user_roles").set(obj,{
+    merge:true
+  })
+  response.send(obj)
+})
