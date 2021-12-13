@@ -102,19 +102,38 @@ exports.addData = functions
 exports.generateCSV = functions
 .region("asia-northeast3")
 .https.onRequest( async (request, response) => {
-  let {department, lineNumber } = request.body;
+  let {department, lineNumber, company } = request.body;
   department = department || "all"
   lineNumber = lineNumber || '1'
   lineNumber = lineNumber.toString()
-
-  const doc = await admin.firestore().collection("data").doc("anusha_8923").get()
+  company = company || "test"
+  console.log("The company is", company)
+  const doc = await admin.firestore().collection("data").doc(company).get()
   const data = doc.data()
   // console.log(departmentData)
+  let departments = []
+  let values = {}
+  for (let department of data["form"]){
+   const {id, lines, process, form}  = department;
+   values[id] = []
+   for(let proces of process){
+     console.log("The process are", form[proces].map( ({field}) => field ))
+     values[id]=values[id].concat(form[proces].map( ({field}) => field ))
+   }
+   for (let line of lines){
+     departments.push({
+       id,
+       lineNumber:line
+     })
+   }
+  }
+  // getDepartments(data["form"]);
+  console.log("The departments are", departments);
   let file = ""
   if (department !== "all"){
-    file = generateData(data[department], department, lineNumber)
+    file = generateData(data[department], department, lineNumber, values)
   } else {
-    file += departments.map( ({name, lineNumber}) =>  generateData(data[name], name, lineNumber) )
+    file += departments.map( ({id, lineNumber}) =>  generateData(data[id], id, lineNumber, values) )
   }
   // console.log(file)
   response.attachment(`${department}:${lineNumber}.csv`)
@@ -173,8 +192,9 @@ const mergeStyleCode = (data) => {
   return result
 }
 
-const generateData = (departmentData ,department, line) => {
-  let filteredDepartmentData = departmentData.filter( ({lineNumber, status})  => lineNumber === line && status === "active")
+const generateData = (departmentData ,department, line, values) => {
+  console.log("The values are", values)
+  let filteredDepartmentData = departmentData.filter( ({lineNumber, status})  => lineNumber === line.toString() && status === "active")
   filteredDepartmentData = mergeStyleCode(filteredDepartmentData)
   let keys = values[department]
   let fileData = ""
