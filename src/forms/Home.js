@@ -61,7 +61,7 @@ const Home = ({ department }) => {
     <div>
       <DepartmentHeader department={department} lineNumber={lineNumber} />
       {isFetching && <Loader />}
-      <div className="mg-y">
+      <div className="mg-y" style={{paddingBottom:"20px"}}>
         {!isFetching &&
       p.map(
             ({

@@ -61,13 +61,13 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, enteredAt, updatedAt
         hoverable
         actions={
             [
-                <Button type="round" color="blue"style={{backgroundColor:"lightblue"}} className="outline wd-100">{date}</Button>,
+                <Button type="round" color="blue"style={{backgroundColor:"lightblue"}} className="wd-100">{date}</Button>,
                 <Button icon={<EditOutlined />} type="link" className="outline wd-100" onClick={onClick}>Update</Button>
             ]
         }
         style={{
             width: "100%",
-            marginBottom:'20px',
+            marginBottom:'25px',
             // border:"solid 0.25px",
             boxShadow: "1px 1px 5px #000000"
           }}
