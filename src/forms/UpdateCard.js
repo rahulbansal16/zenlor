@@ -1,8 +1,9 @@
 import { Button, Card } from "antd"
 import { useHistory} from "react-router"
-import { appendToPath } from "../util"
+import { appendToPath, formatDate } from "../util"
 import { useState } from "react"
 import { EditOutlined} from "@ant-design/icons";
+import moment from "moment";
 
 const CardTitle = ({styleCode, process}) => {
     return (
@@ -20,7 +21,6 @@ const CardTitle = ({styleCode, process}) => {
 const UpdateCard = ({id, styleCodeId, styleCode, createdAt, enteredAt, updatedAt, process, data, total, lineNumber}) => {
     console.log("The total is", total)
     const history = useHistory()
-    const [loading, setLoading] = useState(false);
     const onClick = () => {
         history.push({
             pathname: appendToPath(history, '/form/edit'),
@@ -47,11 +47,11 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, enteredAt, updatedAt
     }
     const parseDate = (enteredAt, createdAt) => {
         if (!enteredAt)
-            return { createdAt, color:"primary"}
+            return { createdAt: formatDate(createdAt), color:"primary"}
         if (enteredAt !== createdAt){
-            return {createdAt: createdAt.substring(0,9) + " Late Entry", color:"danger"}
+            return {createdAt: formatDate(createdAt).substring(0,12) + " Late Entry", color:"danger"}
         }
-        return  { createdAt, color:"primary" }
+        return  { createdAt: formatDate(createdAt), color:"primary" }
     }
     const {createdAt: date, color} = parseDate(enteredAt, createdAt)
     return <Card
@@ -61,8 +61,8 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, enteredAt, updatedAt
         hoverable
         actions={
             [
-                // <Button danger className="wd-100"size="medium">Delete</Button>,
-                <Button size="large" icon={<EditOutlined />} type="link" className="wd-100"size="medium" onClick={onClick}>Update</Button>
+                <Button type="round" color="blue"style={{backgroundColor:"lightblue"}} className="outline wd-100">{date}</Button>,
+                <Button icon={<EditOutlined />} type="link" className="outline wd-100" onClick={onClick}>Update</Button>
             ]
         }
         style={{
@@ -75,7 +75,6 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, enteredAt, updatedAt
         <div>
             {printValue(data)}
             <div className="txt-al-left" style={{fontWeight:20}}>
-                <Button type={color} shape="round" className="mg-top-10">{date}</Button>
             </div>
         </div>
     </Card>
