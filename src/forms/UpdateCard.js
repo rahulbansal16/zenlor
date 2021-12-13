@@ -31,18 +31,14 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, enteredAt, updatedAt
         })
     }
     const printValue = (data) => {
-        let keys =[]
-        let values = []
+        let keys = Object.keys(data).sort()
         let output = []
-        for (let key in data){
-            keys.push(key)
-            values.push(data[key])
+        for (let key of keys){
             output.push(
                 <div className="fx-sp-bt">
                     <div id ="key" style={{fontWeight:20}}>{key}</div>
-                    <div><div>
+                    <div>
                         {data[key]} | {total[key]}
-                        </div>
                     </div>
                 </div>
                 )
