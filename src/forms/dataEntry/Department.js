@@ -41,7 +41,7 @@ const Department = () => {
     
     return (
         <div className="mg-x-8">
-            {departments.map( ({name, id, line}) => <Button size="large" className="wd-100 mg-y" type="primary" onClick = { () => onClick(`/${id}?lineNumber=${line}`)}>{name}</Button>)}
+            {departments.map( ({name, id, line}) => <Button size="large" className="wd-100 mg-y outline" type="link" onClick = { () => onClick(`/${id}?lineNumber=${line}`)}>{name}</Button>)}
         </div>
     )
 }
