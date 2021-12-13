@@ -1,5 +1,6 @@
 import { Button, Empty } from "antd";
 import { useState } from "react";
+
 import { useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router";
 import Loader from "../components/Loader";
@@ -7,6 +8,7 @@ import PlusButton from "../components/PlusButton";
 import DepartmentHeader from "./DepartmentHeader";
 import UpdateCard from "./UpdateCard";
 import { MenuOutlined } from "@ant-design/icons";
+import moment from "moment";
 
 const filterData = (state, department, lineNumber) => {
   let departmentData = state.taskReducer[department] || [];
@@ -53,13 +55,15 @@ const Home = ({ department }) => {
     console.log(styleCode, department, lineNumber, process)
     return `${styleCode.toLowerCase()}-${department.toLowerCase()}-${lineNumber}-${process.toLowerCase()}`;
   };
+  let p = updates.sort((a,b)=> -moment(a.createdAt).valueOf() + moment(b.createdAt).valueOf())
+  console.log("The p and updaes are",p, updates)
   return (
     <div>
       <DepartmentHeader department={department} lineNumber={lineNumber} />
       {isFetching && <Loader />}
       <div className="mg-y">
         {!isFetching &&
-          updates.map(
+      p.map(
             ({
               id,
               styleCode,
