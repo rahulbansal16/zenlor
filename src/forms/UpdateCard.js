@@ -62,7 +62,9 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, 
         }
         style={{
             width: "100%",
-            marginBottom:'10px'
+            marginBottom:'20px',
+            // border:"solid 0.25px",
+            boxShadow: "1px 1px 5px #000000"
           }}
     >
         <div>
