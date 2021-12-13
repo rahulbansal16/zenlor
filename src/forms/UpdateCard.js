@@ -17,7 +17,7 @@ const CardTitle = ({styleCode, process}) => {
     )
   }
 
-const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, data, total, lineNumber}) => {
+const UpdateCard = ({id, styleCodeId, styleCode, createdAt, enteredAt, updatedAt, process, data, total, lineNumber}) => {
     console.log("The total is", total)
     const history = useHistory()
     const [loading, setLoading] = useState(false);
@@ -49,6 +49,15 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, 
         }
         return output
     }
+    const parseDate = (enteredAt, createdAt) => {
+        if (!enteredAt)
+            return { createdAt, color:"primary"}
+        if (enteredAt !== createdAt){
+            return {createdAt: createdAt.substring(0,9) + " Late Entry", color:"danger"}
+        }
+        return  { createdAt, color:"primary" }
+    }
+    const {createdAt: date, color} = parseDate(enteredAt, createdAt)
     return <Card
         key = {styleCodeId}
         title = {<CardTitle styleCode={styleCode} process={process}/>}
@@ -68,10 +77,10 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, updatedAt, process, 
           }}
     >
         <div>
-            <div className="txt-al-left" style={{fontWeight:20}}>
-                Updated At {createdAt}
-            </div>
             {printValue(data)}
+            <div className="txt-al-left" style={{fontWeight:20}}>
+                <Button type={color} shape="round" className="mg-top-10">{date}</Button>
+            </div>
         </div>
     </Card>
 }

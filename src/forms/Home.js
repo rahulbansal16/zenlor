@@ -66,6 +66,7 @@ const Home = ({ department }) => {
               styleCodeId,
               process,
               createdAt,
+              enteredAt,
               lineNumber,
               values,
             }) => (
@@ -76,6 +77,7 @@ const Home = ({ department }) => {
                 styleCodeId={styleCodeId}
                 process={process}
                 createdAt={createdAt}
+                enteredAt={enteredAt}
                 data={values}
                 total={total[generateKey(styleCode, department, lineNumber, process)]}
                 lineNumber={lineNumber}
