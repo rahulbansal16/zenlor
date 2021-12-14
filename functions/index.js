@@ -248,11 +248,37 @@ exports.updateData = functions
 exports.insertStyleCode = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
-  const {styleCodes} = data
-  return await admin.firestore().collection("data").doc("anusha_8923").set({
-    styleCodes
+.onRequest( async (request, response) => {
+
+  const {styleCodes, company} = request.body;
+  console.log("The styleCodes and company are", styleCodes, company)
+  const doc = await admin.firestore().collection("data").doc(company).get();
+  console.log("The doc data", doc.data())
+  let existingStyleCodes = doc.data()["styleCodes"] || [];
+  
+  existingStyleCodes =  existingStyleCodes.concat( styleCodes.map(styleCode => ({
+    id:  styleCode.toUpperCase(),
+    name: styleCode.toUpperCase()
+  })))
+
+  console.log("The styleCodes are", existingStyleCodes)
+  existingStyleCodes = existingStyleCodes.reduce((acc, current) => {
+    const x = acc.find(item => item.id === current.id);
+    if (!x) {
+      return acc.concat([current]);
+    } else {
+      return acc;
+    }
+  }, []);
+
+  await admin.firestore().collection("data").doc(company).set({
+    styleCodes: existingStyleCodes
   } ,{merge: true})
+
+  response.send({
+    styleCodes: existingStyleCodes
+  })
+
 })
 
 exports.getUserRole = functions
