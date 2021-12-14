@@ -303,6 +303,16 @@ exports.getUserRole = functions
 
 })
 
+exports.backUpCompany = functions
+.region("asia-northeast3")
+.https
+.onRequest( async(request, response) => {
+  const {company} = request.body;
+  const doc = await admin.firestore().collection("data").doc(company).get();
+  await admin.firestore().collection("backup").doc(company + moment().valueOf()).set(doc.data());
+  response.send(doc.data())
+})
+
 exports.addDepartment = functions
 .region("asia-northeast3")
 .https
