@@ -56,6 +56,28 @@ const Home = ({ department }) => {
     return `${styleCode.toLowerCase()}-${department.toLowerCase()}-${lineNumber}-${process.toLowerCase()}`;
   };
   let p = updates.sort((a,b)=> -moment(a.createdAt).valueOf() + moment(b.createdAt).valueOf())
+  const cumulative = {}
+  console.log("The p is", p);
+  for (let i = p.length-1; i >= 0; i -= 1){
+    let update = p[i]
+    console.log("The udpate is", update);
+    const { styleCode, department, lineNumber, process, values} = update;
+    console.log("The updates are ", update);
+    const key = generateKey(styleCode, department||"", lineNumber, process);
+    const pastValues = cumulative[key];
+    if (!pastValues){
+      p[i].cumulative = values;
+    } else {
+      let newValues = {...pastValues};
+      for (let key in values){
+        newValues[key] = (newValues[key] || 0) +  values[key]
+      }
+      p[i].cumulative = newValues;
+    }
+    cumulative[key] = p[i].cumulative;
+  }
+  console.log("The cumulative is", cumulative);
+
   console.log("The p and updaes are",p, updates)
   return (
     <div>
@@ -72,6 +94,7 @@ const Home = ({ department }) => {
               createdAt,
               enteredAt,
               lineNumber,
+              cumulative,
               values,
             }) => (
               <UpdateCard
@@ -83,7 +106,7 @@ const Home = ({ department }) => {
                 createdAt={createdAt}
                 enteredAt={enteredAt}
                 data={values}
-                total={total[generateKey(styleCode, department, lineNumber, process)]}
+                total={cumulative}
                 lineNumber={lineNumber}
               />
             )
