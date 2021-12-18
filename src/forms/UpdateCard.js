@@ -30,6 +30,17 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, enteredAt, updatedAt
             }
         })
     }
+
+    const printAggregate = (key, individualValue, cumulativeValue) => {
+        if ("CARTON No.".startsWith(key)){
+            return individualValue;
+        }
+        if (!cumulativeValue){
+            return individualValue
+        }
+        return individualValue + " | " + cumulativeValue
+    }
+
     const printValue = (data) => {
         let keys = Object.keys(data).sort()
         let output = []
@@ -38,7 +49,8 @@ const UpdateCard = ({id, styleCodeId, styleCode, createdAt, enteredAt, updatedAt
                 <div className="fx-sp-bt">
                     <div id ="key" style={{fontWeight:20}}>{key}</div>
                     <div>
-                        {data[key]} | {total[key]}
+                        {printAggregate(key, data[key], total[key])}
+                        {/* {data[key]} | {total[key]} */}
                     </div>
                 </div>
                 )
