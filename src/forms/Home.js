@@ -49,7 +49,7 @@ const Home = ({ department }) => {
   const updates = useSelector((state) =>
     filterData(state, department, lineNumber)
   );
-  const total = useSelector((state) => state.taskReducer.aggregate);
+  // const total = useSelector((state) => state.taskReducer.aggregate);
   console.log("The updates are", updates);
   const generateKey = (styleCode, department, lineNumber, process) => {
     console.log(styleCode, department, lineNumber, process)
