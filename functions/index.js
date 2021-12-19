@@ -448,3 +448,69 @@ exports.addMetaRole = functions
   })
   response.send(obj)
 })
+
+// API for getting out the styleCodesInfo for the Pre Prod App
+exports.styleCodesInfo = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  const {company} = getCompany(data, context);
+  const dataDoc = await admin.firestore().collection("data").doc(company).get();
+  const companyInfo = dataDoc.data();
+  const {styleCodesInfo} =  companyInfo;
+  return styleCodesInfo || []
+})
+
+/**
+ * {
+ *  styleCodeId, 
+ * }
+ * Write a method that can be used for updating the record and the user will be able to change the system
+ */
+exports.insertStyleCodesInfo = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  const {company, styleCodeInfo} = data;
+  console.log("The insertStyleCodesIndo", company);
+  if (!styleCodeInfo){
+    return {
+
+    }
+  }
+  const dataDoc = await admin.firestore().collection("data").doc(company).get();
+  const companyInfo = dataDoc.data();
+  const styleCodesInfo =  companyInfo?.styleCodesInfo ?? [];
+  await admin.firestore().collection("data").doc(company).set({
+    styleCodesInfo: [ styleCodeInfo, ...styleCodesInfo] },{
+      merge: true
+    }
+  )
+  return data
+})
+
+exports.updateStyleCodesInfo = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  const {company} = getCompany(data, context);
+  const {styleCodeInfo} = data;
+  const dataDoc = await admin.firestore().collection("data").doc(company).get();
+  const companyInfo = dataDoc.data();
+  const styleCodesInfo =  companyInfo?.styleCodesInfo ?? [];
+  let obj = []
+  for (let info of styleCodesInfo){
+    if (info.id === styleCodeInfo?.id){
+      obj.push({
+        ...info,
+        ...styleCodeInfo
+      })
+    } else {
+      obj.push(info)
+    }
+  }
+  await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).set({
+    styleCodesInfo: obj
+  } ,{merge: true})
+  return obj
+})
