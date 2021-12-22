@@ -1,6 +1,6 @@
 // import { FETCH_COMPLETE_TASKS, FETCH_INCOMPLETE_TASKS, UPDATE_TASK_STATUS } from "../actionType";
 
-import { FETCH_DATA, UPDATE_AUTH, UPDATE_ROLE } from "../actionType"
+import { FETCH_DATA, UPDATE_AUTH, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
 
 const initialState = {
     user: {
@@ -13,6 +13,110 @@ const initialState = {
     kajjaandbuttoning: [],
     washing: [],
     styleCodes: [],
+    
+    // I can store the data across a certain id which can be stored as
+    // some global Id
+    styleCodesInfo:[],  
+    order_materials: {
+            columns: [{
+                title: "No",
+                dataIndex: "no",
+                key: "no",
+              },
+              {
+                title: "Style Code",
+                dataIndex: "styleCode",
+                key: "styleCode",
+              },
+              {
+                title: "To Make Qty",
+                dataIndex: "toMakeQty",
+                key: "toMakeQty",
+              },
+              {
+                title: "Category",
+                dataIndex: "category",
+                key: "category",
+              }, 
+              {
+                title: "Type",
+                dataIndex: "type",
+                key: "type",
+              },
+              {
+                title: "Material Id",
+                dataIndex: "materialId",
+                key: "materialId",
+              },
+              {
+                title: "Description",
+                dataIndex: "description",
+                key: "description",
+              },
+              {
+                title: "Consumption",
+                dataIndex: "consumption",
+                key: "consumption",
+              }, 
+              {
+                title: "Req Qty",
+                dataIndex: "reqQty",
+                key: "reqQty",
+              },
+              {
+                title: "Rem Qty",
+                dataIndex: "remQty",
+                key: "remQty",
+              },
+              {
+                title: "Supplier",
+                dataIndex: "supplier",
+                key: "supplier",
+              },             
+             {
+                title: "PO Qty",
+                dataIndex: "poQty",
+                key: "poQty",
+              },              
+            ],
+            actions:[
+
+            ],
+            dataSource: [{
+                id: "WASH23-50",
+                styleCode: "WSH23",
+                toMakeQty: 50,
+                category: 'shirts',
+                type: 'casual',
+                materialId: 'SFSDFLSD2323',
+                description: 'Soft Fabric',
+                unit: 12,
+                rate: 232,
+                consumption: 1.23,
+                reqQty: 40,
+                remQty: 10,
+                supplier: "Anusha",
+                poQty: 20
+            }, {
+                id: "WNG989-40",
+                styleCode: "WNG989",
+                toMakeQty: 50,
+                category: 'shirts',
+                type: 'casual',
+                materialId: 'SFSDFLSD2323',
+                description: 'Soft Fabric',
+                unit: 12,
+                consumption: 1.23,
+                reqQty: 40,
+                remQty: 10,
+                supplier: "Anusha",
+                poQty: 20
+            }]
+    },
+    create_po: {
+            columns: [],
+            dataSource: []
+    },
     isFetching: true,
     name:  "Factory",
     form: [{
@@ -144,6 +248,13 @@ const taskReducer = (state = initialState, action) => {
             return {
                 ...state,
                 user
+            }
+        }
+        case UPDATE_STYLE_CODE_INFO: {
+            const {styleCodeInfo} = action.payload;
+            return {
+                ...state,
+                styleCodeInfo
             }
         }
         // case UPDATE_TASK_STATUS:{
