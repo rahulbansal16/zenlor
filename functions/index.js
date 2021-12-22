@@ -3,6 +3,9 @@ const admin = require("firebase-admin");
 const moment = require("moment");
 
 admin.initializeApp();
+admin.firestore().settings({
+  ignoreUndefinedProperties: true,
+})
 
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const DEFAULT_COMPANY = "test";
@@ -513,4 +516,58 @@ exports.updateStyleCodesInfo = functions
     styleCodesInfo: obj
   } ,{merge: true})
   return obj
+})
+
+exports.createPO = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  const {company} = await getCompany(data, context);
+  const {bom, createdAt} = data;
+  console.log("The bom is createdAt company", bom, createdAt, company)
+  let supplierMap = {}
+
+  for (let item of bom ){
+
+    const {supplier, styleCode, description,id, poQty, unit, rate} = item;
+
+    if (!supplierMap[supplier]){
+      supplierMap[supplier] = []
+    }
+    supplierMap[supplier].push({
+      SNo: supplierMap[supplier].length + 1,
+      ReferenceId: styleCode,
+      ItemId: id,
+      ItemDesc: description,
+      Qty: poQty,
+      Unit: unit,
+      Rate: rate,
+      Tax: '',
+      Amt: ''
+    });
+  }
+
+  console.log("The supplier map is", supplierMap);
+  const purchaseOrders = []
+
+  for (let key in supplierMap){
+    purchaseOrders.push({
+      id: generateUId("po",6),
+      supplier: key,
+      createdAt,
+      status: "active",
+      data: supplierMap[key]
+    })
+  }
+
+  let doc = await admin.firestore().collection("data").doc(company).get();
+  let {purchaseOrders: pastOrders} = doc.data();
+  await admin.firestore().collection("data").doc(company).set({
+    purchaseOrders: [...purchaseOrders, ...(pastOrders||[])]
+  },{
+    merge: true
+  });
+
+  return [...purchaseOrders, ...(pastOrders||[])];
+
 })
