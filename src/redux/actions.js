@@ -1,4 +1,4 @@
-import { FETCH_DATA, UPDATE_AUTH, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO} from "./actionType"
+import { FETCH_DATA, FETCH_PO, UPDATE_AUTH, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO} from "./actionType"
 export const fetchDataAction = (data) => ({
     type: FETCH_DATA,
     payload: {...data}
@@ -15,5 +15,11 @@ export const updateStyleCodeInfo = (styleCodeInfo) => ({
     type: UPDATE_STYLE_CODE_INFO,
     payload: {
         styleCodeInfo
+    }
+})
+export const fetchPOs = (pos) => ({
+    type: FETCH_PO,
+    payload: {
+        data: pos
     }
 })

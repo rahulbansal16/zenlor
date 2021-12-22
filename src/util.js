@@ -69,7 +69,7 @@ export const appendToPath= (history, path) => {
 }
 
 export function getCurrentTime(){
-    return moment().format("MMM DD YY, h:mm:ss a")
+    return moment().format("ddd DD MMM | h:mm A")
 }
 
 export function formatDate(date){

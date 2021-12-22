@@ -1,5 +1,5 @@
 import { Table, Select, Button, Form } from "antd";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RightOutlined } from "@ant-design/icons";
 
 import Loader from "./Loader";
@@ -7,6 +7,8 @@ import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import { functions } from "../firebase";
 import { getCurrentTime } from "../util";
+import { fetchPOs } from "../redux/actions";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 const { Option } = Select;
 const actions = {
   order_materials: [
@@ -15,6 +17,12 @@ const actions = {
       value: "create_po",
     },
   ],
+  create_po: [
+    {
+      key: "Download PO",
+      value: "download_po"
+    }
+  ]
 };
 
 const next_action = {
@@ -23,6 +31,8 @@ const next_action = {
 const formItemLayout = {};
 
 const Action = ({ type }) => {
+  const dispatch = useDispatch();
+  const history = useHistory();
   const [selectedRows, setSelectedRows] = useState([]);
   const action = useSelector((state) => state.taskReducer[type]);
   const isFetching = useSelector((state) => state.taskReducer.isFetching);
@@ -43,21 +53,20 @@ const Action = ({ type }) => {
     return dataSource;
   };
 
-  const filterSelectedRows = () => {
-      return dataSource.filter(item => selectedRows.includes(item.id))
-  };
-
   const onFinish = async (data) => {
     const action = data.action;
     console.log("The data is", data);
     if (action === "create_po") {
       let createPO = functions.httpsCallable("createPO");
-
-      await createPO({
+      const result = await createPO({
         bom: dataSource.filter(item => selectedRows.includes(item.id)),
         createdAt: getCurrentTime(),
       });
+      console.log("The result is", result.data);
+      dispatch(fetchPOs(result.data))
+      history.push('/action/'+action)
     } else {
+
     }
   };
 
