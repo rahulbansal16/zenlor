@@ -1,4 +1,37 @@
 {
+    "styleCodesInfo":[{
+        "id": "",
+        "name":"",
+        "brand":"",
+        "buyer":"",
+        "product":"",
+        "orderNo":"",
+        "styleCode":"",
+        "qty":"",
+        "orderConfirmation":"",
+        "createdOn":"",
+        "dueDate":"",
+        "brandName":"",
+        "quantitySet":"",
+        "status":"",// active, deleted :- For Checking if the status is active or not
+        "lastAction":[{
+
+        }],
+        "purchaseOrders":[{
+            "id":"",
+            "supplier":"",
+            "createdOn":"",
+            "status":"",
+            "rows":[{}]
+        }],
+        "techPackInfo":{
+            "excelLink":"",
+            "trims":[{
+            }],
+            // other details realted to the TechPack
+        }
+    }],  
+
     "cutting":[
         {
             "id":23423423,
