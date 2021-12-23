@@ -552,7 +552,7 @@ exports.createPO = functions
 
   for (let key in supplierMap){
     purchaseOrders.push({
-      id: generateUId(10).toUpperCase(),
+      id: generateUId("",10).toUpperCase(),
       supplier: key,
       createdAt,
       status: "active",
