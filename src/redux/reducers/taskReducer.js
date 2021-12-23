@@ -1,6 +1,6 @@
 // import { FETCH_COMPLETE_TASKS, FETCH_INCOMPLETE_TASKS, UPDATE_TASK_STATUS } from "../actionType";
 
-import { FETCH_DATA, FETCH_PO, UPDATE_AUTH, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
+import { FETCH_DATA, FETCH_PO, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
 
 const initialState = {
     user: {
@@ -77,6 +77,7 @@ const initialState = {
                 title: "PO Qty",
                 dataIndex: "poQty",
                 key: "poQty",
+                editable: true,
               },              
             ],
             actions:[
@@ -292,6 +293,16 @@ const taskReducer = (state = initialState, action) => {
             let newState = JSON.parse(JSON.stringify(state))
             newState.create_po.dataSource = [...data]
             return newState;
+        }
+        case UPDATE_CELL: {
+            const {row, type} = action.payload;
+            let newState = JSON.parse(JSON.stringify(state));
+            const newData = newState[type]["dataSource"];
+            const index = newData.findIndex((item) => row.key === item.key);
+            const item = newData[index];
+            newData.splice(index, 1, { ...item, ...row });
+            // newState[type]["dataSource"] = newData
+            return newState
         }
         // case UPDATE_TASK_STATUS:{
         //     const {styleCodeId, taskId, status} = action.payload

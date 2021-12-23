@@ -1,13 +1,13 @@
-import { Table, Select, Button, Form } from "antd";
+import { Table, Select, Button, Form, Input } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { RightOutlined } from "@ant-design/icons";
-
+// https://codesandbox.io/s/editable-cells-antd-4-17-4-forked-w3q20?file=/index.js:1809-1869
 import Loader from "./Loader";
 import { useLocation } from "react-router";
-import { useEffect, useState } from "react";
+import React,{ useEffect, useContext, useState, useRef } from "react";
 import { functions } from "../firebase";
 import { getCurrentTime } from "../util";
-import { fetchPOs } from "../redux/actions";
+import { fetchPOs, updateCell } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 const { Option } = Select;
 const actions = {
@@ -29,6 +29,88 @@ const next_action = {
   order_materials: "create_po",
 };
 const formItemLayout = {};
+const EditableContext = React.createContext(null);
+
+const EditableRow = ({ index, ...props }) => {
+  const [form] = Form.useForm();
+  return (
+    <Form form={form} component={false}>
+      <EditableContext.Provider value={form}>
+        <tr {...props} />
+      </EditableContext.Provider>
+    </Form>
+  );
+};
+
+const EditableCell = ({
+  title,
+  editable,
+  children,
+  dataIndex,
+  record,
+  handleSave,
+  ...restProps
+}) => {
+  const [editing, setEditing] = useState(false);
+  const inputRef = useRef(null);
+  const form = useContext(EditableContext);
+  useEffect(() => {
+    if (editing) {
+      inputRef.current.focus();
+    }
+  }, [editing]);
+
+  const toggleEdit = () => {
+    setEditing(!editing);
+    form.setFieldsValue({
+      [dataIndex]: record[dataIndex]
+    });
+  };
+
+  const save = async () => {
+    try {
+      const values = await form.validateFields();
+      toggleEdit();
+      handleSave({ ...record, ...values });
+    } catch (errInfo) {
+      console.log("Save failed:", errInfo);
+    }
+  };
+
+  let childNode = children;
+
+  if (editable) {
+    childNode = editing ? (
+      <Form.Item
+        style={{
+          margin: 0
+        }}
+        name={dataIndex}
+        rules={[
+          {
+            required: true,
+            message: `${title} is required.`
+          }
+        ]}
+      >
+        <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+      </Form.Item>
+    ) : (
+      <div
+        className="editable-cell-value-wrap"
+        style={{
+          paddingRight: 24
+        }}
+        onClick={toggleEdit}
+      >
+        {children}
+      </div>
+    );
+  }
+
+  return <td {...restProps}>{childNode}</td>;
+};
+
 
 const Action = ({ type }) => {
   const dispatch = useDispatch();
@@ -69,11 +151,41 @@ const Action = ({ type }) => {
 
     }
   };
+  const components = {
+    body: {
+      row: EditableRow,
+      cell: EditableCell
+    }
+  };
+
+  const column = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+
+    console.log("The Cell is Editable", col)
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        editable: col.editable,
+        dataIndex: col.dataIndex,
+        title: col.title,
+        handleSave: (e) => {
+          console.log("Cell saved called",e)
+          dispatch(updateCell(e, type))
+        }
+      })
+    };
+  });
 
   console.log("The type is", type);
   return (
     <div>
       <Table
+        rowClassName={() => "editable-row"}
+        bordered
+        components={components}
         rowSelection={{
           type: "checkbox",
           onChange: (selectedRowKeys, selectedRows) => {
@@ -83,7 +195,7 @@ const Action = ({ type }) => {
             );
           },
         }}
-        columns={columns}
+        columns={column}
         dataSource={applyFilter(dataSource).map((item) => ({
           ...item,
           key: item.id,
