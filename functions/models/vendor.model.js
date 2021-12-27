@@ -2,10 +2,6 @@ const { generateUId } = require("../utils/common");
 const admin = require("./db");
 
 const create = async (vendor) => {
-  if (doesVendorExist(vendor)) {
-    // Vendor Exist in the Database
-    // throw
-  }
   let newVendor = {
     ...vendor,
     id: generateUId(10),
@@ -24,10 +20,10 @@ const create = async (vendor) => {
 };
 
 const doesVendorExist = async (vendor) => {
-  const { phoneNumber } = vendor;
+  const { gst } = vendor;
   const doc = await admin.firestore().collection("data").doc("vendors").get();
   const vendors = doc.data()["vendors"] || [];
-  return vendors.some((vendor) => vendor.phoneNumber === phoneNumber);
+  return vendors.some((vendor) => vendor.gst === gst);
 };
 
 module.exports = {

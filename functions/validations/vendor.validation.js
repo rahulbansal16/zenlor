@@ -1,10 +1,16 @@
 const Joi = require('joi');
 const createVendor = {
     body: Joi.object().keys({
-      email: Joi.string().required().email(),
-      // password: Joi.string().required().custom(pas),
       name: Joi.string().required(),
-      role: Joi.string().required().valid('user', 'admin'),
+      address: Joi.string(),
+      city: Joi.string(),
+      state: Joi.string(),
+      pin: Joi.number(),
+      gst: Joi.string().required(),
+      panCard: Joi.string(),
+      contactPerson: Joi.string(),
+      email: Joi.string().required().email(),
+      mobileNumber: Joi.string().required()
     }),
 };
 const updateVendor = {

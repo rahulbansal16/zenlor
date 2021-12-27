@@ -1,2 +1,2 @@
-module.exports.vendorController = require('./vendorController');
-
+module.exports.vendorController = require('./vendor.controller');
+module.exports.bomController = require('./bom.controller');
