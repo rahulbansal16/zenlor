@@ -1,6 +1,6 @@
 const { generateUId } = require("../utils/common");
 const admin = require("./db");
-const DEFAULT_COMPANY = "anusha_8923"
+const DEFAULT_COMPANY = "shakti_tex"
 
 const create = async (bom) => {
   let newItem = {
