@@ -61,6 +61,9 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async
   if (data && data[phoneNumber]){
     const {company, role} = data[phoneNumber];
     if (company && role) {
+      if (!role?.company){
+        role['company'] = company
+      }
       console.log("Setting up the role and company as", role, company);
       userInfo["role"] = role;
       userInfo["company"] = company;
