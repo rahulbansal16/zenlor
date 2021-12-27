@@ -1,5 +1,6 @@
 const express = require('express');
 const vendorRoute = require('./vendor.route');
+const bomRoute = require('./bom.route')
 const router = express.Router();
 
 const defaultRoutes = [
@@ -7,6 +8,10 @@ const defaultRoutes = [
     path: '/vendor',
     route: vendorRoute,
   },
+  {
+    path: '/bom',
+    route: bomRoute
+  }
 ];
 
 defaultRoutes.forEach((route) => {
