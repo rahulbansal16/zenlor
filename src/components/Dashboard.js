@@ -10,11 +10,11 @@ const { Option } = Select;
 const actions = [
     {
         key: "Order Materials",
-        value: "order_materials"
+        value: "orderMaterials"
     },
     {
         key: "Create PO",
-        value: "create_po"
+        value: "createPO"
     }
 ]
 
@@ -99,6 +99,7 @@ const Dashboard = () => {
 
   return (
     <div>
+      <h2>Dashboard</h2>
       <Table
         rowSelection={{
           type: "checkbox",

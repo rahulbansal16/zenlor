@@ -17,7 +17,7 @@ const initialState = {
     // I can store the data across a certain id which can be stored as
     // some global Id
     styleCodesInfo:[],  
-    order_materials: {
+    orderMaterials: {
             columns: [{
                 title: "No",
                 dataIndex: "no",
@@ -96,7 +96,7 @@ const initialState = {
                 consumption: 1.23,
                 reqQty: 40,
                 remQty: 10,
-                supplier: "Anusha",
+                supplier: "ABC Company",
                 poQty: 20
             }, {
                 id: "WNG989-40",
@@ -114,7 +114,7 @@ const initialState = {
                 poQty: 20
             }]
     },
-    create_po: {
+    createPO: {
             columns: [{
                 title: "ID",
                 dataIndex: "id",
@@ -259,6 +259,14 @@ const taskReducer = (state = initialState, action) => {
                 // packing: [...packing],
                 // isFetching,
                 // name,
+                createPO: {
+                    ...state.createPO,
+                    dataSource: action.payload.purchaseOrders
+                },
+                orderMaterials: {
+                    ...state.orderMaterials,
+                    dataSource: action?.payload?.orderMaterials??[]
+                },
                 form: form  || state.form
             }
         }
@@ -291,7 +299,7 @@ const taskReducer = (state = initialState, action) => {
         case FETCH_PO: {
             const {data}= action.payload;
             let newState = JSON.parse(JSON.stringify(state))
-            newState.create_po.dataSource = [...data]
+            newState.createPO.dataSource = [...data]
             return newState;
         }
         case UPDATE_CELL: {

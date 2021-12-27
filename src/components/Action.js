@@ -11,22 +11,22 @@ import { fetchPOs, updateCell } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 const { Option } = Select;
 const actions = {
-  order_materials: [
+  orderMaterials: [
     {
       key: "Create PO",
-      value: "create_po",
+      value: "createPO",
     },
   ],
-  create_po: [
+  createPO: [
     {
       key: "Download PO",
-      value: "download_po"
+      value: "downloadPO"
     }
   ]
 };
 
 const next_action = {
-  order_materials: "create_po",
+  orderMaterials: "createPO",
 };
 const formItemLayout = {};
 const EditableContext = React.createContext(null);
@@ -138,7 +138,7 @@ const Action = ({ type }) => {
   const onFinish = async (data) => {
     const action = data.action;
     console.log("The data is", data);
-    if (action === "create_po") {
+    if (action === "createPO") {
       let createPO = functions.httpsCallable("createPO");
       const result = await createPO({
         bom: dataSource.filter(item => selectedRows.includes(item.id)),
