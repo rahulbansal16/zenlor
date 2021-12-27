@@ -1,11 +1,15 @@
 const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+// const admin = require("firebase-admin");
 const moment = require("moment");
+const admin = require("./models/db");
+const express = require('express');
+const app = express();
+const router = require("./routes/v1/index")
 
-admin.initializeApp();
-admin.firestore().settings({
-  ignoreUndefinedProperties: true,
-})
+// admin.initializeApp();
+// admin.firestore().settings({
+//   ignoreUndefinedProperties: true,
+// })
 
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const DEFAULT_COMPANY = "test";
@@ -470,6 +474,7 @@ exports.styleCodesInfo = functions
  * }
  * Write a method that can be used for updating the record and the user will be able to change the system
  */
+// API Endpoint for inserting the styleCodeInfo
 exports.insertStyleCodesInfo = functions
 .region("asia-northeast3")
 .https
@@ -571,3 +576,6 @@ exports.createPO = functions
   return [...purchaseOrders, ...(pastOrders||[])];
 
 })
+
+app.use("/", router)
+exports.api = functions.region("asia-northeast3").https.onRequest(app);
