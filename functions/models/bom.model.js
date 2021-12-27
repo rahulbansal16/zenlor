@@ -12,7 +12,7 @@ const create = async (bom) => {
     .collection("data")
     .doc(DEFAULT_COMPANY)
     .set(
-      { vendors: admin.firestore.FieldValue.arrayUnion(newItem) },
+      { billOfMaterials: admin.firestore.FieldValue.arrayUnion(newItem) },
       {
         merge: true,
       }
