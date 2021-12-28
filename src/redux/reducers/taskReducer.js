@@ -265,7 +265,7 @@ const taskReducer = (state = initialState, action) => {
                 },
                 orderMaterials: {
                     ...state.orderMaterials,
-                    dataSource: action?.payload?.orderMaterials??[]
+                    dataSource: action?.payload?.billOfMaterials??[]
                 },
                 form: form  || state.form
             }
