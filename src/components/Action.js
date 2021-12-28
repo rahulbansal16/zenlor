@@ -127,7 +127,7 @@ const Action = ({ type }) => {
   const { columns, dataSource } = action;
 
   const applyFilter = (dataSource) => {
-    if (type === "order_materials") {
+    if (type === "orderMaterials") {
       const ids = new URLSearchParams(search).get("ids").split(",");
       console.log("The ids are ", ids);
       return dataSource.filter((item) => ids.includes(item.styleCode));
