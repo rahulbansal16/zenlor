@@ -22,7 +22,17 @@ const actions = {
       key: "Download PO",
       value: "downloadPO"
     }
-  ]
+  ],
+  dashboard: [
+    {
+        key: "Order Materials",
+        value: "orderMaterials"
+    },
+    // {
+    //     key: "Create PO",
+    //     value: "createPO"
+    // }
+]
 };
 
 const next_action = {
@@ -147,8 +157,12 @@ const Action = ({ type }) => {
       console.log("The result is", result.data);
       dispatch(fetchPOs(result.data))
       history.push('/action/'+action)
-    } else {
-
+    } else if (action === "orderMaterials"){
+      console.log(data, selectedRows);
+      history.push({
+        pathname: `/action/${data.action}`,
+        search: `ids=${[...new Set(selectedRows)]}`
+      })
     }
   };
   const components = {

@@ -17,6 +17,70 @@ const initialState = {
     // I can store the data across a certain id which can be stored as
     // some global Id
     styleCodesInfo:[],  
+    dashboard: {
+        columns: [
+            {
+              title: "Buyer",
+              dataIndex: "buyer",
+              key: "buyer",
+              editable: true,
+              render: (text) => <a>{text}</a>,
+            },
+            {
+              title: "Category",
+              dataIndex: "category",
+              key: "category",
+              editable: true
+            },
+            {
+              title: "Style Code",
+              dataIndex: "styleCode",
+              key: "styleCode",
+            },
+            {
+              title: "Order Number",
+              dataIndex: "orderNo",
+              key: "orderNo",
+              editable: true
+            },
+            {
+              title: "Order Conf",
+              dataIndex: "orderConfirmation",
+              key: "orderConfirmation",
+              editable: true
+            },
+            {
+              title: "Order Quantity",
+              dataIndex: "orderQuantity",
+              key: "orderQuantity",
+              editable: true
+            },
+            {
+              title: "To Make Quantity",
+              dataIndex: "toMakeQuantity",
+              key: "toMakeQty",
+              editable: true
+            },
+            {
+              title: "Delivery Date",
+              dataIndex: "deliveryDate",
+              key: "deliveryDate",
+              editable: true
+            },
+            {
+              title: "Status",
+              dataIndex: "status",
+              key: "status",
+              editable: true
+            },
+            {
+              title: "Last Action",
+              dataIndex: "lastAction",
+              key: "lastAction",
+            },
+          ],
+        dataSource: []
+    },
     orderMaterials: {
             columns: [{
                 title: "No",
@@ -129,21 +193,25 @@ const initialState = {
                 title: "Delivery Date",
                 dataIndex: "deliveryDate",
                 key: "deliveryDate",
+                editable: true,
               },
               {
                 title: "Supplier",
                 dataIndex: "supplier",
                 key: "supplier",
+                editable: true,
               }, 
               {
                 title: "Amount",
                 dataIndex: "amount",
                 key: "amount",
+                editable: true,
               },
               {
                 title: "Status",
                 dataIndex: "status",
                 key: "status",
+                editable: true,
               }, 
             ],
             dataSource: []
@@ -267,6 +335,10 @@ const taskReducer = (state = initialState, action) => {
                     ...state.orderMaterials,
                     dataSource: action?.payload?.billOfMaterials??[]
                 },
+                dashboard: {
+                    ...state.dashboard,
+                    dataSource: action?.payload?.styleCodesInfo??[]
+                 },
                 form: form  || state.form
             }
         }
@@ -306,7 +378,7 @@ const taskReducer = (state = initialState, action) => {
             const {row, type} = action.payload;
             let newState = JSON.parse(JSON.stringify(state));
             const newData = newState[type]["dataSource"];
-            const index = newData.findIndex((item) => row.key === item.key);
+            const index = newData.findIndex((item) => row.key === item.id);
             const item = newData[index];
             newData.splice(index, 1, { ...item, ...row });
             // newState[type]["dataSource"] = newData
