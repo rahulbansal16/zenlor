@@ -18,6 +18,7 @@ const createBOM = {
     body: Joi.object().keys({
       styleCode: Joi.string().required(),
       toMakeQty: Joi.string(),
+      company: Joi.string().required(),
       category: Joi.string().required(),
       type: Joi.string().required(),
       materialId: Joi.string().required(),
