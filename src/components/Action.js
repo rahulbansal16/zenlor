@@ -35,9 +35,11 @@ const actions = {
 ]
 };
 
-const next_action = {
-  orderMaterials: "createPO",
-};
+const header = {
+  orderMaterials: "BOM",
+  createPO: "Purchase Orders",
+  dashboard: "Dashboard"
+}
 const formItemLayout = {};
 const EditableContext = React.createContext(null);
 
@@ -196,6 +198,7 @@ const Action = ({ type }) => {
   console.log("The type is", type);
   return (
     <div>
+      <h3>{header[type].toUpperCase()}</h3>
       <Table
         rowClassName={() => "editable-row"}
         bordered
