@@ -5,7 +5,7 @@ const DEFAULT_COMPANY = "shakti_tex"
 const create = async (bom) => {
   let newItem = {
     ...bom,
-    id: generateUId(10),
+    id: bom.styleCode + bom.category + bom.type,
   };
   await admin
     .firestore()
