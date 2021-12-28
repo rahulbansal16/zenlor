@@ -10,7 +10,7 @@ const create = async (bom) => {
   await admin
     .firestore()
     .collection("data")
-    .doc(DEFAULT_COMPANY)
+    .doc(bom?.company || DEFAULT_COMPANY)
     .set(
       { billOfMaterials: admin.firestore.FieldValue.arrayUnion(newItem) },
       {
@@ -22,7 +22,7 @@ const create = async (bom) => {
 
 const isExist = async (bom) => {
   const { styleCode, materialId } = bom;
-  const doc = await admin.firestore().collection("data").doc(DEFAULT_COMPANY).get();
+  const doc = await admin.firestore().collection("data").doc(bom?.company || DEFAULT_COMPANY).get();
   const boms = doc.data()["billOfMaterials"] || [];
   return boms.some((bom) => bom.styleCode === styleCode && bom.materialId === materialId);
 };
