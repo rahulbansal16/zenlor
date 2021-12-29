@@ -165,6 +165,8 @@ const Action = ({ type }) => {
         pathname: `/action/${data.action}`,
         search: `ids=${[...new Set(selectedRows)]}`
       })
+    } else if (action === "downloadPO"){
+      console.log("In the action of downloadPO");
     }
   };
   const components = {
@@ -202,6 +204,9 @@ const Action = ({ type }) => {
       <Table
         rowClassName={() => "editable-row"}
         bordered
+        pagination={false}
+        size="small"
+        sticky={true}
         components={components}
         rowSelection={{
           type: "checkbox",

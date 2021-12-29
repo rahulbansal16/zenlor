@@ -1,5 +1,6 @@
 // import { FETCH_COMPLETE_TASKS, FETCH_INCOMPLETE_TASKS, UPDATE_TASK_STATUS } from "../actionType";
 
+import { functions } from "../../firebase"
 import { FETCH_DATA, FETCH_PO, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
 
 const initialState = {
@@ -381,6 +382,13 @@ const taskReducer = (state = initialState, action) => {
             const index = newData.findIndex((item) => row.key === item.id);
             const item = newData[index];
             newData.splice(index, 1, { ...item, ...row });
+            if (type === "dashboard"){
+                const updateStyleCodesInfo = functions.httpsCallable("updateStyleCodesInfo")
+                updateStyleCodesInfo({
+                    styleCodeInfo: item
+                })
+                // updateStyleCodesInfo
+            }
             // newState[type]["dataSource"] = newData
             return newState
         }
