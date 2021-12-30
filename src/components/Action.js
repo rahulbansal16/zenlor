@@ -1,6 +1,6 @@
-import { Table, Select, Button, Form, Input } from "antd";
+import { Table, Select, Button, Form, Input, Space } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { RightOutlined } from "@ant-design/icons";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 // https://codesandbox.io/s/editable-cells-antd-4-17-4-forked-w3q20?file=/index.js:1809-1869
 import Loader from "./Loader";
 import { useLocation } from "react-router";
@@ -9,40 +9,13 @@ import { functions } from "../firebase";
 import { getCurrentTime } from "../util";
 import { fetchPOs, updateCell } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-const { Option } = Select;
-const actions = {
-  orderMaterials: [
-    {
-      key: "Create PO",
-      value: "createPO",
-    },
-  ],
-  createPO: [
-    {
-      key: "Download PO",
-      value: "downloadPO"
-    }
-  ],
-  dashboard: [
-    {
-        key: "Order Materials",
-        value: "orderMaterials"
-    },
-    // {
-    //     key: "Create PO",
-    //     value: "createPO"
-    // }
-]
-};
-
+import ActionBar from "./ActionBar";
 const header = {
   orderMaterials: "BOM",
   createPO: "Purchase Orders",
   dashboard: "Dashboard"
 }
-const formItemLayout = {};
 const EditableContext = React.createContext(null);
-
 const EditableRow = ({ index, ...props }) => {
   const [form] = Form.useForm();
   return (
@@ -223,58 +196,7 @@ const Action = ({ type }) => {
           key: item.id,
         }))}
       />
-      <Form
-        {...formItemLayout}
-        style={{
-          marginLeft: "8px",
-          marginRight: "8px",
-        }}
-        size="medium"
-        name="styleCodeEditor"
-        align="left"
-        labelAlign="left"
-        onFinish={async (data) => {
-          await onFinish(data);
-          //   console.log(data, selectedRows);
-          //   history.push({
-          //     pathname: `/action/${data.action}`,
-          //     search: `ids=${[...new Set(selectedRows)]}`
-          //     // `styleCode=${styleCode || 123}&process=${process}&lineNumber=${
-          //     //   lineNumber || 1
-          //     // }&day=${day}`,
-          //   });
-        }}
-      >
-        <Form.Item
-          label="Choose an Action"
-          name="action"
-          rules={[
-            {
-              required: true,
-              message: "Please Choose Action",
-            },
-          ]}
-        >
-          <Select
-            placeholder="Select Action"
-            size="medium"
-            autoFocus
-            onChange={() => {}}
-            allowClear
-          >
-            {actions[type].map((action) => (
-              <Option size="large" value={action.value}>
-                {action.key}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <div className="wd-100">
-          <Button type="primary" htmlType="submit">
-            Next <RightOutlined />
-          </Button>
-        </div>
-      </Form>
+      <ActionBar type={type} onFinish={onFinish}/>
     </div>
   );
 };
