@@ -10,6 +10,7 @@ import { getCurrentTime } from "../util";
 import { fetchPOs, updateCell } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ActionBar from "./ActionBar";
+import useFilter from "../hooks/useFilter";
 const header = {
   orderMaterials: "BOM",
   createPO: "Purchase Orders",
@@ -104,12 +105,12 @@ const Action = ({ type }) => {
   const action = useSelector((state) => state.taskReducer[type]);
   const isFetching = useSelector((state) => state.taskReducer.isFetching);
   const { search } = useLocation();
+  const { columns, dataSource } = action;
+  const filteredColumns = useFilter(columns);
 
   if (isFetching) {
     return <Loader />;
   }
-
-  const { columns, dataSource } = action;
 
   const applyFilter = (dataSource) => {
     if (type === "orderMaterials") {
@@ -149,12 +150,10 @@ const Action = ({ type }) => {
     }
   };
 
-  const column = columns.map((col) => {
+  const column = filteredColumns.map((col) => {
     if (!col.editable) {
       return col;
     }
-
-    console.log("The Cell is Editable", col)
     return {
       ...col,
       onCell: (record) => ({
@@ -163,7 +162,6 @@ const Action = ({ type }) => {
         dataIndex: col.dataIndex,
         title: col.title,
         handleSave: (e) => {
-          console.log("Cell saved called",e)
           dispatch(updateCell(e, type))
         }
       })
