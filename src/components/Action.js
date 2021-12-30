@@ -1,13 +1,13 @@
-import { Table, Select, Button, Form, Input, Space } from "antd";
+import { Table, Select, Button, Form, Input, Space, Affix } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { LeftOutlined, PlusOutlined, RightOutlined } from "@ant-design/icons";
 // https://codesandbox.io/s/editable-cells-antd-4-17-4-forked-w3q20?file=/index.js:1809-1869
 import Loader from "./Loader";
 import { useLocation } from "react-router";
 import React,{ useEffect, useContext, useState, useRef } from "react";
 import { functions } from "../firebase";
 import { getCurrentTime } from "../util";
-import { fetchPOs, updateCell } from "../redux/actions";
+import { fetchPOs, insertRow, updateCell } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ActionBar from "./ActionBar";
 import useFilter from "../hooks/useFilter";
@@ -116,7 +116,7 @@ const Action = ({ type }) => {
     if (type === "orderMaterials") {
       const ids = new URLSearchParams(search).get("ids").split(",");
       console.log("The ids are ", ids);
-      return dataSource.filter((item) => ids.includes(item.styleCode));
+      return dataSource.filter((item) => ids.includes(item.styleCode) || !item.styleCode);
     }
     return dataSource;
   };
@@ -151,14 +151,14 @@ const Action = ({ type }) => {
   };
 
   const column = filteredColumns.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
+    // if (!col.editable) {
+    //   return col;
+    // }
     return {
       ...col,
       onCell: (record) => ({
         record,
-        editable: col.editable,
+        editable: col.editable || true,
         dataIndex: col.dataIndex,
         title: col.title,
         handleSave: (e) => {
@@ -168,12 +168,39 @@ const Action = ({ type }) => {
     };
   });
 
+  const insertRowHandler = () => {
+    console.log("In the insert Row Handler")
+    dispatch(insertRow({
+      "sfsdlfkl":3232
+    },type))
+  }
+  
   console.log("The type is", type);
   return (
     <div>
-      <h3>{header[type].toUpperCase()}</h3>
       <Table
-        // rowClassName={() => "editable-row"}
+        title={() => header[type].toUpperCase()}
+        summary={() => (
+          <Table.Summary fixed>
+            <Table.Summary.Row>
+            <Table.Summary.Cell><Button type="primary" size="large" onClick={() => insertRowHandler()}>Add Entry<PlusOutlined/></Button>            
+            </Table.Summary.Cell>
+            {/* <Table.Summary.Cell>
+                         <div style={{display:'flex'}}>
+                          <Button>Plus</Button>
+                          <Button>Delete</Button>
+                      </div>
+            </Table.Summary.Cell> */}
+              {/* <div className="fx-sp-bt wd-100"> */}
+                
+                {/* <div style={{display:'flex'}}> */}
+                  {/* <Button>Plus</Button>
+                  <Button>Delete</Button>
+                </div> */}
+              {/* </div> */}
+            </Table.Summary.Row>
+          </Table.Summary>
+        )}
         bordered
         pagination={false}
         size="small"

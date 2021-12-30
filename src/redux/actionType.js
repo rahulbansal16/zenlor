@@ -4,3 +4,4 @@ export const UPDATE_STYLE_CODE_INFO = "UPDATE_STYLE_CODE_INFO";
 export const FETCH_PO = "FETCH_PO";
 export const UPDATE_ROLE = "UPDATE_ROLE";
 export const UPDATE_CELL = "UPDATE_CELL";
+export const INSERT_ROW = "INSERT_ROW";

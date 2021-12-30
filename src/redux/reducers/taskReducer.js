@@ -1,7 +1,7 @@
 // import { FETCH_COMPLETE_TASKS, FETCH_INCOMPLETE_TASKS, UPDATE_TASK_STATUS } from "../actionType";
 
 import { functions } from "../../firebase"
-import { FETCH_DATA, FETCH_PO, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
+import { FETCH_DATA, FETCH_PO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
 
 const initialState = {
     user: {
@@ -27,6 +27,7 @@ const initialState = {
               editable: true,
               filter: "multiSelect",
               sortType:"", // date, number, integer, string
+              // https://codesandbox.io/s/filter-and-sorter-antd-4-18-1-forked-zhoph?file=/index.js
               filters: [{
                 text:"WROGN",
                 value:"WROGN"
@@ -397,6 +398,13 @@ const taskReducer = (state = initialState, action) => {
             }
             // newState[type]["dataSource"] = newData
             return newState
+        }
+        case INSERT_ROW: {
+          const {row, type} = action.payload;
+          let newState = JSON.parse(JSON.stringify(state));
+          const newData = newState[type]["dataSource"];
+          newData.push(row)
+          return newState
         }
         // case UPDATE_TASK_STATUS:{
         //     const {styleCodeId, taskId, status} = action.payload
