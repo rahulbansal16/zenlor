@@ -9,6 +9,7 @@ import DepartmentHeader from "./DepartmentHeader";
 import UpdateCard from "./UpdateCard";
 import { MenuOutlined } from "@ant-design/icons";
 import moment from "moment";
+import Header from "../components/Header";
 
 const filterData = (state, department, lineNumber) => {
   let departmentData = state.taskReducer[department] || [];
@@ -81,6 +82,7 @@ const Home = ({ department }) => {
   console.log("The p and updaes are",p, updates)
   return (
     <div>
+      <Header/>
       <DepartmentHeader department={department} lineNumber={lineNumber} />
       {isFetching && <Loader />}
       <div className="mg-y" style={{paddingBottom:"20px"}}>

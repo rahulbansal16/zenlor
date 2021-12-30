@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux"
 import { useHistory } from "react-router"
+import Header from "../../components/Header"
 import Loader from "../../components/Loader"
 
 const { Button} = require("antd")
@@ -40,8 +41,11 @@ const Department = () => {
     }
     
     return (
+        <div>
+            <Header/>
         <div className="mg-x-8">
             {departments.map( ({name, id, line}) => <Button size="large" className="wd-100 mg-y outline" type="link" onClick = { () => onClick(`/${id}?lineNumber=${line}`)}>{name}</Button>)}
+        </div>
         </div>
     )
 }

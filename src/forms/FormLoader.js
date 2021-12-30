@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import FormLayout from "./dataEntry/FormLayout";
 import FourNotFour from "../auth/FourNotFour";
 import moment from "moment";
+import Header from "../components/Header";
 
 const loadForm = (initialValues, department, process, onFinish, departmentsData) => {
     const departmentData = departmentsData.filter( departmentData => departmentData.id === department)
@@ -62,6 +63,7 @@ const FormLoader = ({initialValues, department: departmentId, header = () => {}}
     }
     return (
         <div>
+            <Header/>
             <DepartmentHeader department={departmentId} lineNumber={lineNumber}/>
             <ProcessHeader process={process} styleCode={styleCode}/>
             {header()}

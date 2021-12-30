@@ -84,7 +84,6 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <Header/>
         {renderPages()}
       </Router>
     </div>
