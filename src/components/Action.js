@@ -173,7 +173,7 @@ const Action = ({ type }) => {
     <div>
       <h3>{header[type].toUpperCase()}</h3>
       <Table
-        rowClassName={() => "editable-row"}
+        // rowClassName={() => "editable-row"}
         bordered
         pagination={false}
         size="small"
