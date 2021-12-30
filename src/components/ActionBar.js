@@ -7,14 +7,27 @@ const formItemLayout = {
     labelCol: {
         xs: {
           span: 20,
-          // offset:2
         },
         sm: {
           span: 20,
         },
-        m : {
-          span: 18   
+        md : {
+          span: 18,
+          offset:4
+        },
+        lg : {
+            span: 8,
+            offset: 0
+        },
+        xl: {
+            span: 8,
+            offset: 0
+        },
+        xxl: {
+            span: 8,
+            offset: 0
         }
+
       },
       wrapperCol: {
         xs: {
@@ -25,6 +38,14 @@ const formItemLayout = {
           span: 20,
           // offset:2
         },
+        xl: {
+            span: 8,
+            offset: 8
+        },
+        xxl: {
+            span: 8,
+            offset: 8
+        }
       },
 }
 const actions = {
@@ -52,17 +73,17 @@ const ActionBar = ({type, onFinish}) => {
     const history = useHistory();
     return (
         <Form
+        style = {{
+            marginTop:'24px'
+        }}
         {...formItemLayout}
         size="medium"
-        name="styleCodeEditor"
-        alig n="left"
-        labelAlign="left"
         onFinish={async (data) => {
           await onFinish(data);
         }}
       >
         <Form.Item
-          label="Choose an Action"
+          label=""
           name="action"
           rules={[
             {
@@ -85,7 +106,6 @@ const ActionBar = ({type, onFinish}) => {
             ))}
           </Select>
         </Form.Item>
-        <div>
           <Space>
             <Button onClick = { () => {
               history.goBack()
@@ -94,7 +114,6 @@ const ActionBar = ({type, onFinish}) => {
               Next <RightOutlined />
             </Button>
           </Space>
-        </div>
       </Form>   
     )
 }
