@@ -429,7 +429,8 @@ exports.getData = functions
   console.log("The company is", company);
   const companyDoc = await admin.firestore().collection("data").doc(company).get()
   const companyData = companyDoc.data();
-  companyData["aggregate"] = {...await getAggregate(company)}
+  // companyData["aggregate"] = {...await getAggregate(company)}
+  console.log("The getData result is", companyData);
   return companyData
 })
 
@@ -504,8 +505,9 @@ exports.updateStyleCodesInfo = functions
 .region("asia-northeast3")
 .https
 .onCall( async (data, context) => {
-  const {company} = getCompany(data, context);
+  const {company} = await getCompany(data, context);
   const {styleCodeInfo} = data;
+  console.log("The company is", company);
   const dataDoc = await admin.firestore().collection("data").doc(company).get();
   const companyInfo = dataDoc.data();
   const styleCodesInfo =  companyInfo?.styleCodesInfo ?? [];
@@ -534,27 +536,28 @@ exports.createPO = functions
   const {bom, createdAt} = data;
   console.log("The bom is createdAt company", bom, createdAt, company)
   let supplierMap = {}
+  let totalAmount = 0;
 
   for (let item of bom ){
 
-    const {supplier, styleCode, description,id, poQty, unit, rate} = item;
+    const {supplier, styleCode, description,id, poQty, unit, rate, consumption} = item;
 
     if (!supplierMap[supplier]){
       supplierMap[supplier] = []
     }
     supplierMap[supplier].push({
-      SNo: supplierMap[supplier].length + 1,
-      ReferenceId: styleCode,
-      ItemId: id,
-      ItemDesc: description,
-      Qty: poQty,
-      Unit: unit,
-      Rate: rate,
-      Tax: '',
-      Amt: ''
+      sno: supplierMap[supplier].length + 1,
+      referenceId: styleCode,
+      itemId: id,
+      itemDesc: description,
+      quantity: poQty,
+      unit: unit,
+      rate: rate,
+      tax: '',
+      amount: poQty*rate*consumption
     });
+    totalAmount += poQty*rate*consumption;
   }
-
   console.log("The supplier map is", supplierMap);
   const purchaseOrders = []
 
@@ -563,6 +566,8 @@ exports.createPO = functions
       id: generateUId("",10).toUpperCase(),
       supplier: key,
       createdAt,
+      deliveryDate:'',
+      amount: totalAmount,
       status: "active",
       data: supplierMap[key]
     })
