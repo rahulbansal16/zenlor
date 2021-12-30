@@ -21,7 +21,6 @@ const renderPages = () => {
   return (
     <Switch>
       <Route exact path="/" render = { (props) => <Department/>} />
-      <Route exact path="/dashboard" render = {(props) => <Dashboard/>} />
       <Route exact path="/action/:type" render = { (props) => <Action type={props.match.params.type}/>} />
       <Route exact path="/bom" render = {(props) => <BOM></BOM>}/>
       <Route exact path="/logout" render = { (props) => <Logout/>} /> 
