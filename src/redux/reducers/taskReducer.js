@@ -25,6 +25,12 @@ const initialState = {
               dataIndex: "buyer",
               key: "buyer",
               editable: true,
+              filter: "multiSelect",
+              sortType:"", // date, number, integer, string
+              filters: [{
+                text:"WROGN",
+                value:"WROGN"
+              }],
               render: (text) => <a>{text}</a>,
             },
             {
