@@ -113,10 +113,12 @@ const Action = ({ type }) => {
   }
 
   const applyFilter = (dataSource) => {
+    const styleCode = new URLSearchParams(search).get('styleCode')??',';
+    const styleCodes = styleCode.split(',')
+    console.log("The length of styleCodes is", styleCodes)
     if (type === "orderMaterials") {
-      const ids = new URLSearchParams(search).get("ids").split(",");
-      console.log("The ids are ", ids);
-      return dataSource.filter((item) => ids.includes(item.styleCode) || !item.styleCode);
+      if (styleCodes[0] !== "")
+        return dataSource.filter((item) => styleCodes.includes(item.styleCode) || !item.styleCode);
     }
     return dataSource;
   };
@@ -137,7 +139,7 @@ const Action = ({ type }) => {
       console.log(data, selectedRows);
       history.push({
         pathname: `/action/${data.action}`,
-        search: `ids=${[...new Set(selectedRows)]}`
+        search: `styleCode=${[...new Set(selectedRows)]}`
       })
     } else if (action === "downloadPO"){
       console.log("In the action of downloadPO");
@@ -177,7 +179,7 @@ const Action = ({ type }) => {
   const insertRowHandler = () => {
     console.log("In the insert Row Handler")
     dispatch(insertRow({
-      id: generateUId("", 8)
+      id: generateUId("", 8),
     },type))
   }
   
@@ -218,10 +220,8 @@ const Action = ({ type }) => {
         rowSelection={{
           type: "checkbox",
           onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedRows((state) => state.concat(selectedRowKeys));
-            console.log(
-              "Logging something" + `${selectedRowKeys} + ${selectedRows}`
-            );
+            let selectedStyleCode = selectedRows.map ( row => row.styleCode)
+            setSelectedRows(selectedStyleCode);
           },
         }}
         columns={column}
