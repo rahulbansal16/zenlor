@@ -6,7 +6,7 @@ import Loader from "./Loader";
 import { useLocation } from "react-router";
 import React,{ useEffect, useContext, useState, useRef } from "react";
 import { functions } from "../firebase";
-import { getCurrentTime } from "../util";
+import { generateUId, getCurrentTime } from "../util";
 import { fetchPOs, insertRow, updateCell } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ActionBar from "./ActionBar";
@@ -177,7 +177,7 @@ const Action = ({ type }) => {
   const insertRowHandler = () => {
     console.log("In the insert Row Handler")
     dispatch(insertRow({
-      "sfsdlfkl":3232
+      id: generateUId("", 8)
     },type))
   }
   
