@@ -389,14 +389,6 @@ const taskReducer = (state = initialState, action) => {
             const index = newData.findIndex((item) => row.key === item.id);
             const item = newData[index];
             newData.splice(index, 1, { ...item, ...row });
-            if (type === "dashboard"){
-                const updateStyleCodesInfo = functions.httpsCallable("updateStyleCodesInfo")
-                updateStyleCodesInfo({
-                    styleCodeInfo: item
-                })
-                // updateStyleCodesInfo
-            }
-            // newState[type]["dataSource"] = newData
             return newState
         }
         case INSERT_ROW: {

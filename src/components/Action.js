@@ -161,8 +161,14 @@ const Action = ({ type }) => {
         editable: col.editable || true,
         dataIndex: col.dataIndex,
         title: col.title,
-        handleSave: (e) => {
+        handleSave:async (e) => {
+          console.log("The e in update cell is", e)
           dispatch(updateCell(e, type))
+          const updateStyleCodesInfo = functions.httpsCallable("actions")
+         await updateStyleCodesInfo({
+            item: e,
+            type
+          })
         }
       })
     };
@@ -180,6 +186,9 @@ const Action = ({ type }) => {
     <div>
       <Table
         title={() => header[type].toUpperCase()}
+        style={{
+          maxHeight:'calc(100vh - 50px)'
+        }}
         summary={() => (
           <Table.Summary fixed>
             <Table.Summary.Row>
