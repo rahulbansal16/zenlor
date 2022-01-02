@@ -1,4 +1,6 @@
-import { Table, Select, Button, Form, Input, Space, Affix } from "antd";
+import {Table, Select, Button, Form, Input, Space, Affix } from "antd";
+import { Table as ExportTable } from "ant-table-extensions";
+
 import { useDispatch, useSelector } from "react-redux";
 import { LeftOutlined, PlusOutlined, RightOutlined } from "@ant-design/icons";
 // https://codesandbox.io/s/editable-cells-antd-4-17-4-forked-w3q20?file=/index.js:1809-1869
@@ -186,8 +188,9 @@ const Action = ({ type }) => {
   console.log("The type is", type);
   return (
     <div>
-      <Table
-        title={() => header[type].toUpperCase()}
+      {header[type].toUpperCase()}
+      <ExportTable
+      exportable 
         style={{
           maxHeight:'calc(100vh - 50px)'
         }}
