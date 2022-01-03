@@ -484,6 +484,7 @@ exports.insertStyleCodesInfo = functions
 .https
 .onCall( async (data, context) => {
   const {company, styleCodeInfo} = data;
+  styleCodeInfo["id"] = generateUId("", 8);
   console.log("The insertStyleCodesIndo", company);
   if (!styleCodeInfo){
     return {
@@ -500,6 +501,57 @@ exports.insertStyleCodesInfo = functions
   )
   return data
 })
+
+exports.actions = functions
+.region("asia-northeast3")
+.https
+.onCall( async (data, context) => {
+  const {company} = await getCompany(data, context);
+  const {type, item} = data;
+  console.log("The company, type and item are", company, type, item)
+  const dataDoc = await admin.firestore().collection("data").doc(company).get();
+  const companyInfo = dataDoc.data();
+  let output = {}
+  switch(type){
+    case "dashboard":
+      output['styleCodesInfo']  = updateItemInArray(companyInfo['styleCodesInfo'], item)
+      break;
+    case "orderMaterials":
+      output['billOfMaterials'] = updateItemInArray(companyInfo['billOfMaterials'], item)
+      break;
+    case "purchaseOrders": 
+      output['purchaseOrders'] = updateItemInArray(companyInfo['purchaseOrders'], item)
+      break;
+    default: 
+  }
+  await admin.firestore().collection("data").doc(company).set(output,{merge: true})
+  console.log("The output is", output)
+  return output
+})
+
+
+const updateItemInArray = (items, newItem, cmp = (a, b) => a.id === b.id) => {
+  let output = []
+  let inserted = false
+  for (let item of items ){
+    if (cmp(item, newItem)){
+      inserted = true
+      output.push({
+        ...item,
+        ...newItem
+      })
+    } else {
+      output.push(item)
+    }
+  }
+  if (!inserted){
+    output.push({
+      id: generateUId("", 8),
+      ...newItem
+    })
+  }
+  return output
+}
 
 exports.updateStyleCodesInfo = functions
 .region("asia-northeast3")
@@ -522,6 +574,7 @@ exports.updateStyleCodesInfo = functions
       obj.push(info)
     }
   }
+  console.log("The updatedStyleCodesInfo are", obj)
   await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).set({
     styleCodesInfo: obj
   } ,{merge: true})
