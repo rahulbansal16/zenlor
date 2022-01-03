@@ -66,7 +66,8 @@ const actions = {
           key: "Order Materials",
           value: "orderMaterials"
       },
-  ]
+  ],
+  purchaseOrder:[]
 };
 
 const ActionBar = ({type, onFinish}) => {

@@ -134,6 +134,16 @@ const initialState = {
                 key: "consumption",
               }, 
               {
+                title: "Unit",
+                dataIndex: "unit",
+                key: "unit",
+              },
+              {
+                title: "rate",
+                dataIndex: "rate",
+                key: "rate",
+              },
+              {
                 title: "Req Qty",
                 dataIndex: "reqQty",
                 key: "reqQty",
