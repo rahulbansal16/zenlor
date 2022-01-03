@@ -229,6 +229,60 @@ const initialState = {
             ],
             dataSource: []
     },
+    purchaseOrder: {
+      columns: [{
+        title: "S.No",
+        dataIndex: "sno",
+        key: "sno",
+      },
+      {
+        title: "Reference Id",
+        dataIndex: "referenceId",
+        key: "referenceId",
+      },
+      {
+        title: "Item Id",
+        dataIndex: "itemId",
+        key: "itemId",
+        editable: true,
+      },
+      {
+        title: "Item Description",
+        dataIndex: "itemDesc",
+        key: "itemDesc",
+      }, 
+      {
+        title: "Qty",
+        dataIndex: "quantity",
+        key: "quantity",
+        editable: true,
+      },
+      {
+        title: "Unit",
+        dataIndex: "unit",
+        key: "unit",
+        editable: true,
+      },
+      {
+        title: "Rate",
+        dataIndex: "rate",
+        key: "rate",
+        editable: true,
+      },
+      {
+        title: "Tax",
+        dataIndex: "tax",
+        key: "tax",
+        editable: true,
+      }, 
+      {
+        title: "Amount",
+        dataIndex: "amount",
+        key: "amount",
+        editable: true,
+      }],
+      dataSource: []
+    },
     isFetching: true,
     name:  "Factory",
     form: [{
@@ -328,6 +382,15 @@ const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
             const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments, name, form} = action.payload
+            let purchaseOrders = action?.payload?.purchaseOrders
+            let formatedPurchaseOrders = []
+            for (let purchaseOrder of purchaseOrders){
+              const data = purchaseOrder?.data?.map( item => ({
+                ...item,
+                id: purchaseOrder.id
+              }))
+              formatedPurchaseOrders = formatedPurchaseOrders.concat(data)
+            }
             return {
                 ...state,
                 ...action.payload,
@@ -351,6 +414,10 @@ const taskReducer = (state = initialState, action) => {
                 dashboard: {
                     ...state.dashboard,
                     dataSource: action?.payload?.styleCodesInfo??[]
+                 },
+                 purchaseOrder: {
+                   ...state.purchaseOrder,
+                   dataSource: formatedPurchaseOrders
                  },
                 form: form  || state.form
             }

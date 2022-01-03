@@ -533,6 +533,7 @@ exports.actions = functions
 const updateItemInArray = (items, newItem, cmp = (a, b) => a.id === b.id) => {
   let output = []
   let inserted = false
+  // Add some code to remove the spaces around the value
   for (let item of items ){
     if (cmp(item, newItem)){
       inserted = true
@@ -594,10 +595,12 @@ exports.createPO = functions
   for (let item of bom ){
 
     const {supplier, styleCode, description,id, poQty, unit, rate, consumption} = item;
+    console.log("The item information is", item);
 
     if (!supplierMap[supplier]){
       supplierMap[supplier] = []
     }
+    let amount = (poQty || 0) * ( rate  || 0) *(consumption || 0)
     supplierMap[supplier].push({
       sno: supplierMap[supplier].length + 1,
       referenceId: styleCode,
@@ -607,9 +610,9 @@ exports.createPO = functions
       unit: unit,
       rate: rate,
       tax: '',
-      amount: poQty*rate*consumption
+      amount: amount 
     });
-    totalAmount += poQty*rate*consumption;
+    totalAmount += amount
   }
   console.log("The supplier map is", supplierMap);
   const purchaseOrders = []

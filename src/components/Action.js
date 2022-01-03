@@ -16,7 +16,8 @@ import useFilter from "../hooks/useFilter";
 const header = {
   orderMaterials: "BOM",
   createPO: "Purchase Orders",
-  dashboard: "Dashboard"
+  dashboard: "Dashboard",
+  purchaseOrder: "Purhcase Orders"
 }
 const EditableContext = React.createContext(null);
 const EditableRow = ({ index, ...props }) => {
@@ -115,12 +116,19 @@ const Action = ({ type }) => {
   }
 
   const applyFilter = (dataSource) => {
-    const styleCode = new URLSearchParams(search).get('styleCode')??',';
-    const styleCodes = styleCode.split(',')
-    console.log("The length of styleCodes is", styleCodes)
+
     if (type === "orderMaterials") {
+      const styleCode = new URLSearchParams(search).get('styleCode')??',';
+      const styleCodes = styleCode.split(',')
+      console.log("The length of styleCodes is", styleCodes)
       if (styleCodes[0] !== "")
         return dataSource.filter((item) => styleCodes.includes(item.styleCode) || !item.styleCode);
+    }
+    if (type === "purchaseOrder"){
+      const id = new URLSearchParams(search).get('id')??',';
+      const ids = id.split(',')
+      if (ids[0] !== "") 
+        return dataSource.filter( item => ids.includes(item.id))
     }
     return dataSource;
   };
@@ -129,22 +137,28 @@ const Action = ({ type }) => {
     const action = data.action;
     console.log("The data is", data);
     if (action === "createPO") {
+      const selectedIds = selectedRows.map ( row => row.id)
       let createPO = functions.httpsCallable("createPO");
       const result = await createPO({
-        bom: dataSource.filter(item => selectedRows.includes(item.id)),
+        bom: dataSource.filter(item => selectedIds.includes(item.id)),
         createdAt: getCurrentTime(),
       });
       console.log("The result is", result.data);
       dispatch(fetchPOs(result.data))
       history.push('/action/'+action)
     } else if (action === "orderMaterials"){
-      console.log(data, selectedRows);
+      const selectedStyleCodes = selectedRows.map ( row => row.styleCode)
       history.push({
         pathname: `/action/${data.action}`,
-        search: `styleCode=${[...new Set(selectedRows)]}`
+        search: `styleCode=${selectedStyleCodes}`
       })
     } else if (action === "downloadPO"){
       console.log("In the action of downloadPO");
+      const selectedIds = selectedRows.map ( row => row.id)
+      history.push({
+        pathname: `/action/purchaseOrder`,
+        search: `id=${selectedIds}`
+      })
     }
   };
   const components = {
@@ -190,6 +204,7 @@ const Action = ({ type }) => {
     <div>
       {header[type].toUpperCase()}
       <ExportTable
+      // title={ () => header[type].toUpperCase() }
       exportable 
         style={{
           maxHeight:'calc(100vh - 50px)'
@@ -223,8 +238,8 @@ const Action = ({ type }) => {
         rowSelection={{
           type: "checkbox",
           onChange: (selectedRowKeys, selectedRows) => {
-            let selectedStyleCode = selectedRows.map ( row => row.styleCode)
-            setSelectedRows(selectedStyleCode);
+            // let selectedStyleCode = selectedRows.map ( row => row.styleCode)
+            setSelectedRows(selectedRows);
           },
         }}
         columns={column}
