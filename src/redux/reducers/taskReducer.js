@@ -44,6 +44,7 @@ const initialState = {
               title: "Style Code",
               dataIndex: "styleCode",
               key: "styleCode",
+              filter: "multiSelect",
             },
             {
               title: "Order Number",
@@ -79,6 +80,7 @@ const initialState = {
               title: "Status",
               dataIndex: "status",
               key: "status",
+              filter: "multiSelect",
               editable: true
             },
             {
@@ -98,6 +100,7 @@ const initialState = {
               {
                 title: "Style Code",
                 dataIndex: "styleCode",
+                filter: "multiSelect",
                 key: "styleCode",
               },
               {
@@ -143,6 +146,7 @@ const initialState = {
               {
                 title: "Supplier",
                 dataIndex: "supplier",
+                filter: "multiSelect",
                 key: "supplier",
               },             
              {
@@ -207,6 +211,7 @@ const initialState = {
                 title: "Supplier",
                 dataIndex: "supplier",
                 key: "supplier",
+                filter: "multiSelect",
                 editable: true,
               }, 
               {
