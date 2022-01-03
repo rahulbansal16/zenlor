@@ -108,7 +108,7 @@ const Action = ({ type }) => {
   const isFetching = useSelector((state) => state.taskReducer.isFetching);
   const { search } = useLocation();
   const { columns, dataSource } = action;
-  const filteredColumns = useFilter(columns);
+  const filteredColumns = useFilter(columns, dataSource);
 
   if (isFetching) {
     return <Loader />;
