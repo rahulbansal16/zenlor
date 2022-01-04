@@ -6,7 +6,24 @@
   // min-height: 100vh !important;
   height: 100%;
 }
-
+.ant-table {
+  font-size: 14px !important;
+}
+// .ant-table-tbody > tr > td {
+//   height: 5px !important;
+//   padding: 4px !important;
+// }
+// .ant-table-cell {
+//   height: 20px !important;
+// }
+// /* row tags */
+// .my-tag {
+//   font-size: 12px;
+// }
+// .ant-table-thead > tr > th {
+//   height: 5px !important;
+//   padding: 4px !important;
+// }
 .mx-8 {
   margin-left: 8px;
   margin-right: 8px;
@@ -23,20 +40,23 @@
   margin-bottom: 0px !important;
 }
 
-.ant-card-head-title{
-  padding: 0px !important;
-}
+// .ant-card-head-title{
+//   padding: 0px !important;
+// }
 
-.ant-card-grid {
-  padding: 1px !important;
-}
+// .ant-card-grid {
+//   padding: 1px !important;
+// }
 
-.anticon.ant-input-clear-icon{
-  font-size: 20px;
-}
-.ant-card-head {
-  min-height: unset !important;
-}
+// .anticon.ant-input-clear-icon{
+//   font-size: 20px;
+// }
+// .ant-card-head {
+//   min-height: unset !important;
+// }
+// .ant-table-body{
+//   height: 80vh !important;
+// }
 
 .App {
   margin-left: auto !important;
@@ -63,6 +83,30 @@
   border: 1px solid #d9d9d9;
   border-radius: 2px;
 }
+
+.editable-row:hover .editable-cell-value-wrap {
+  border: 1px solid #434343;
+}
+
+.editable-cell {
+  position: relative;
+}
+
+.editable-cell-value-wrap {
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+  padding: 4px 11px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+}
+
+[data-theme="dark"] .editable-row:hover .editable-cell-value-wrap {
+  border: 1px solid #434343;
+}
+
 
 .fx {
   display: flex;

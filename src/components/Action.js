@@ -206,12 +206,12 @@ const Action = ({ type }) => {
       // rowClassName={() => "editable-row"}
       exportable 
         style={{
-          maxHeight:'calc(100vh - 50px)'
+          minHeight:'100vh'
         }}
         summary={() => (
           <Table.Summary fixed>
             <Table.Summary.Row>
-            <Table.Summary.Cell><Button type="primary" size="large" onClick={() => insertRowHandler()}>Add Entry<PlusOutlined/></Button>            
+            <Table.Summary.Cell><Button type="primary" size="middle" onClick={() => insertRowHandler()}>Add Entry<PlusOutlined/></Button>            
             </Table.Summary.Cell>
             {/* <Table.Summary.Cell>
                          <div style={{display:'flex'}}>
@@ -226,6 +226,11 @@ const Action = ({ type }) => {
                   <Button>Delete</Button>
                 </div> */}
               {/* </div> */}
+            </Table.Summary.Row>
+            <Table.Summary.Row >
+              <Table.Summary.Cell colSpan={12}>
+                <ActionBar type={type} onFinish={onFinish}/>
+              </Table.Summary.Cell>
             </Table.Summary.Row>
           </Table.Summary>
         )}
@@ -247,7 +252,7 @@ const Action = ({ type }) => {
           key: item.id,
         }))}
       />
-      <ActionBar type={type} onFinish={onFinish}/>
+      {/* <ActionBar type={type} onFinish={onFinish}/> */}
     </div>
   );
 };

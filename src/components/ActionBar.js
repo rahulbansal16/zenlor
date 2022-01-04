@@ -5,49 +5,47 @@ import { useHistory } from "react-router-dom";
 const { Option } = Select;
 
 const formItemLayout = {
-    labelCol: {
-        xs: {
-          span: 20,
-        },
-        sm: {
-          span: 20,
-        },
-        md : {
-          span: 18,
-          offset:4
-        },
-        lg : {
-            span: 8,
-            offset: 0
-        },
-        xl: {
-            span: 8,
-            offset: 0
-        },
-        xxl: {
-            span: 8,
-            offset: 0
-        }
+    // labelCol: {
+    //     xs: {
+    //       span: 20,
+    //     },
+    //     sm: {
+    //       span: 20,
+    //     },
+    //     md : {
+    //       span: 18,
+    //       offset:4
+    //     },
+    //     lg : {
+    //         span: 4,
+    //         offset: 0
+    //     },
+    //     xl: {
+    //         span: 32,
+    //         offset: 0
+    //     },
+    //     xxl: {
+    //         span: 4,
+    //         offset: 0
+    //     }
 
-      },
-      wrapperCol: {
-        xs: {
-          span: 20,
-          // offset:2
-        },
-        sm: {
-          span: 20,
-          // offset:2
-        },
-        xl: {
-            span: 8,
-            offset: 8
-        },
-        xxl: {
-            span: 8,
-            offset: 8
-        }
-      },
+    //   },
+    //   wrapperCol: {
+    //     xs: {
+    //       span: 20,
+    //       // offset:2
+    //     },
+    //     sm: {
+    //       span: 20,
+    //       // offset:2
+    //     },
+    //     xl: {
+    //         span: 0,
+    //     },
+    //     xxl: {
+    //         span: 24,
+    //     }
+    //   },
 }
 const actions = {
     orderMaterials: [
@@ -81,11 +79,12 @@ const ActionBar = ({type, onFinish}) => {
 
     return (
         <Form
-        style = {{
-            marginTop:'24px'
-        }}
+        layout="inline"
         form = {form}
         {...formItemLayout}
+        style = {{
+          marginBottom:'40px'
+        }}
         size="medium"
         onFinish={async (data) => {
           await onFinish(data);
