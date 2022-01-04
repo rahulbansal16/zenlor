@@ -606,7 +606,7 @@ exports.createPO = functions
       referenceId: styleCode,
       itemId: id,
       itemDesc: description,
-      quantity: poQty,
+      quantity: poQty*consumption,
       unit: unit,
       rate: rate,
       tax: '',
