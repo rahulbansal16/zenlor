@@ -388,19 +388,23 @@ const initialState = {
     }]
 }
 
+const formatPurchaseOrder = (purchaseOrders) => {
+  let formatedPurchaseOrders = []
+  for (let purchaseOrder of purchaseOrders){
+    const data = purchaseOrder?.data?.map( item => ({
+      ...item,
+      id: purchaseOrder.id
+    }))
+    formatedPurchaseOrders = formatedPurchaseOrders.concat(data)
+  }
+  return formatedPurchaseOrders
+}
+
 const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
             const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments, name, form} = action.payload
             let purchaseOrders = action?.payload?.purchaseOrders
-            let formatedPurchaseOrders = []
-            for (let purchaseOrder of purchaseOrders){
-              const data = purchaseOrder?.data?.map( item => ({
-                ...item,
-                id: purchaseOrder.id
-              }))
-              formatedPurchaseOrders = formatedPurchaseOrders.concat(data)
-            }
             return {
                 ...state,
                 ...action.payload,
@@ -427,7 +431,7 @@ const taskReducer = (state = initialState, action) => {
                  },
                  purchaseOrder: {
                    ...state.purchaseOrder,
-                   dataSource: formatedPurchaseOrders
+                   dataSource: formatPurchaseOrder(purchaseOrders)
                  },
                 form: form  || state.form
             }
@@ -462,6 +466,10 @@ const taskReducer = (state = initialState, action) => {
             const {data}= action.payload;
             let newState = JSON.parse(JSON.stringify(state))
             newState.createPO.dataSource = [...data]
+            newState.purchaseOrder = {
+              ...state.purchaseOrder,
+              dataSource: formatPurchaseOrder(data)
+            }
             return newState;
         }
         case UPDATE_CELL: {

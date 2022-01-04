@@ -87,9 +87,6 @@ const EditableCell = ({
     ) : (
       <div
         className="editable-cell-value-wrap"
-        style={{
-          paddingRight: 24
-        }}
         onClick={toggleEdit}
       >
         {children}
@@ -174,6 +171,7 @@ const Action = ({ type }) => {
     // }
     return {
       ...col,
+      ellipsis: true,
       onCell: (record) => ({
         record,
         editable: col.editable || true,
@@ -205,6 +203,7 @@ const Action = ({ type }) => {
       {header[type].toUpperCase()}
       <ExportTable
       // title={ () => header[type].toUpperCase() }
+      // rowClassName={() => "editable-row"}
       exportable 
         style={{
           maxHeight:'calc(100vh - 50px)'
