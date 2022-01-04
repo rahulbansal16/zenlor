@@ -1,5 +1,6 @@
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Select, Button, Form, Space } from "antd";
+import { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 const { Option } = Select;
 
@@ -72,11 +73,18 @@ const actions = {
 
 const ActionBar = ({type, onFinish}) => {
     const history = useHistory();
+    const [form] = Form.useForm();
+
+    useEffect( () => {
+      form.resetFields()
+    } , [type])
+
     return (
         <Form
         style = {{
             marginTop:'24px'
         }}
+        form = {form}
         {...formItemLayout}
         size="medium"
         onFinish={async (data) => {
@@ -101,7 +109,7 @@ const ActionBar = ({type, onFinish}) => {
             allowClear
           >
             {actions[type].map((action) => (
-              <Option size="large" value={action.value}>
+              <Option size="large" value={action.value} key = {action.key}>
                 {action.key}
               </Option>
             ))}
