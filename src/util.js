@@ -69,9 +69,24 @@ export const appendToPath= (history, path) => {
 }
 
 export function getCurrentTime(){
-    return moment().format("ddd DD MMM | h:mm A")
+    return moment().format("MMM DD YY, h:mm:ss a")
 }
 
 export function formatDate(date){
     return moment(date).format("ddd DD MMM | h:mm A")
+}
+
+export function jsonToCsv(json){
+    
+}
+
+export function downloadCsv(fileContent, fileName){
+    var downloadLink = document.createElement("a");
+    var blob = new Blob([fileContent], { type: 'text/csv' });
+    var url = URL.createObjectURL(blob);
+    downloadLink.href = url;
+    downloadLink.download = fileName;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
 }
