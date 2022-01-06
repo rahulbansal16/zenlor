@@ -5,9 +5,6 @@ import './App.less';
 import Authorization from "./auth/Authorization";
 import Logout from "./auth/Logout";
 import Action from "./components/Action";
-import BOM from "./components/BOM";
-import Dashboard from "./components/Dashboard";
-import Header from './components/Header';
 import Login from "./container/Login";
 import { auth, functions} from "./firebase";
 import Department from "./forms/dataEntry/Department";
@@ -22,7 +19,6 @@ const renderPages = () => {
     <Switch>
       <Route exact path="/" render = { (props) => <Department/>} />
       <Route exact path="/action/:type" render = { (props) => <Action type={props.match.params.type}/>} />
-      <Route exact path="/bom" render = {(props) => <BOM></BOM>}/>
       <Route exact path="/logout" render = { (props) => <Logout/>} /> 
       <Route exact path="/login" render = {() => <Login/>} />
       <Route exact path="/:department">
