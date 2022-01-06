@@ -7,12 +7,12 @@ import TaskDelay from "./TaskDelay";
 const CardTitle = ({styleCode, buyerName}) => {
   return (
     <div style = {{display:'flex', justifyContent:'space-between'}}>
-      <div>
+      <h4>
         {(styleCode || "").toUpperCase()}
-      </div>
-      <div>
+      </h4>
+      <h4>
         {buyerName}
-      </div>
+      </h4>
     </div>
   )
 }
