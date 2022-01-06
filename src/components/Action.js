@@ -1,4 +1,4 @@
-import {Table, Select, Button, Form, Input, Space, Affix } from "antd";
+import {Table, Select, Button, Form, Input, Space, Affix, Tooltip } from "antd";
 import { Table as ExportTable } from "ant-table-extensions";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -85,12 +85,14 @@ const EditableCell = ({
         <Input ref={inputRef} onPressEnter={save} onBlur={save} />
       </Form.Item>
     ) : (
+      <Tooltip title={children}>
       <div
         className="editable-cell-value-wrap"
         onClick={toggleEdit}
-      >
+        >
         {children}
       </div>
+      </Tooltip>
     );
   }
 
@@ -240,6 +242,7 @@ const Action = ({ type }) => {
         sticky={true}
         components={components}
         rowSelection={{
+          fixed:'right',
           type: "checkbox",
           onChange: (selectedRowKeys, selectedRows) => {
             // let selectedStyleCode = selectedRows.map ( row => row.styleCode)
