@@ -1,0 +1,52 @@
+{
+
+    styleCodes:[{
+            id: "",
+            name:"",
+            brand:"",
+            buyer:"",
+            product:"",
+            orderNo:"",
+            styleCode:"",
+            qty:"",
+            orderConfirmation:"",
+            createdOn:"",
+            dueDate:"",
+            brandName:"",
+            quantitySet:"",
+            status:"",
+            purchaseOrders:[{
+
+            }],
+            techPackInfo:{
+                trims:[{
+                }],
+            }
+        },{
+        }]
+}
+
+enum StyleCodeStatus {
+    DELAYED,
+    ONTIME,
+    COMPLETED,
+}
+
+enum StyleCodeActionStatus {
+    CONFIRMATION_PENDING_AT_BRAND,
+    CONFIRMED,
+    ORDER_RAW_MATERIALS {
+        ORDER TRIMS,
+        ORDER FABRIC,
+    },
+}
+
+
+// vendors: [{
+  name:"",
+  contact:""
+}]
+
+
+// 
+labels:[]

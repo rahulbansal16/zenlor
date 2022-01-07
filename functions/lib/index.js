@@ -1,37 +1,39 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable guard-for-in */
+/* eslint-disable require-jsdoc */
+/* eslint-disable max-len */
 const functions = require("firebase-functions");
-// const admin = require("firebase-admin");
+const admin = require("firebase-admin");
 const moment = require("moment");
-const admin = require("./models/db");
-const express = require('express');
-const app = express();
-const router = require("./routes/v1/index");
-// admin.initializeApp();
-// admin.firestore().settings({
-//   ignoreUndefinedProperties: true,
-// })
+/* tslint:disable */
+admin.initializeApp();
+admin.firestore().settings({
+    ignoreUndefinedProperties: true,
+});
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const DEFAULT_COMPANY = "test";
 const DEFAULT_ROLE = [{
         name: "admin",
-        department: "all"
+        department: "all",
     }];
-const departments = [
-    { name: "cutting", lineNumber: "1" },
-    { name: "sewing", lineNumber: "1" },
-    { name: "sewing", lineNumber: "2" },
-    { name: "sewing", lineNumber: "3" },
-    { name: "packing", lineNumber: "1" },
-    { name: "washing", lineNumber: "1" },
-    { name: "kajjaandbuttoning", lineNumber: "1" },
-];
-const values = {
-    "cutting": ["fabricIssued", "output"],
-    "sewing": ["loadingReceivedQuantity", "output"],
-    "kajjaandbuttoning": ["sewingReceivedQuantity", "output"],
-    "washing": ["washingReceivedQuantity", "washingSentQuantity"],
-    "packing": ["washingReceivedQuantity", "packedQuantity", "rejectedQuantity"]
-};
+// const departments = [
+//   {name: "cutting", lineNumber: "1"},
+//   {name: "sewing", lineNumber: "1"},
+//   {name: "sewing", lineNumber: "2"},
+//   {name: "sewing", lineNumber: "3"},
+//   {name: "packing", lineNumber: "1"},
+//   {name: "washing", lineNumber: "1"},
+//   {name: "kajjaandbuttoning", lineNumber: "1"},
+// ];
+// const values = {
+//   "cutting": ["fabricIssued", "output"],
+//   "sewing": ["loadingReceivedQuantity", "output"],
+//   "kajjaandbuttoning": ["sewingReceivedQuantity", "output"],
+//   "washing": ["washingReceivedQuantity", "washingSentQuantity"],
+//   "packing": ["washingReceivedQuantity", "packedQuantity", "rejectedQuantity"],
+// };
 function generateUId(prefix, length) {
     let result = " ";
     const charactersLength = characters.length;
@@ -56,7 +58,7 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async
         const { company, role } = data[phoneNumber];
         if (company && role) {
             if (!(role === null || role === void 0 ? void 0 : role.company)) {
-                role['company'] = company;
+                role["company"] = company;
             }
             console.log("Setting up the role and company as", role, company);
             userInfo["role"] = role;
@@ -68,32 +70,42 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async
     }
     return admin
         .firestore()
-        .collection('users')
+        .collection("users")
         .doc(user.uid)
         .set(userInfo);
 });
 exports.addData = functions
     .region("asia-northeast3")
     .https.onCall(async (body, context) => {
-    if (!context.auth.uid)
+    var _a;
+    // .https.onCall(async (body: { department: any; json: any; createdAt: any; modifiedAt: any; enteredAt: any; }, context: { auth: { uid: any; }; }) => {
+    if (!context) {
+        throw new Error("Cnot");
+    }
+    if (!((_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid)) {
         return {
-            message: "Not permitted to update the Data"
+            message: "Not permitted to update the Data",
         };
+    }
     const uid = context.auth.uid;
     const user = await admin.firestore().collection("users").doc(uid).get();
     console.log("The data is ", user.data());
-    const { company } = user.data();
+    const userData = user.data();
+    if (!userData) {
+        throw new Error("User Data is undefined");
+    }
+    const { company } = userData;
     const { department, json, createdAt, modifiedAt, enteredAt } = body;
     console.log("The body is", body);
     const id = generateUId("", 15);
-    const entry = Object.assign(Object.assign({}, json), { createdAt, modifiedAt, id, status: 'active', enteredAt });
+    const entry = Object.assign(Object.assign({}, json), { createdAt, modifiedAt, id, status: "active", enteredAt });
     const doc = await admin.firestore().collection("data").doc(company).get();
     console.log("The doc is", doc.data());
-    const departmentData = [entry, ...(doc.data()[department] || [])];
+    const departmentData = [entry, ...(userData[department] || [])];
     // let obj ={
     //   [department]: departmentData
     // }
-    let obj = {};
+    const obj = {};
     /* tslint:disable-next-line */
     obj[department] = departmentData;
     await admin.firestore().collection("data").doc(company).set(obj, { merge: true });
@@ -104,27 +116,30 @@ exports.generateCSV = functions
     .https.onRequest(async (request, response) => {
     let { department, lineNumber, company } = request.body;
     department = department || "all";
-    lineNumber = lineNumber || '1';
+    lineNumber = lineNumber || "1";
     lineNumber = lineNumber.toString();
     company = company || "test";
     console.log("The company is", company);
     const doc = await admin.firestore().collection("data").doc(company).get();
     const data = doc.data();
+    if (!data) {
+        throw new Error("");
+    }
     // console.log(departmentData)
-    let departments = [];
-    let values = {};
-    for (let department of data["form"]) {
+    const departments = [];
+    const values = {};
+    for (const department of data["form"]) {
         const { id, lines, process, form } = department;
         /* tslint:disable-next-line */
         values[id] = [];
-        for (let proces of process) {
+        for (const proces of process) {
             console.log("The process are", form[proces].map((field) => field));
             values[id] = values[id].concat(form[proces].map((field) => field));
         }
-        for (let line of lines) {
+        for (const line of lines) {
             departments.push({
                 id,
-                lineNumber: line
+                lineNumber: line,
             });
         }
     }
@@ -139,7 +154,7 @@ exports.generateCSV = functions
     }
     // console.log(file)
     response.attachment(`${department}:${lineNumber}.csv`);
-    response.type('csv');
+    response.type("csv");
     response.send(file);
     // response.setHeader('Content-Type', 'application/vnd.openxmlformats');
     // response.setHeader("Content-Disposition", "attachment; filename=" + department + " : " + lineNumber);
@@ -151,11 +166,11 @@ const csvDate = (date) => {
     return moment(date, "MMM DD YY, h:mm:ss a").format("DD MMM YYYY");
 };
 const sum = (values1, values2) => {
-    let result = {};
-    for (let key in values1) {
+    const result = {};
+    for (const key in values1) {
         result[key] = values1[key];
     }
-    for (let key in values2) {
+    for (const key in values2) {
         if (result[key]) {
             result[key] += values2[key];
         }
@@ -166,28 +181,28 @@ const sum = (values1, values2) => {
     return result;
 };
 const mergeStyleCode = (data) => {
-    let hash = {};
-    for (let d of data) {
+    const hash = {};
+    for (const d of data) {
         const { createdAt, styleCode, values } = d;
-        let key = styleCode + csvDate(createdAt);
+        const key = styleCode + csvDate(createdAt);
         if (!hash[key]) {
             hash[key] = {
                 values,
                 createdAt,
-                styleCode
+                styleCode,
             };
         }
         else {
             hash[key] = {
                 styleCode,
                 values: sum(values, hash[key].values),
-                createdAt
+                createdAt,
             };
         }
     }
-    let result = [];
+    const result = [];
     console.log(hash);
-    for (let v in hash) {
+    for (const v in hash) {
         result.push(hash[v]);
     }
     return result;
@@ -196,16 +211,16 @@ const generateData = (departmentData, department, line, values) => {
     console.log("The values are", values);
     let filteredDepartmentData = departmentData.filter(({ lineNumber, status }) => lineNumber === line.toString() && status === "active");
     filteredDepartmentData = mergeStyleCode(filteredDepartmentData);
-    let keys = values[department];
+    const keys = values[department];
     let fileData = "";
     fileData += filteredDepartmentData.map((row) => {
         const { createdAt, styleCode, values } = row;
         let header = `${csvDate(createdAt)},${styleCode},`;
         header += keys.map((key) => values[key] || 0);
-        header += '\n';
+        header += "\n";
         return header;
     });
-    fileData = ',' + fileData;
+    fileData = "," + fileData;
     fileData = `\n${department} and lineNumber ${line}\n` + fileData;
     return fileData;
 };
@@ -213,25 +228,31 @@ exports.updateData = functions
     .region("asia-northeast3")
     .https
     .onCall(async (data, context) => {
-    if (!context.auth.uid)
+    var _a;
+    if (!((_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid)) {
         return {
-            message: "Not permitted to update the Data"
+            message: "Not permitted to update the Data",
         };
+    }
     const uid = context.auth.uid;
     const user = await admin.firestore().collection("users").doc(uid).get();
     console.log("The data is ", user.data());
-    const { company } = user.data();
+    const userData = user.data();
+    if (!userData) {
+        return {};
+    }
+    const { company } = userData;
     const { department, id, json, modifiedAt, status } = data;
     const entry = Object.assign(Object.assign({}, json), { modifiedAt, status: status || "active" });
-    const doc = await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).get();
-    let departmentData = doc.data()[department] || [];
+    // const doc = await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).get();
+    let departmentData = userData[department] || [];
     departmentData = departmentData.map((item) => {
         if (item.id !== id) {
             return item;
         }
         return Object.assign(Object.assign({}, item), entry);
     });
-    let obj = {};
+    const obj = {};
     obj[department] = departmentData;
     await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).set(obj, { merge: true });
     return departmentData;
@@ -244,10 +265,14 @@ exports.insertStyleCode = functions
     console.log("The styleCodes and company are", styleCodes, company);
     const doc = await admin.firestore().collection("data").doc(company).get();
     console.log("The doc data", doc.data());
-    let existingStyleCodes = doc.data()["styleCodes"] || [];
+    const docData = doc.data();
+    if (!docData) {
+        throw new Error();
+    }
+    let existingStyleCodes = docData["styleCodes"] || [];
     existingStyleCodes = existingStyleCodes.concat(styleCodes.map((styleCode) => ({
         id: styleCode.toUpperCase(),
-        name: styleCode.toUpperCase()
+        name: styleCode.toUpperCase(),
     })));
     console.log("The styleCodes are", existingStyleCodes);
     existingStyleCodes = existingStyleCodes.reduce((acc, current) => {
@@ -260,29 +285,35 @@ exports.insertStyleCode = functions
         }
     }, []);
     await admin.firestore().collection("data").doc(company).set({
-        styleCodes: existingStyleCodes
+        styleCodes: existingStyleCodes,
     }, { merge: true });
     response.send({
-        styleCodes: existingStyleCodes
+        styleCodes: existingStyleCodes,
     });
 });
 exports.getUserRole = functions
     .region("asia-northeast3")
     .https
-    .onCall(async (data, context) => {
-    if (!context.auth.uid)
+    .onCall(async (_data, context) => {
+    var _a;
+    if (!((_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid)) {
         return {
             uid: null,
-            role: []
+            role: [],
         };
+    }
     const uid = context.auth.uid;
     const user = await admin.firestore().collection("users").doc(uid).get();
     console.log("The data is ", user.data());
-    const { role, company } = user.data();
+    const userData = user.data();
+    if (!userData) {
+        return {};
+    }
+    const { role, company } = userData;
     return {
         uid,
         role,
-        company
+        company,
     };
 });
 exports.backUpCompany = functions
@@ -291,16 +322,20 @@ exports.backUpCompany = functions
     .onRequest(async (request, response) => {
     const { company } = request.body;
     const doc = await admin.firestore().collection("data").doc(company).get();
-    await admin.firestore().collection("backup").doc(company + moment().valueOf()).set(doc.data());
+    const docData = doc.data();
+    if (!docData) {
+        throw new Error("");
+    }
+    await admin.firestore().collection("backup").doc(company + moment().valueOf()).set(docData);
     response.send(doc.data());
 });
 exports.addDepartment = functions
     .region("asia-northeast3")
     .https
-    .onCall(async (data, context) => {
+    .onCall(async (data, _context) => {
     const { departments } = data;
     await admin.firestore().collection("data").doc("anusha_8923").set({
-        departments
+        departments,
     }, { merge: true });
 });
 exports.addForm = functions
@@ -310,33 +345,41 @@ exports.addForm = functions
     const { company, form } = request.body;
     console.log("Adding the form to the ", company, form);
     await admin.firestore().collection("data").doc(company).set({
-        form
+        form,
     }, {
-        merge: true
+        merge: true,
     });
     response.send(form);
 });
-const getCompany = async function (data, context) {
+const getCompany = async function (_data, context) {
     const uid = context.auth.uid;
     const user = await admin.firestore().collection("users").doc(uid).get();
     console.log("The data is ", user.data());
-    return user.data();
+    const userData = user.data();
+    if (!userData) {
+        throw new Error("User Data is Empty");
+    }
+    return userData;
 };
 const getDepartments = (form) => {
     return form.map((department) => ({ id: department.id, process: department.process, lines: department.lines }));
 };
 const getAggregate = async (company) => {
     console.log("The company is", company);
-    let result = {};
+    const result = {};
     const dataDoc = await admin.firestore().collection("data").doc(company).get();
     const factoryData = dataDoc.data();
+    if (!factoryData) {
+        return {};
+    }
     const departments = getDepartments(factoryData["form"]);
     console.log("The departments are", departments);
-    for (let department of departments) {
+    for (const department of departments) {
         const { id: departmentId } = department;
-        for (let update of (factoryData[departmentId] || [])) {
-            if (update.status !== "active")
+        for (const update of (factoryData[departmentId] || [])) {
+            if (update.status !== "active") {
                 continue;
+            }
             const { values, lineNumber, process, styleCode } = update;
             const processKey = process.toLowerCase();
             const key = `${styleCode.toLowerCase()}-${departmentId.toLowerCase()}-${lineNumber}-${processKey}`;
@@ -344,7 +387,7 @@ const getAggregate = async (company) => {
                 result[key] = Object.assign({}, values);
             }
             else {
-                let total = {};
+                const total = {};
                 for (const fieldKey in values) {
                     total[fieldKey] = values[fieldKey] + (result[key][fieldKey] || 0);
                 }
@@ -368,9 +411,10 @@ exports.dataInsights = functions
     .region("asia-northeast3")
     .https
     .onCall(async (data, context) => {
-    if (!context.auth.uid) {
+    var _a;
+    if (!((_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid)) {
         return {
-            message: "Not allowed"
+            message: "Not allowed",
         };
     }
     const { company } = await getCompany(data, context);
@@ -380,9 +424,10 @@ exports.getData = functions
     .region("asia-northeast3")
     .https
     .onCall(async (data, context) => {
-    if (!context.auth.uid) {
+    var _a;
+    if (!((_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid)) {
         return {
-            message: "Not allowed"
+            message: "Not allowed",
         };
     }
     const { company } = await getCompany(data, context);
@@ -402,19 +447,19 @@ exports.addMetaRole = functions
     .onRequest(async (request, response) => {
     const { company, roles } = request.body;
     console.log("The company and roles are ", company, roles);
-    let obj = {};
-    for (let role of roles) {
+    const obj = {};
+    for (const role of roles) {
         const { phoneNumber, departments } = role;
         obj["+91" + phoneNumber] = {
             company,
             role: departments.map((department) => ({
                 department,
-                name: department === "all" ? "admin" : "manager"
-            }))
+                name: department === "all" ? "admin" : "manager",
+            })),
         };
     }
     await admin.firestore().collection("meta").doc("user_roles").set(obj, {
-        merge: true
+        merge: true,
     });
     response.send(obj);
 });
@@ -426,6 +471,9 @@ exports.styleCodesInfo = functions
     const { company } = await getCompany(data, context);
     const dataDoc = await admin.firestore().collection("data").doc(company).get();
     const companyInfo = dataDoc.data();
+    if (!companyInfo) {
+        throw new Error("Company Info is undefined");
+    }
     const { styleCodesInfo } = companyInfo;
     return styleCodesInfo || [];
 });
@@ -439,7 +487,7 @@ exports.styleCodesInfo = functions
 exports.insertStyleCodesInfo = functions
     .region("asia-northeast3")
     .https
-    .onCall(async (data, context) => {
+    .onCall(async (data, _context) => {
     var _a;
     const { company, styleCodeInfo } = data;
     styleCodeInfo["id"] = generateUId("", 8);
@@ -451,9 +499,9 @@ exports.insertStyleCodesInfo = functions
     const companyInfo = dataDoc.data();
     const styleCodesInfo = (_a = companyInfo === null || companyInfo === void 0 ? void 0 : companyInfo.styleCodesInfo) !== null && _a !== void 0 ? _a : [];
     await admin.firestore().collection("data").doc(company).set({
-        styleCodesInfo: [styleCodeInfo, ...styleCodesInfo]
+        styleCodesInfo: [styleCodeInfo, ...styleCodesInfo],
     }, {
-        merge: true
+        merge: true,
     });
     return data;
 });
@@ -466,16 +514,19 @@ exports.actions = functions
     console.log("The company, type and item are", company, type, item);
     const dataDoc = await admin.firestore().collection("data").doc(company).get();
     const companyInfo = dataDoc.data();
-    let output = {};
+    if (!companyInfo) {
+        throw new Error("Company Info is undefined");
+    }
+    const output = {};
     switch (type) {
         case "dashboard":
-            output['styleCodesInfo'] = updateItemInArray(companyInfo['styleCodesInfo'], item);
+            output["styleCodesInfo"] = updateItemInArray(companyInfo["styleCodesInfo"], item);
             break;
         case "orderMaterials":
-            output['billOfMaterials'] = updateItemInArray(companyInfo['billOfMaterials'], item);
+            output["billOfMaterials"] = updateItemInArray(companyInfo["billOfMaterials"], item);
             break;
         case "purchaseOrders":
-            output['purchaseOrders'] = updateItemInArray(companyInfo['purchaseOrders'], item);
+            output["purchaseOrders"] = updateItemInArray(companyInfo["purchaseOrders"], item);
             break;
         default:
     }
@@ -484,10 +535,10 @@ exports.actions = functions
     return output;
 });
 const updateItemInArray = (items, newItem, cmp = (a, b) => a.id === b.id) => {
-    let output = [];
+    const output = [];
     let inserted = false;
     // Add some code to remove the spaces around the value
-    for (let item of items) {
+    for (const item of items) {
         if (cmp(item, newItem)) {
             inserted = true;
             output.push(Object.assign(Object.assign({}, item), newItem));
@@ -512,8 +563,8 @@ exports.updateStyleCodesInfo = functions
     const dataDoc = await admin.firestore().collection("data").doc(company).get();
     const companyInfo = dataDoc.data();
     const styleCodesInfo = (_a = companyInfo === null || companyInfo === void 0 ? void 0 : companyInfo.styleCodesInfo) !== null && _a !== void 0 ? _a : [];
-    let obj = [];
-    for (let info of styleCodesInfo) {
+    const obj = [];
+    for (const info of styleCodesInfo) {
         if (info.id === (styleCodeInfo === null || styleCodeInfo === void 0 ? void 0 : styleCodeInfo.id)) {
             obj.push(Object.assign(Object.assign({}, info), styleCodeInfo));
         }
@@ -523,7 +574,7 @@ exports.updateStyleCodesInfo = functions
     }
     console.log("The updatedStyleCodesInfo are", obj);
     await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).set({
-        styleCodesInfo: obj
+        styleCodesInfo: obj,
     }, { merge: true });
     return obj;
 });
@@ -534,15 +585,15 @@ exports.createPO = functions
     const { company } = await getCompany(data, context);
     const { bom, createdAt } = data;
     console.log("The bom is createdAt company", bom, createdAt, company);
-    let supplierMap = {};
+    const supplierMap = {};
     let totalAmount = 0;
-    for (let item of bom) {
+    for (const item of bom) {
         const { supplier, styleCode, description, id, poQty, unit, rate, consumption } = item;
         console.log("The item information is", item);
         if (!supplierMap[supplier]) {
             supplierMap[supplier] = [];
         }
-        let amount = (poQty || 0) * (rate || 0) * (consumption || 0);
+        const amount = (poQty || 0) * (rate || 0) * (consumption || 0);
         supplierMap[supplier].push({
             sno: supplierMap[supplier].length + 1,
             referenceId: styleCode,
@@ -551,33 +602,35 @@ exports.createPO = functions
             quantity: poQty * consumption,
             unit: unit,
             rate: rate,
-            tax: '',
-            amount: amount
+            tax: "",
+            amount: amount,
         });
         totalAmount += amount;
     }
     console.log("The supplier map is", supplierMap);
     const purchaseOrders = [];
-    for (let key in supplierMap) {
+    for (const key in supplierMap) {
         purchaseOrders.push({
             id: generateUId("", 10).toUpperCase(),
             supplier: key,
             createdAt,
-            deliveryDate: '',
+            deliveryDate: "",
             amount: totalAmount,
             status: "active",
-            data: supplierMap[key]
+            data: supplierMap[key],
         });
     }
-    let doc = await admin.firestore().collection("data").doc(company).get();
-    let { purchaseOrders: pastOrders } = doc.data();
+    const doc = await admin.firestore().collection("data").doc(company).get();
+    const companyData = doc.data();
+    if (!companyData) {
+        throw new Error("The company does not exist");
+    }
+    const { purchaseOrders: pastOrders } = companyData;
     await admin.firestore().collection("data").doc(company).set({
-        purchaseOrders: [...purchaseOrders, ...(pastOrders || [])]
+        purchaseOrders: [...purchaseOrders, ...(pastOrders || [])],
     }, {
-        merge: true
+        merge: true,
     });
     return [...purchaseOrders, ...(pastOrders || [])];
 });
-app.use("/", router);
-exports.api = functions.region("asia-northeast3").https.onRequest(app);
 //# sourceMappingURL=index.js.map

@@ -7,7 +7,8 @@
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "lint-fix": "npm run lint -- --fix"
   },
   "engines": {
     "node": "14"
@@ -29,7 +30,8 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.22.0",
     "firebase-functions-test": "^0.2.0",
-    "typescript": "^3.8.0"
+    "typescript": "^3.8.0",
+    "prettier": "latest"
   },
   "private": true
 }

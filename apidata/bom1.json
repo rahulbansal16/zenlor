@@ -1,0 +1,15 @@
+{
+    "styleCode": "WSH123",
+     "toMakeQty": "650",
+     "category": "fabric",
+     "type": "main",
+     "materialId": "1255",
+     "description": "Blue Twill Super",
+     "unit": "mtr",
+     "rate": 100,
+     "consumption": 1.75,
+     "reqQty": 100,
+     "remQty": 232,
+     "supplier": "Y2K",
+     "poQty": 120
+ }
