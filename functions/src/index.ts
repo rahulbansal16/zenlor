@@ -220,9 +220,9 @@ const mergeStyleCode = (data: any) => {
   return result;
 };
 
-const generateData = (departmentData: any[], department: string | number, line: { toString: () => any; }, values: { [x: string]: any; }) => {
+const generateData = (departmentData: any[] , department: string | number, line: { toString: () => any; }, values: { [x: string]: any; }) => {
   console.log("The values are", values);
-  let filteredDepartmentData = departmentData.filter(({lineNumber, status}) => lineNumber === line.toString() && status === "active");
+  let filteredDepartmentData = departmentData??[].filter(({lineNumber, status}) => lineNumber === line.toString() && status === "active");
   filteredDepartmentData = mergeStyleCode(filteredDepartmentData);
   const keys = values[department];
   let fileData = "";
