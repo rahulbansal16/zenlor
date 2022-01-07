@@ -15,7 +15,7 @@ const ZenlorTags = ({text}) => {
         default:
             color="white"
     }
-    return <Tag color={color}>text</Tag>
+    return <Tag color={color}>{text}</Tag>
 }
 
 export default ZenlorTags

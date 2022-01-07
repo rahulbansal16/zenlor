@@ -168,9 +168,9 @@ const Action = ({ type }) => {
   };
 
   const column = filteredColumns.map((col) => {
-    // if (!col.editable) {
-    //   return col;
-    // }
+    if (!col.editable) {
+      return col;
+    }
     return {
       ...col,
       ellipsis: true,
@@ -206,6 +206,9 @@ const Action = ({ type }) => {
       <ExportTable
       // title={ () => header[type].toUpperCase() }
       // rowClassName={() => "editable-row"}
+      // expandable={{
+      //   expandedRowRender: record => <p style={{ margin: 0 }}>I am expandablee</p>,
+      // }}
       exportable 
         style={{
           minHeight:'100vh'

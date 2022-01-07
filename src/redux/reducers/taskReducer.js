@@ -1,5 +1,7 @@
 // import { FETCH_COMPLETE_TASKS, FETCH_INCOMPLETE_TASKS, UPDATE_TASK_STATUS } from "../actionType";
 
+import { Table, Tooltip } from "antd"
+import ZenlorTags from "../../components/ZenlorTags"
 import { functions } from "../../firebase"
 import { FETCH_DATA, FETCH_PO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
 
@@ -20,11 +22,21 @@ const initialState = {
     styleCodesInfo:[],  
     dashboard: {
         columns: [
+          {
+            title: () => <Tooltip title="Style Code">Style Code</Tooltip> ,
+            dataIndex: "styleCode",
+            key: "styleCode",
+            filter: "multiSelect",
+            showSorterTooltip: false,
+            width:150,
+            fixed: true
+          },
             {
-              title: "Buyer",
-              dataIndex: "buyer",
-              key: "buyer",
-              editable: true,
+              title: "Brand",
+              dataIndex: "brand",
+              key: "brand",
+              width:100,
+              showSorterTooltip: false,
               filter: "multiSelect",
               sortType:"", // date, number, integer, string
               // https://codesandbox.io/s/filter-and-sorter-antd-4-18-1-forked-zhoph?file=/index.js
@@ -35,31 +47,39 @@ const initialState = {
               render: (text) => <a>{text}</a>,
             },
             {
-              title: "Category",
-              dataIndex: "category",
-              key: "category",
-              editable: true
+              title: "Product",
+              dataIndex: "product",
+              width: 100,
+              key: "product",
             },
             {
-              title: "Style Code",
-              dataIndex: "styleCode",
-              key: "styleCode",
-              filter: "multiSelect",
-            },
-            {
-              title: "Order Number",
+              title: "Order No",
               dataIndex: "orderNo",
+              showSorterTooltip: false,
               key: "orderNo",
+              width:100,
               editable: true
             },
             {
-              title: "Order Conf",
+              title: () => <Tooltip title="Order Confirmation">Order Confirmation</Tooltip>,
+              width:100,
               dataIndex: "orderConfirmation",
+              showSorterTooltip: false,
               key: "orderConfirmation",
               editable: true
             },
             {
-              title: "Order Quantity",
+              title: () => <Tooltip title="Order Confirmation">Order Confirmation</Tooltip>,
+              width:100,
+              dataIndex: "orderConfirmation",
+              showSorterTooltip: false,
+              key: "orderConfirmation",
+              editable: true
+            },
+            {
+              title: () => <Tooltip title="Order Quantity">Order Quantity</Tooltip>,
+              showSorterTooltip: false,
+              width:100,
               dataIndex: "orderQuantity",
               key: "orderQuantity",
               editable: true
@@ -76,6 +96,25 @@ const initialState = {
               key: "deliveryDate",
               editable: true
             },
+            Table.EXPAND_COLUMN,
+            {
+              title: "Material Status",
+              children : [
+               {
+                title:"Purchase",
+                dataIndex: "purchaseStatus",
+                key: "purchaseStatus",
+                editable: true,
+                render: () => <ZenlorTags text="partial order"></ZenlorTags>
+               },
+               {
+                title:"Inventory",
+                dataIndex: "inventoryStatus",
+                key: "inventoryStatus",
+                editable: true
+               }
+              ]
+            },
             {
               title: "Status",
               dataIndex: "status",
@@ -88,6 +127,7 @@ const initialState = {
               dataIndex: "lastAction",
               key: "lastAction",
             },
+            Table.SELECTION_COLUMN,
           ],
         dataSource: []
     },
