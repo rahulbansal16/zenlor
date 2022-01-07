@@ -1,10 +1,10 @@
 const functions = require("firebase-functions");
 // const admin = require("firebase-admin");
 const moment = require("moment");
-const admin = require("./models/db");
+import admin from "./models/db";
 const express = require('express');
 const app = express();
-const router = require("./routes/v1/index")
+// const router = require("./routes/v1/index")
 
 // admin.initializeApp();
 // admin.firestore().settings({
@@ -36,7 +36,7 @@ const values = {
   "packing": ["washingReceivedQuantity","packedQuantity","rejectedQuantity"]
 }
 
-function generateUId(prefix, length) {
+function generateUId(prefix: string, length: number) {
   let result = " ";
   const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
@@ -50,7 +50,7 @@ function generateUId(prefix, length) {
 //   return moment().locale("en-in").format("MMM DD YY, h:mm:ss a")
 // }
 
-exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async (user) => {
+exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async (user: { uid: any; }) => {
   const userInfo = JSON.parse(JSON.stringify(user))
   userInfo["company"] = DEFAULT_COMPANY;
   userInfo["role"] = DEFAULT_ROLE;
@@ -80,7 +80,7 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async
 
 exports.addData = functions
   .region("asia-northeast3")
-  .https.onCall( async (body, context) => {
+  .https.onCall( async (body: { department: any; json: any; createdAt: any; modifiedAt: any; enteredAt: any; }, context: { auth: { uid: any; }; }) => {
 
     if (!context.auth.uid)
     return {
@@ -102,7 +102,8 @@ exports.addData = functions
     // let obj ={
     //   [department]: departmentData
     // }
-    let obj = {}
+    let obj: any = {}
+    /* tslint:disable-next-line */
     obj[department] = departmentData
     await admin.firestore().collection("data").doc(company).set(obj ,{merge: true})
     return departmentData
@@ -111,7 +112,7 @@ exports.addData = functions
 
 exports.generateCSV = functions
 .region("asia-northeast3")
-.https.onRequest( async (request, response) => {
+.https.onRequest( async (request: { body: { department: string; lineNumber: string; company: string; }; }, response: { attachment: (arg0: string) => void; type: (arg0: string) => void; send: (arg0: string) => void; }) => {
   let {department, lineNumber, company } = request.body;
   department = department || "all"
   lineNumber = lineNumber || '1'
@@ -122,13 +123,14 @@ exports.generateCSV = functions
   const data = doc.data()
   // console.log(departmentData)
   let departments = []
-  let values = {}
+  let values:any = {}
   for (let department of data["form"]){
    const {id, lines, process, form}  = department;
+  /* tslint:disable-next-line */
    values[id] = []
    for(let proces of process){
-     console.log("The process are", form[proces].map( ({field}) => field ))
-     values[id]=values[id].concat(form[proces].map( ({field}) => field ))
+     console.log("The process are", form[proces].map( (field:string) => field ))
+     values[id]=values[id].concat(form[proces].map( (field: string) => field ))
    }
    for (let line of lines){
      departments.push({
@@ -156,12 +158,12 @@ exports.generateCSV = functions
   // response.send(file);
 })
 
-const csvDate = (date) => {
+const csvDate = (date: any) => {
   return moment(date, "MMM DD YY, h:mm:ss a").format("DD MMM YYYY")
 }
 
-const sum = (values1, values2) => {
-  let result = {}
+const sum = (values1: { [x: string]: any; }, values2: { [x: string]: any; }) => {
+  let result:any = {}
   for (let key in values1){
     result[key] = values1[key]
   }
@@ -175,8 +177,8 @@ const sum = (values1, values2) => {
   return result
 }
 
-const mergeStyleCode = (data) => {
-  let hash = {}
+const mergeStyleCode = (data: any) => {
+  let hash:any = {}
   for(let d of data){
     const {createdAt, styleCode, values} = d
     let key = styleCode + csvDate(createdAt)
@@ -202,16 +204,16 @@ const mergeStyleCode = (data) => {
   return result
 }
 
-const generateData = (departmentData ,department, line, values) => {
+const generateData = (departmentData: any[] ,department: string | number, line: { toString: () => any; }, values: { [x: string]: any; }) => {
   console.log("The values are", values)
   let filteredDepartmentData = departmentData.filter( ({lineNumber, status})  => lineNumber === line.toString() && status === "active")
   filteredDepartmentData = mergeStyleCode(filteredDepartmentData)
   let keys = values[department]
   let fileData = ""
-  fileData += filteredDepartmentData.map( row =>  {
+  fileData += filteredDepartmentData.map( (row: { createdAt: any; styleCode: any; values: any; }) =>  {
     const {createdAt, styleCode, values} = row
     let header =  `${csvDate(createdAt)},${styleCode},`
-    header += keys.map (key => values[key]||0)
+    header += keys.map ((key: string | number) => values[key]||0)
     header += '\n'
     return header
   })
@@ -224,7 +226,7 @@ const generateData = (departmentData ,department, line, values) => {
 exports.updateData = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
+.onCall( async (data: { department: any; id: any; json: any; modifiedAt: any; status: any; }, context: { auth: { uid: any; }; }) => {
 
   if (!context.auth.uid)
     return {
@@ -240,7 +242,7 @@ exports.updateData = functions
   const entry  = {...json, modifiedAt, status: status || "active"}
   const doc = await admin.firestore().collection("data").doc( company || DEFAULT_COMPANY).get()
   let departmentData = doc.data()[department] || []
-  departmentData = departmentData.map( item => {
+  departmentData = departmentData.map( (item: { id: any; }) => {
     if (item.id !== id){
       return item
     }
@@ -249,7 +251,7 @@ exports.updateData = functions
       ...entry
     }
   })
-  let obj = {}
+  let obj:any = {}
   obj[department] = departmentData
   await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).set(obj ,{merge: true})
   return departmentData
@@ -258,7 +260,7 @@ exports.updateData = functions
 exports.insertStyleCode = functions
 .region("asia-northeast3")
 .https
-.onRequest( async (request, response) => {
+.onRequest( async (request: { body: { styleCodes: any; company: any; }; }, response: { send: (arg0: { styleCodes: any; }) => void; }) => {
 
   const {styleCodes, company} = request.body;
   console.log("The styleCodes and company are", styleCodes, company)
@@ -266,14 +268,14 @@ exports.insertStyleCode = functions
   console.log("The doc data", doc.data())
   let existingStyleCodes = doc.data()["styleCodes"] || [];
   
-  existingStyleCodes =  existingStyleCodes.concat( styleCodes.map(styleCode => ({
+  existingStyleCodes =  existingStyleCodes.concat( styleCodes.map((styleCode: string) => ({
     id:  styleCode.toUpperCase(),
     name: styleCode.toUpperCase()
   })))
 
   console.log("The styleCodes are", existingStyleCodes)
-  existingStyleCodes = existingStyleCodes.reduce((acc, current) => {
-    const x = acc.find(item => item.id === current.id);
+  existingStyleCodes = existingStyleCodes.reduce((acc: any[], current: { id: any; }) => {
+    const x = acc.find((item: { id: any; }) => item.id === current.id);
     if (!x) {
       return acc.concat([current]);
     } else {
@@ -294,7 +296,7 @@ exports.insertStyleCode = functions
 exports.getUserRole = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
+.onCall( async (data: any, context: { auth: { uid: any; }; }) => {
   if (!context.auth.uid)
     return {
       uid: null,
@@ -316,7 +318,7 @@ exports.getUserRole = functions
 exports.backUpCompany = functions
 .region("asia-northeast3")
 .https
-.onRequest( async(request, response) => {
+.onRequest( async(request: { body: { company: any; }; }, response: { send: (arg0: any) => void; }) => {
   const {company} = request.body;
   const doc = await admin.firestore().collection("data").doc(company).get();
   await admin.firestore().collection("backup").doc(company + moment().valueOf()).set(doc.data());
@@ -326,7 +328,7 @@ exports.backUpCompany = functions
 exports.addDepartment = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
+.onCall( async (data: { departments: any; }, context: any) => {
   const { departments }= data;
   await admin.firestore().collection("data").doc("anusha_8923").set({
     departments
@@ -336,7 +338,7 @@ exports.addDepartment = functions
 exports.addForm = functions
 .region("asia-northeast3")
 .https
-.onRequest( async ( request, response) => {
+.onRequest( async ( request: { body: { company: any; form: any; }; }, response: { send: (arg0: any) => void; }) => {
   const {company, form} = request.body;
   console.log("Adding the form to the ", company, form);
   await admin.firestore().collection("data").doc(company).set({
@@ -347,21 +349,21 @@ exports.addForm = functions
   response.send(form)
 })
 
-const getCompany = async (data, context) => {
+const getCompany = async function (data: any, context: { auth: { uid: any; }; }): Promise<{company: string}> {
   const uid = context.auth.uid
   const user = await admin.firestore().collection("users").doc(uid).get()
   console.log("The data is ", user.data())
   return user.data();
 }
 
-const getDepartments = form => {
-  return form.map( department =>  ({id: department.id, process: department.process, lines: department.lines }))
+const getDepartments = (form: any[]) => {
+  return form.map( (department: { id: any; process: any; lines: any; }) =>  ({id: department.id, process: department.process, lines: department.lines }))
 }
 
 
-const getAggregate = async (company) => {
+const getAggregate = async (company: any) => {
   console.log("The company is", company)
-  let result = {};
+  let result:any = {};
   const dataDoc = await admin.firestore().collection("data").doc(company).get();
   const factoryData = dataDoc.data();
   const departments = getDepartments(factoryData["form"])
@@ -380,7 +382,7 @@ const getAggregate = async (company) => {
       if (!result[key]){
         result[key] = {...values}
       } else {
-        let total = {}
+        let total:any = {}
         for ( const fieldKey in values) {
           total[fieldKey] = values[fieldKey] + (result[key][fieldKey] || 0)
         }
@@ -406,7 +408,7 @@ const getAggregate = async (company) => {
 exports.dataInsights = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
+.onCall( async (data: any, context: { auth: { uid: any; }; }) => {
   if (!context.auth.uid){
     return {
       message: "Not allowed"
@@ -419,7 +421,7 @@ exports.dataInsights = functions
 exports.getData = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
+.onCall( async (data: any, context: { auth: { uid: any; }; }) => {
   if (!context.auth.uid){
     return {
       message: "Not allowed"
@@ -440,15 +442,15 @@ exports.getData = functions
 exports.addMetaRole = functions
 .region("asia-northeast3")
 .https 
-.onRequest(async (request, response) => {
+.onRequest(async (request: { body: { company: any; roles: any; }; }, response: { send: (arg0: {}) => void; }) => {
   const {company, roles } = request.body;
   console.log("The company and roles are ",company, roles)
-  let obj = {}
+  let obj:any = {}
   for (let role of roles){
     const {phoneNumber, departments} = role
     obj["+91"+phoneNumber] = {
       company,
-      role: departments.map(department => ({
+      role: departments.map((department: string) => ({
         department,
         name: department === "all"?"admin":"manager"
       }))
@@ -464,8 +466,8 @@ exports.addMetaRole = functions
 exports.styleCodesInfo = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
-  const {company} = getCompany(data, context);
+.onCall( async (data: any, context: any) => {
+  const {company} = await getCompany(data, context);
   const dataDoc = await admin.firestore().collection("data").doc(company).get();
   const companyInfo = dataDoc.data();
   const {styleCodesInfo} =  companyInfo;
@@ -482,7 +484,7 @@ exports.styleCodesInfo = functions
 exports.insertStyleCodesInfo = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
+.onCall( async (data: { company: any; styleCodeInfo: any; }, context: any) => {
   const {company, styleCodeInfo} = data;
   styleCodeInfo["id"] = generateUId("", 8);
   console.log("The insertStyleCodesIndo", company);
@@ -505,13 +507,13 @@ exports.insertStyleCodesInfo = functions
 exports.actions = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
+.onCall( async (data: { type: any; item: any; }, context: any) => {
   const {company} = await getCompany(data, context);
   const {type, item} = data;
   console.log("The company, type and item are", company, type, item)
   const dataDoc = await admin.firestore().collection("data").doc(company).get();
   const companyInfo = dataDoc.data();
-  let output = {}
+  let output :any = {}
   switch(type){
     case "dashboard":
       output['styleCodesInfo']  = updateItemInArray(companyInfo['styleCodesInfo'], item)
@@ -530,7 +532,7 @@ exports.actions = functions
 })
 
 
-const updateItemInArray = (items, newItem, cmp = (a, b) => a.id === b.id) => {
+const updateItemInArray = (items: any, newItem: any, cmp = (a: { id: any; }, b: { id: any; }) => a.id === b.id) => {
   let output = []
   let inserted = false
   // Add some code to remove the spaces around the value
@@ -557,7 +559,7 @@ const updateItemInArray = (items, newItem, cmp = (a, b) => a.id === b.id) => {
 exports.updateStyleCodesInfo = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
+.onCall( async (data: { styleCodeInfo: any; }, context: any) => {
   const {company} = await getCompany(data, context);
   const {styleCodeInfo} = data;
   console.log("The company is", company);
@@ -585,11 +587,11 @@ exports.updateStyleCodesInfo = functions
 exports.createPO = functions
 .region("asia-northeast3")
 .https
-.onCall( async (data, context) => {
+.onCall( async (data: { bom: any; createdAt: any; }, context: any) => {
   const {company} = await getCompany(data, context);
   const {bom, createdAt} = data;
   console.log("The bom is createdAt company", bom, createdAt, company)
-  let supplierMap = {}
+  let supplierMap :any = {}
   let totalAmount = 0;
 
   for (let item of bom ){
@@ -641,5 +643,5 @@ exports.createPO = functions
 
 })
 
-app.use("/", router)
-exports.api = functions.region("asia-northeast3").https.onRequest(app);
+// app.use("/", router)
+// exports.api = functions.region("asia-northeast3").https.onRequest(app);
