@@ -32,7 +32,8 @@
     "test": "craco test",
     "eject": "craco eject",
     "deploy": "firebase.cmd deploy --only hosting",
-    "alpha": "firebase.cmd hosting:channel:deploy alpha"
+    "alpha": "firebase.cmd hosting:channel:deploy alpha",
+    "debug":"firebase.cmd emulators:start --only functions --inspect-functions"
   },
   "eslintConfig": {
     "extends": [
