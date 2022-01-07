@@ -105,7 +105,13 @@ exports.addData = functions
       const entry = {...json, createdAt, modifiedAt, id, status: "active", enteredAt};
       const doc = await admin.firestore().collection("data").doc(company).get();
       console.log("The doc is", doc.data());
-      const departmentData = [entry, ...(userData[department] || [])];
+      const companyData = doc.data();
+      if (!companyData) {
+        throw new Error("Company not present in the DB" + company);
+      }
+      const oldDepartmentData = companyData[department];
+      console.log("The oldDEparmentData is ", oldDepartmentData, companyData[department]);
+      const departmentData = [entry, ...(oldDepartmentData??[])];
       // let obj ={
       //   [department]: departmentData
       // }
@@ -253,8 +259,12 @@ exports.updateData = functions
       const {company} = userData;
       const {department, id, json, modifiedAt, status} = data;
       const entry = {...json, modifiedAt, status: status || "active"};
-      // const doc = await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).get();
-      let departmentData = userData[department] || [];
+      const doc = await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).get();
+      const companyData = doc.data();
+      if (!companyData) {
+        throw new Error("Data Not Present For the company" + company);
+      }
+      let departmentData = companyData[department] || [];
       departmentData = departmentData.map((item: { id: any; }) => {
         if (item.id !== id) {
           return item;
