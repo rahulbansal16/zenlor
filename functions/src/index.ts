@@ -145,8 +145,8 @@ exports.generateCSV = functions
         /* tslint:disable-next-line */
         values[id] = [];
         for (const proces of process) {
-          console.log("The process are", form[proces].map((field: string) => field));
-          values[id] = values[id].concat(form[proces].map((field: string) => field));
+          console.log("The process are", form[proces].map( ({field}:{field:string}) => field));
+          values[id] = values[id].concat(form[proces].map(({field}:{field:string}) => field));
         }
         for (const line of lines) {
           departments.push({
@@ -220,9 +220,12 @@ const mergeStyleCode = (data: any) => {
   return result;
 };
 
-const generateData = (departmentData: any[] , department: string | number, line: { toString: () => any; }, values: { [x: string]: any; }) => {
+const generateData = (departmentData: any[], department: string | number, line: { toString: () => any; }, values: { [x: string]: any; }) => {
   console.log("The values are", values);
-  let filteredDepartmentData = departmentData??[].filter(({lineNumber, status}) => lineNumber === line.toString() && status === "active");
+  if (!departmentData) {
+    return "";
+  }
+  let filteredDepartmentData = departmentData.filter(({lineNumber, status}) => lineNumber === line.toString() && status === "active");
   filteredDepartmentData = mergeStyleCode(filteredDepartmentData);
   const keys = values[department];
   let fileData = "";
