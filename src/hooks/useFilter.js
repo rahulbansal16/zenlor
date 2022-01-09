@@ -25,6 +25,8 @@ const fetchAllKeys = (dataSource, column) => {
 
 const useFilter = (columns, dataSource) => {
     const columnsWithFilter = columns.map( column => {
+        if (!column.filter)
+            return column;
         let filterColumn = {
             ...column,
             sorter: (a,b) => a[column?.dataIndex] - b[column?.dataIndex]
