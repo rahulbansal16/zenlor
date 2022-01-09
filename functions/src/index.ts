@@ -544,7 +544,7 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
   .unknown(false);
 
 exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
-  name: "insertyStyleCodesInfo",
+  name: "upsertyStyleCodesInfo",
   schema: insertStyleCodeSchema,
   handler: async (data, context) => {
     console.log("The data is", data);
