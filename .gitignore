@@ -26,3 +26,7 @@ yarn-error.log*
 functions/index copy.js
 datadump.json
 stylecodesData.js
+functions/lib/index.js
+functions/lib/index.js
+functions/lib/index.js.map
+functions/lib/*
