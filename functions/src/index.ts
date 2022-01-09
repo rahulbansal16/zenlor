@@ -555,7 +555,7 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
       throw Error("The company does not exist" + company);
     }
     const {styleCodesInfo} = docData;
-    let output = upsertItemsInArray(styleCodesInfo, styleCodes);
+    let output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
       styleCodesInfo: output
     }, {
@@ -589,7 +589,7 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     }
     const {bomsInfo} = docData;
     // This will use stylecode plus materialId
-    let output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => oldItem.id === newItem.id && oldItem.styleCode === newItem.styleCode);
+    let output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
       bomsInfo: output
     }, {
@@ -622,7 +622,7 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     }
     const {purchaseMaterialsInfo} = docData;
     // This will use stylecode plus materialId
-    let output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.id === newItem.id && oldItem.styleCode === newItem.styleCode);
+    let output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
       purchaseMaterialsInfo: output
     }, {
