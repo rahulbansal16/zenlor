@@ -8,7 +8,7 @@ import * as moment from "moment";
 import * as Joi from "joi";
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
-import {BOMInfo, PurchaseMaterialsInfo, StyleCodesInfo} from "../../types/styleCodesInfo";
+import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrdersInfo, StyleCodesInfo} from "../../types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -625,6 +625,39 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     let output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
       purchaseMaterialsInfo: output
+    }, {
+      merge: true
+    })
+  }
+})
+
+const upsertPurchaseOrdersInfoSchema = Joi.object<PurchaseOrdersInfo, true>({
+  company: Joi.string().required(),
+  purchaseOrders: Joi.array().items({
+    id:  Joi.string().required(),
+    name: Joi.string().required(),
+    category: Joi.string().required(),
+  })
+})
+  .strict(true)
+  .unknown(false);
+
+exports.upsertPurchaseOrdersInfo = onCall<PurchaseOrdersInfo>({
+  name: "upsertPurchaseOrdersInfo",
+  schema: upsertPurchaseOrdersInfoSchema,
+  handler: async (data, context) => {
+    console.log("The data is", data);
+    const {company, purchaseOrders} = data;
+    const doc = await admin.firestore().collection("data").doc(company).get();
+    const docData = doc.data();
+    if (!docData){
+      throw Error("The company does not exist" + company);
+    }
+    const {purchaseOrdersInfo} = docData;
+    // This will use stylecode plus materialId
+    let output = upsertItemsInArray(purchaseOrdersInfo, purchaseOrders, (oldItem, newItem) => oldItem.purchaseOrderId === newItem.purchaseOrderId);
+    return await admin.firestore().collection("data").doc(company).set( {
+      purchaseOrdersInfo: output
     }, {
       merge: true
     })
