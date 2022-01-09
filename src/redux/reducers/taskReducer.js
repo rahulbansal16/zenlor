@@ -61,19 +61,11 @@ const initialState = {
               editable: true
             },
             {
-              title: () => <Tooltip title="Order Confirmation">Order Confirmation</Tooltip>,
+              title: "Order Confirmation",
               width:100,
-              dataIndex: "orderConfirmation",
+              dataIndex: "orderConfirmationDate",
               showSorterTooltip: false,
-              key: "orderConfirmation",
-              editable: true
-            },
-            {
-              title: () => <Tooltip title="Order Confirmation">Order Confirmation</Tooltip>,
-              width:100,
-              dataIndex: "orderConfirmation",
-              showSorterTooltip: false,
-              key: "orderConfirmation",
+              key: "orderConfirmationDate",
               editable: true
             },
             {
@@ -96,7 +88,6 @@ const initialState = {
               key: "deliveryDate",
               editable: true
             },
-            Table.EXPAND_COLUMN,
             {
               title: "Material Status",
               children : [
@@ -114,18 +105,6 @@ const initialState = {
                 editable: true
                }
               ]
-            },
-            {
-              title: "Status",
-              dataIndex: "status",
-              key: "status",
-              filter: "multiSelect",
-              editable: true
-            },
-            {
-              title: "Last Action",
-              dataIndex: "lastAction",
-              key: "lastAction",
             },
             Table.SELECTION_COLUMN,
           ],
