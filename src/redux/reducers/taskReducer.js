@@ -112,78 +112,81 @@ const initialState = {
     },
     orderMaterials: {
             columns: [{
-                title: "No",
-                dataIndex: "no",
-                key: "no",
-              },
-              {
                 title: "Style Code",
                 dataIndex: "styleCode",
                 filter: "multiSelect",
                 key: "styleCode",
+              },{
+                title: "MATERIAL",
+                children:[
+                  {
+                    title: "S.No",
+                    dataIndex: "no",
+                    key: "no",
+                  },
+                  {
+                    title: "Category",
+                    dataIndex: "category",
+                    key: "category",
+                  },
+                  {
+                    title: "Type",
+                    dataIndex: "type",
+                    key: "type",
+                  },
+                  {
+                    title: "Id",
+                    dataIndex: "materialId",
+                    key: "materialId",
+                  },
+                  {
+                    title: "Description",
+                    dataIndex: "description",
+                    key: "description",
+                  },
+                  {
+                    title: "Consumption",
+                    dataIndex: "consumption",
+                    key: "consumption",
+                  }, 
+                  {
+                    title: "Unit",
+                    dataIndex: "unit",
+                    key: "unit",
+                  },
+                  {
+                    title: "Placement",
+                    dataIndex: "placement",
+                    key: "placement",
+                  }
+                ]
               },
               {
-                title: "To Make Qty",
-                dataIndex: "toMakeQty",
-                key: "toMakeQty",
-              },
-              {
-                title: "Category",
-                dataIndex: "category",
-                key: "category",
-              }, 
-              {
-                title: "Type",
-                dataIndex: "type",
-                key: "type",
-              },
-              {
-                title: "Material Id",
-                dataIndex: "materialId",
-                key: "materialId",
-              },
-              {
-                title: "Description",
-                dataIndex: "description",
-                key: "description",
-              },
-              {
-                title: "Consumption",
-                dataIndex: "consumption",
-                key: "consumption",
-              }, 
-              {
-                title: "Unit",
-                dataIndex: "unit",
-                key: "unit",
-              },
-              {
-                title: "rate",
-                dataIndex: "rate",
-                key: "rate",
-              },
-              {
-                title: "Req Qty",
-                dataIndex: "reqQty",
-                key: "reqQty",
-              },
-              {
-                title: "Rem Qty",
-                dataIndex: "remQty",
-                key: "remQty",
-              },
-              {
-                title: "Supplier",
-                dataIndex: "supplier",
-                filter: "multiSelect",
-                key: "supplier",
-              },             
-             {
-                title: "PO Qty",
-                dataIndex: "poQty",
-                key: "poQty",
-                editable: true,
-              },              
+                title: "Quantity",
+                children:[              
+                {
+                  title: "Required",
+                  dataIndex: "reqQty",
+                  key: "reqQty",
+                },
+                {
+                  title: "Inventory",
+                  dataIndex: "inventory",
+                  key: "inventory",
+                },
+                {
+                  title: "Ordered",
+                  dataIndex: "ordered",
+                  key: "ordered",
+                },             
+               {
+                  title: "Pending",
+                  dataIndex: "pending",
+                  key: "pending",
+                  editable: true,
+                },              
+              ]
+              }
             ],
             actions:[
 
