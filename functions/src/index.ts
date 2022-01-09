@@ -543,13 +543,22 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
   .strict(true)
   .unknown(false);
 
-exports.insertStyleCodesInfo = onCall<StyleCodesInfo>({
+exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
   name: "insertyStyleCodesInfo",
   schema: insertStyleCodeSchema,
   handler: async (data, context) => {
     console.log("The data is", data);
     const {company, styleCodes} = data;
-    return await admin.firestore().collection("data").doc(company).set( styleCodes, {
+    const doc = await admin.firestore().collection("data").doc(company).get();
+    const docData = doc.data();
+    if (!docData){
+      throw Error("The company does not exist" + company);
+    }
+    const {styleCodesInfo} = docData;
+    let output = upsertItemsInArray(styleCodesInfo, styleCodes);
+    return await admin.firestore().collection("data").doc(company).set( {
+      styleCodesInfo: output
+    }, {
       merge: true
     })
   }
@@ -620,6 +629,13 @@ exports.actions = functions
       return output;
     });
 
+const upsertItemsInArray = (items: any[], newItems: any[], cmp = (a: { id: any; }, b: { id: any; }) => a.id === b.id  ) => {
+  let output: any[] = [];
+  for (let newItem of newItems){
+    output = upsertItemInArray(output, newItem, cmp);
+  }
+  return output;
+}
 
 const upsertItemInArray = (items: any, newItem: any, cmp = (a: { id: any; }, b: { id: any; }) => a.id === b.id) => {
   const output = [];
