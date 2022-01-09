@@ -5,6 +5,12 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as moment from "moment";
+import * as Joi from "joi";
+import * as express from "express";
+import {onCall, onRequest} from "./helpers/functions";
+import {StyleCodesInfo} from "../../types/styleCodesInfo";
+import * as router from "./routes/router";
+const app = express();
 /* tslint:disable */
 admin.initializeApp();
 admin.firestore().settings({
@@ -526,29 +532,63 @@ exports.styleCodesInfo = functions
  * Write a method that can be used for updating the record and the user will be able to change the system
  */
 // API Endpoint for inserting the styleCodeInfo
-exports.insertStyleCodesInfo = functions
-    .region("asia-northeast3")
-    .https
-    .onCall(async (data: { company: any; styleCodeInfo: any; }, _context: any) => {
-      const {company, styleCodeInfo} = data;
-      styleCodeInfo["id"] = generateUId("", 8);
-      console.log("The insertStyleCodesIndo", company);
-      if (!styleCodeInfo) {
-        return {
+const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
+  company: Joi.string().required(),
+  styleCodes: Joi.array().items({
+    id:  Joi.string().required(),
+    name: Joi.string().required(),
+    category: Joi.string().required(),
+  })
+})
+  .strict(true)
+  .unknown(false);
 
-        };
-      }
-      const dataDoc = await admin.firestore().collection("data").doc(company).get();
-      const companyInfo = dataDoc.data();
-      const styleCodesInfo = companyInfo?.styleCodesInfo ?? [];
-      await admin.firestore().collection("data").doc(company).set({
-        styleCodesInfo: [styleCodeInfo, ...styleCodesInfo],
-      }, {
-        merge: true,
-      }
-      );
-      return data;
-    });
+exports.insertStyleCodesInfo = onCall<StyleCodesInfo>({
+  name: "insertyStyleCodesInfo",
+  schema: insertStyleCodeSchema,
+  handler: async (data, context) => {
+    console.log("The data is", data);
+    const {company, styleCodes} = data;
+    return await admin.firestore().collection("data").doc(company).set( styleCodes, {
+      merge: true
+    })
+  }
+})
+
+// exports.styleCodesInfo = onRequest({
+//   name:"styleCodesInfo",
+//   schema: {
+//     "GET": insertStyleCodeSchema,
+//   },
+//   handler: {
+
+//   }
+// })
+
+
+// exports.insertStyleCodesInfo = functions
+//     .region("asia-northeast3")
+//     .https
+//     .onCall(async (data: { company: any; styleCodeInfo: any; }, _context: any) => {
+//       const {company, styleCodeInfo} = data;
+//       styleCodeInfo["id"] = generateUId("", 8);
+//       console.log("The insertStyleCodesIndo", company);
+//       if (!styleCodeInfo) {
+//         return {
+
+//         };
+//       }
+//       const dataDoc = await admin.firestore().collection("data").doc(company).get();
+//       const companyInfo = dataDoc.data();
+//       const styleCodesInfo = companyInfo?.styleCodesInfo ?? [];
+//       await admin.firestore().collection("data").doc(company).set({
+//         styleCodesInfo: [styleCodeInfo, ...styleCodesInfo],
+//       }, {
+//         merge: true,
+//       }
+//       );
+//       return data;
+//     });
 
 exports.actions = functions
     .region("asia-northeast3")
@@ -692,3 +732,19 @@ exports.createPO = functions
 
       return [...purchaseOrders, ...(pastOrders || [])];
     });
+
+// Will pick it up when making the RestFul APIs
+// const router = express.Router();
+// const defaultRoutes = [
+//   {
+//     path: '/styleCode',
+//     route: 
+//   }
+// ];
+
+// defaultRoutes.forEach((route) => {
+//   router.use(route.path, route.route);
+// });
+
+// app.use("/", router); 
+// exports.api = functions.region("asia-northeast3").https.onRequest(app)
