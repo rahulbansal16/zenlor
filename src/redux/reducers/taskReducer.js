@@ -224,15 +224,89 @@ const initialState = {
             }]
     },
     createPO: {
-            columns: [{
-                title: "ID",
-                dataIndex: "id",
-                key: "id",
+            columns: [
+              {
+              title: "Style Code",
+              dataIndex: "styleCode",
+              filter: "multiSelect",
+              key: "styleCode",
+            },{
+              title: "Material",
+              children: [
+                {
+                  title: "Category",
+                  dataIndex: "category",
+                  key: "category",
+                },
+                {
+                  title: "Type",
+                  dataIndex: "type",
+                  key:"type"
+                },{
+                  title: "ID",
+                  dataIndex: "id",
+                  key: "id",
+                },
+                {
+                  title: "Description",
+                  dataIndex: "decription",
+                  key: "decription",
+                },
+                {
+                  title: "Unit",
+                  dataIndex: "unit",
+                  key: "unit",
+                }
+              ]
+            },{
+              title: "Quantity",
+              children:[
+                {
+                  title:"pending",
+                  dataIndex:"pending",
+                  key:"pending"
+                },
+                {
+                  title:"purchase",
+                  dataIndex:"purchase",
+                  key:"purchase"
+                }
+              ]
+            },
+              {
+                title: "Rate",
+                dataIndex: "rate",
+                key: "rate",
               },
               {
-                title: "Created At",
-                dataIndex: "createdAt",
-                key: "createdAt",
+                title: "Disc %",
+                dataIndex: "discount",
+                key: "discount",
+                editable: true,
+              },
+              {
+                title: "Pre Tax",
+                dataIndex: "preTaxAmount",
+                key: "preTaxAmount",
+                editable: true,
+              }, 
+              {
+                title: "Tax %",
+                dataIndex: "tax",
+                key: "tax",
+                editable: true,
+              },
+              {
+                title: "Tax Amount",
+                dataIndex: "taxAmount",
+                key: "taxAmount",
+                editable: true,
+              }, 
+              {
+                title: "Supplier",
+                dataIndex: "supplier",
+                key: "supplier",
+                editable: true,
               },
               {
                 title: "Delivery Date",
@@ -240,25 +314,7 @@ const initialState = {
                 key: "deliveryDate",
                 editable: true,
               },
-              {
-                title: "Supplier",
-                dataIndex: "supplier",
-                key: "supplier",
-                filter: "multiSelect",
-                editable: true,
-              }, 
-              {
-                title: "Amount",
-                dataIndex: "amount",
-                key: "amount",
-                editable: true,
-              },
-              {
-                title: "Status",
-                dataIndex: "status",
-                key: "status",
-                editable: true,
-              }, 
+              Table.SELECTION_COLUMN 
             ],
             dataSource: []
     },
