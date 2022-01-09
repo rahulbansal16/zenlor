@@ -605,13 +605,13 @@ exports.actions = functions
       const output: any = {};
       switch (type) {
         case "dashboard":
-          output["styleCodesInfo"] = updateItemInArray(companyInfo["styleCodesInfo"], item);
+          output["styleCodesInfo"] = upsertItemInArray(companyInfo["styleCodesInfo"], item);
           break;
         case "orderMaterials":
-          output["billOfMaterials"] = updateItemInArray(companyInfo["billOfMaterials"], item);
+          output["billOfMaterials"] = upsertItemInArray(companyInfo["billOfMaterials"], item);
           break;
         case "purchaseOrders":
-          output["purchaseOrders"] = updateItemInArray(companyInfo["purchaseOrders"], item);
+          output["purchaseOrders"] = upsertItemInArray(companyInfo["purchaseOrders"], item);
           break;
         default:
       }
@@ -621,7 +621,7 @@ exports.actions = functions
     });
 
 
-const updateItemInArray = (items: any, newItem: any, cmp = (a: { id: any; }, b: { id: any; }) => a.id === b.id) => {
+const upsertItemInArray = (items: any, newItem: any, cmp = (a: { id: any; }, b: { id: any; }) => a.id === b.id) => {
   const output = [];
   let inserted = false;
   // Add some code to remove the spaces around the value
