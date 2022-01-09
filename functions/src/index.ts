@@ -620,9 +620,9 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     if (!docData){
       throw Error("The company does not exist" + company);
     }
-    const {PurchaseMaterialsInfo} = docData;
+    const {purchaseMaterialsInfo} = docData;
     // This will use stylecode plus materialId
-    let output = upsertItemsInArray(PurchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.id === newItem.id && oldItem.styleCode === newItem.styleCode);
+    let output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.id === newItem.id && oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
       purchaseMaterialsInfo: output
     }, {
