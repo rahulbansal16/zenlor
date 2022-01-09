@@ -18,7 +18,7 @@ export type FitType = "Slim" | "Regular" | "Custom"
 
 export interface StyleCodes {
     id: string,
-    name: string,
+    styleCode: string,
     buyer?: string,
     brand: string
     season?: string, 
@@ -47,4 +47,72 @@ export interface StyleCodes {
     mSizeQty?:number,
     xlSizeQty?:number,
     xxlSizeQty?:number,
+    status:string,
+}
+export interface BOMInfo {
+    boms: BOM[],
+    company: string,
+}
+
+export interface BOM {
+    id: string,
+    styleCode: string,
+    no: number,
+    category: string,
+    type: string,
+    materialId: string,
+    materialDescription: string,
+    consumption: number,
+    unit: string,
+    placement: string,
+    reqQty: number,
+    inventory: number,
+    activeOrderQty: number,
+    pendingOrdersQty: number,
+}
+
+export interface PurchaseMaterialsInfo{
+    purchaseMaterials: PurchaseMaterials[]
+    company: string
+}
+
+export interface PurchaseMaterials{
+    id: string,
+    styleCode: string,
+    category: string,
+    type: string,
+    materialId: string,
+    materialDescription: string,
+    unit: string,
+    pendingQty: number,
+    purchaseQty: number,
+    rate: number,
+    discount: number,
+    preTaxAmount: number,
+    tax: number,
+    taxAmount: number,
+    supplier: string,
+    deliveryDate: string
+}
+
+export interface PurchaseOrdersInfo{
+    purchaseOrders: PurchaseOrder[],
+    company: string
+}
+
+export interface PurchaseOrder {
+    id: string,
+    purchaseOrderId: string,
+    lineItems: PurchaseOrderLineItems[],
+    status: string,
+    supplier: string
+    createdAt: string,
+    deliveryDate: string
+}
+
+export interface PurchaseOrderLineItems {
+    id: string,
+    styleCode: string
+    materialId: string,
+    quantity: string
 }

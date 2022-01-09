@@ -642,6 +642,8 @@ const upsertPurchaseOrdersInfoSchema = Joi.object<PurchaseOrdersInfo, true>({
   .strict(true)
   .unknown(false);
 
+// The individual Line Items in the purchaseOrder can not be appended
+// New Line Items will replace the old one
 exports.upsertPurchaseOrdersInfo = onCall<PurchaseOrdersInfo>({
   name: "upsertPurchaseOrdersInfo",
   schema: upsertPurchaseOrdersInfoSchema,

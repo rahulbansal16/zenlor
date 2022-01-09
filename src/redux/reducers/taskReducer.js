@@ -142,7 +142,7 @@ const initialState = {
                   {
                     title: "Description",
                     dataIndex: "description",
-                    key: "description",
+                    key: "materialDescription",
                   },
                   {
                     title: "Consumption",
@@ -175,14 +175,14 @@ const initialState = {
                   key: "inventory",
                 },
                 {
-                  title: "Ordered",
-                  dataIndex: "ordered",
-                  key: "ordered",
+                  title: "Active Ordered",
+                  dataIndex: "activeOrdersQty",
+                  key: "activeOrdersQty",
                 },             
                {
                   title: "Pending",
-                  dataIndex: "pending",
-                  key: "pending",
+                  dataIndex: "pendingOrdersQty",
+                  key: "pendingOrdersQty",
                   editable: true,
                 },              
               ]
@@ -244,13 +244,13 @@ const initialState = {
                   key:"type"
                 },{
                   title: "ID",
-                  dataIndex: "id",
-                  key: "id",
+                  dataIndex: "materialId",
+                  key: "materialId",
                 },
                 {
                   title: "Description",
-                  dataIndex: "decription",
-                  key: "decription",
+                  dataIndex: "materialDecription",
+                  key: "materialDecription",
                 },
                 {
                   title: "Unit",
@@ -263,13 +263,13 @@ const initialState = {
               children:[
                 {
                   title:"pending",
-                  dataIndex:"pending",
-                  key:"pending"
+                  dataIndex:"pendingQty",
+                  key:"pendingQty"
                 },
                 {
                   title:"purchase",
-                  dataIndex:"purchase",
-                  key:"purchase"
+                  dataIndex:"purchaseQty",
+                  key:"purchaseQty"
                 }
               ]
             },
