@@ -6,11 +6,11 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as moment from "moment";
 import * as Joi from "joi";
-import * as express from "express";
-import {onCall, onRequest} from "./helpers/functions";
+// import * as express from "express";
+import {onCall} from "./helpers/functions";
 import {StyleCodesInfo} from "../../types/styleCodesInfo";
-import * as router from "./routes/router";
-const app = express();
+// import * as router from "./routes/router";
+// const app = express();
 /* tslint:disable */
 admin.initializeApp();
 admin.firestore().settings({
