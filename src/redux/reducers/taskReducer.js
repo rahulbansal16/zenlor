@@ -186,7 +186,8 @@ const initialState = {
                   editable: true,
                 },              
               ]
-              }
+              },
+              Table.SELECTION_COLUMN,
             ],
             actions:[
 
