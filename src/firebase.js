@@ -20,7 +20,7 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
+// firebase.app().functions('asia-northeast3').useEmulator("localhost", 5001);
 export const auth = firebase.auth();
 auth.setPersistence("local")
 export const analytics = firebase.analytics();
