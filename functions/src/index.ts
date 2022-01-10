@@ -574,10 +574,18 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
 const upsertBOMSchema = Joi.object<BOMInfo, true>({
   company: Joi.string().required(),
   boms: Joi.array().items({
-    id: Joi.string().required(),
-    name: Joi.string().required(),
+    styleCode: Joi.string().required(),
     category: Joi.string().required(),
-  }),
+    type: Joi.string().required(),
+    materialId: Joi.string().required(),
+    materialDescription: Joi.string().required(),
+    consumption: Joi.number().required(),
+    placement: Joi.string().required(),
+    reqQty: Joi.number().required(),
+    inventory: Joi.number(),
+    activeOrdersQty: Joi.number(),
+    pendingOrdersQty: Joi.number()
+  }).options({allowUnknown: true}),
 })
     .strict(true)
     .unknown(false);
@@ -607,10 +615,8 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
 const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
   company: Joi.string().required(),
   purchaseMaterials: Joi.array().items({
-    id: Joi.string().required(),
-    name: Joi.string().required(),
-    category: Joi.string().required(),
-  }),
+    styleCode: Joi.string().required(), category: Joi.string().required(), type: Joi.string().required(), materialId: Joi.string().required(), materialDescription: Joi.string().required(), unit: Joi.string().required(), pendingQty: Joi.number().required(), purchaseQty: Joi.number().required(), rate: Joi.number().required(), discount: Joi.number().required(), preTaxAmount: Joi.number().required(), tax: Joi.number().required(), taxAmount: Joi.number().required(), supplier: Joi.string().required(), deliveryDate: Joi.string()
+  }).options({allowUnknown: true}),
 })
     .strict(true)
     .unknown(false);
@@ -746,7 +752,7 @@ const upsertItemsInArray = (items: any[], newItems: any[], cmp = (a:any, b:any) 
 };
 
 const upsertItemInArray = (items: any[], newItem: any, cmp = (a: any, b: any) => a.id === b.id) => {
-  const output = [];
+  let output = [];
   let inserted = false;
   // Add some code to remove the spaces around the value
   for (const item of items) {
@@ -761,10 +767,10 @@ const upsertItemInArray = (items: any[], newItem: any, cmp = (a: any, b: any) =>
     }
   }
   if (!inserted) {
-    output.push({
+    output = [{
       id: generateUId("", 8),
       ...newItem,
-    });
+    }, ...output];
   }
   return output;
 };
