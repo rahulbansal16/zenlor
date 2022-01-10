@@ -8,7 +8,7 @@ import * as moment from "moment";
 import * as Joi from "joi";
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
-import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrdersInfo, StyleCodesInfo} from "../../types/styleCodesInfo";
+import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrdersInfo, StyleCodesInfo} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -535,10 +535,16 @@ exports.styleCodesInfo = functions
 const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
   company: Joi.string().required(),
   styleCodes: Joi.array().items({
-    id: Joi.string().required(),
-    name: Joi.string().required(),
-    category: Joi.string().required(),
-  }),
+    id: Joi.string(),
+    styleCode: Joi.string().required(),
+    brand: Joi.string().required(),
+    product: Joi.string().required(),
+    orderNo: Joi.string().required(),
+    confirmDate: Joi.string(),
+    orderQty: Joi.number().required(),
+    makeQty: Joi.number(),
+    deliveryDate: Joi.string()
+  }).options({allowUnknown: true}),
 })
     .strict(true)
     .unknown(false);
@@ -554,7 +560,7 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
     if (!docData) {
       throw Error("The company does not exist" + company);
     }
-    const {styleCodesInfo} = docData;
+    const styleCodesInfo = docData.styleCodesInfo??[];
     const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
       styleCodesInfo: output,
@@ -587,7 +593,7 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     if (!docData) {
       throw Error("The company does not exist" + company);
     }
-    const {bomsInfo} = docData;
+    const bomsInfo = docData.bomsInfo??[];
     // This will use stylecode plus materialId
     const output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
@@ -620,7 +626,7 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     if (!docData) {
       throw Error("The company does not exist" + company);
     }
-    const {purchaseMaterialsInfo} = docData;
+    const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
     // This will use stylecode plus materialId
     const output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
@@ -655,7 +661,7 @@ exports.upsertPurchaseOrdersInfo = onCall<PurchaseOrdersInfo>({
     if (!docData) {
       throw Error("The company does not exist" + company);
     }
-    const {purchaseOrdersInfo} = docData;
+    const purchaseOrdersInfo = docData.purchaseOrdersInfo??[];
     // This will use stylecode plus materialId
     const output = upsertItemsInArray(purchaseOrdersInfo, purchaseOrders, (oldItem, newItem) => oldItem.purchaseOrderId === newItem.purchaseOrderId);
     return await admin.firestore().collection("data").doc(company).set( {
@@ -732,14 +738,14 @@ exports.actions = functions
     });
 
 const upsertItemsInArray = (items: any[], newItems: any[], cmp = (a:any, b:any) => a.id === b.id ) => {
-  let output: any[] = [];
+  let output: any[] = [...items];
   for (const newItem of newItems) {
     output = upsertItemInArray(output, newItem, cmp);
   }
   return output;
 };
 
-const upsertItemInArray = (items: any, newItem: any, cmp = (a: any, b: any) => a.id === b.id) => {
+const upsertItemInArray = (items: any[], newItem: any, cmp = (a: any, b: any) => a.id === b.id) => {
   const output = [];
   let inserted = false;
   // Add some code to remove the spaces around the value
