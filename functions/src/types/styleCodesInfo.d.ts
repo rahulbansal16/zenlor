@@ -67,7 +67,7 @@ export interface BOM {
     placement: string,
     reqQty: number,
     inventory: number,
-    activeOrderQty: number,
+    activeOrdersQty: number,
     pendingOrdersQty: number,
 }
 
