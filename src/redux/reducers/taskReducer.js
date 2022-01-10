@@ -5,6 +5,34 @@ import ZenlorTags from "../../components/ZenlorTags"
 import { functions } from "../../firebase"
 import { FETCH_DATA, FETCH_PO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
 
+const performCalculation = (item, type) => {
+  
+  const calculationMap = {
+    dashboard: {
+  
+    },
+    orderMaterials: {
+  
+    },
+    createPO: {
+      preTaxAmount: `${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}`,
+      taxAmount: `${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`,
+      totalAmount: `${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}+${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`
+    }
+  }
+  const map = calculationMap[type];
+  let newItem = {}
+  for (const property in item){
+    let value = item[property]
+    if (map[property]){
+     // eslint-disable-next-line no-eval
+     value = eval(map[property])
+    }
+    newItem[property] = value;
+  }
+  return newItem
+}
+
 const initialState = {
     user: {
         rolesFetched: false
@@ -260,16 +288,19 @@ const initialState = {
               ]
             },{
               title: "Quantity",
+              editable: true,
               children:[
                 {
                   title:"pending",
                   dataIndex:"pendingQty",
-                  key:"pendingQty"
+                  key:"pendingQty",
+                  editable: true
                 },
                 {
                   title:"purchase",
                   dataIndex:"purchaseQty",
-                  key:"purchaseQty"
+                  key:"purchaseQty",
+                  editable: true
                 }
               ]
             },
@@ -277,6 +308,7 @@ const initialState = {
                 title: "Rate",
                 dataIndex: "rate",
                 key: "rate",
+                editable: true
               },
               {
                 title: "Disc %",
@@ -288,7 +320,6 @@ const initialState = {
                 title: "Pre Tax",
                 dataIndex: "preTaxAmount",
                 key: "preTaxAmount",
-                editable: true,
               }, 
               {
                 title: "Tax %",
@@ -301,6 +332,11 @@ const initialState = {
                 dataIndex: "taxAmount",
                 key: "taxAmount",
                 editable: true,
+              }, 
+              {
+                title: "Total Amount",
+                dataIndex: "totalAmount",
+                key: "totalAmount",
               }, 
               {
                 title: "Supplier",
@@ -483,7 +519,7 @@ const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
             const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments, name, form} = action.payload
-            let purchaseOrders = action?.payload?.purchaseOrders
+            let purchaseOrders = action?.payload?.purchaseOrders??[]
             return {
                 ...state,
                 ...action.payload,
@@ -498,11 +534,11 @@ const taskReducer = (state = initialState, action) => {
                 // name,
                 createPO: {
                     ...state.createPO,
-                    dataSource: action.payload.purchaseOrders
+                    dataSource: action.payload.purchaseMaterialsInfo
                 },
                 orderMaterials: {
                     ...state.orderMaterials,
-                    dataSource: action?.payload?.billOfMaterials??[]
+                    dataSource: action?.payload?.bomsInfo??[]
                 },
                 dashboard: {
                     ...state.dashboard,
@@ -557,7 +593,8 @@ const taskReducer = (state = initialState, action) => {
             const newData = newState[type]["dataSource"];
             const index = newData.findIndex((item) => row.key === item.id);
             const item = newData[index];
-            newData.splice(index, 1, { ...item, ...row });
+            const newItem = performCalculation({...item, ...row},type)
+            newData.splice(index, 1, newItem);
             return newState
         }
         case INSERT_ROW: {
@@ -567,33 +604,6 @@ const taskReducer = (state = initialState, action) => {
           newData.push(row)
           return newState
         }
-        // case UPDATE_TASK_STATUS:{
-        //     const {styleCodeId, taskId, status} = action.payload
-        //     if (status === "incomplete"){
-        //         return state
-        //     }
-        //     return {
-        //         ...state,
-        //         inCompleteTasks: state.inCompleteTasks.filter((task) => {
-        //             if ( styleCodeId === task.styleCodeId && taskId === task.id) return false
-        //             return true
-        //         }),
-        //     }
-        // }
-        // case FETCH_INCOMPLETE_TASKS:{
-        //     const {tasks} = action.payload
-        //     return {
-        //         ...state,
-        //         inCompleteTasks: tasks
-        //     }
-        // }
-        // case FETCH_COMPLETE_TASKS: {
-        //     const {tasks} = action.payload
-        //     return {
-        //         ...state,
-        //         completeTasks: tasks
-        //     }
-        // }
         default:
             return state
     }
