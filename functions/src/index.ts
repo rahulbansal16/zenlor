@@ -535,13 +535,13 @@ exports.styleCodesInfo = functions
 const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
   company: Joi.string().required(),
   styleCodes: Joi.array().items({
-    id:  Joi.string().required(),
+    id: Joi.string().required(),
     name: Joi.string().required(),
     category: Joi.string().required(),
-  })
+  }),
 })
-  .strict(true)
-  .unknown(false);
+    .strict(true)
+    .unknown(false);
 
 exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
   name: "upsertyStyleCodesInfo",
@@ -551,30 +551,30 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
     const {company, styleCodes} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
     const docData = doc.data();
-    if (!docData){
+    if (!docData) {
       throw Error("The company does not exist" + company);
     }
     const {styleCodesInfo} = docData;
-    let output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
+    const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
-      styleCodesInfo: output
+      styleCodesInfo: output,
     }, {
-      merge: true
-    })
-  }
-})
+      merge: true,
+    });
+  },
+});
 
 
 const upsertBOMSchema = Joi.object<BOMInfo, true>({
   company: Joi.string().required(),
   boms: Joi.array().items({
-    id:  Joi.string().required(),
+    id: Joi.string().required(),
     name: Joi.string().required(),
     category: Joi.string().required(),
-  })
+  }),
 })
-  .strict(true)
-  .unknown(false);
+    .strict(true)
+    .unknown(false);
 
 exports.upsertBOMInfo = onCall<BOMInfo>({
   name: "upsertBOMInfo",
@@ -584,30 +584,30 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     const {company, boms} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
     const docData = doc.data();
-    if (!docData){
+    if (!docData) {
       throw Error("The company does not exist" + company);
     }
     const {bomsInfo} = docData;
     // This will use stylecode plus materialId
-    let output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
+    const output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
-      bomsInfo: output
+      bomsInfo: output,
     }, {
-      merge: true
-    })
-  }
-})
+      merge: true,
+    });
+  },
+});
 
 const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
   company: Joi.string().required(),
   purchaseMaterials: Joi.array().items({
-    id:  Joi.string().required(),
+    id: Joi.string().required(),
     name: Joi.string().required(),
     category: Joi.string().required(),
-  })
+  }),
 })
-  .strict(true)
-  .unknown(false);
+    .strict(true)
+    .unknown(false);
 
 exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
   name: "upsertPurchaseMaterialsInfo",
@@ -617,30 +617,30 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     const {company, purchaseMaterials} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
     const docData = doc.data();
-    if (!docData){
+    if (!docData) {
       throw Error("The company does not exist" + company);
     }
     const {purchaseMaterialsInfo} = docData;
     // This will use stylecode plus materialId
-    let output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
+    const output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
     return await admin.firestore().collection("data").doc(company).set( {
-      purchaseMaterialsInfo: output
+      purchaseMaterialsInfo: output,
     }, {
-      merge: true
-    })
-  }
-})
+      merge: true,
+    });
+  },
+});
 
 const upsertPurchaseOrdersInfoSchema = Joi.object<PurchaseOrdersInfo, true>({
   company: Joi.string().required(),
   purchaseOrders: Joi.array().items({
-    id:  Joi.string().required(),
+    id: Joi.string().required(),
     name: Joi.string().required(),
     category: Joi.string().required(),
-  })
+  }),
 })
-  .strict(true)
-  .unknown(false);
+    .strict(true)
+    .unknown(false);
 
 // The individual Line Items in the purchaseOrder can not be appended
 // New Line Items will replace the old one
@@ -652,19 +652,19 @@ exports.upsertPurchaseOrdersInfo = onCall<PurchaseOrdersInfo>({
     const {company, purchaseOrders} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
     const docData = doc.data();
-    if (!docData){
+    if (!docData) {
       throw Error("The company does not exist" + company);
     }
     const {purchaseOrdersInfo} = docData;
     // This will use stylecode plus materialId
-    let output = upsertItemsInArray(purchaseOrdersInfo, purchaseOrders, (oldItem, newItem) => oldItem.purchaseOrderId === newItem.purchaseOrderId);
+    const output = upsertItemsInArray(purchaseOrdersInfo, purchaseOrders, (oldItem, newItem) => oldItem.purchaseOrderId === newItem.purchaseOrderId);
     return await admin.firestore().collection("data").doc(company).set( {
-      purchaseOrdersInfo: output
+      purchaseOrdersInfo: output,
     }, {
-      merge: true
-    })
-  }
-})
+      merge: true,
+    });
+  },
+});
 
 // exports.styleCodesInfo = onRequest({
 //   name:"styleCodesInfo",
@@ -731,13 +731,13 @@ exports.actions = functions
       return output;
     });
 
-const upsertItemsInArray = (items: any[], newItems: any[], cmp = (a:any, b:any) => a.id === b.id  ) => {
+const upsertItemsInArray = (items: any[], newItems: any[], cmp = (a:any, b:any) => a.id === b.id ) => {
   let output: any[] = [];
-  for (let newItem of newItems){
+  for (const newItem of newItems) {
     output = upsertItemInArray(output, newItem, cmp);
   }
   return output;
-}
+};
 
 const upsertItemInArray = (items: any, newItem: any, cmp = (a: any, b: any) => a.id === b.id) => {
   const output = [];
@@ -856,7 +856,7 @@ exports.createPO = functions
 // const defaultRoutes = [
 //   {
 //     path: '/styleCode',
-//     route: 
+//     route:
 //   }
 // ];
 
@@ -864,5 +864,5 @@ exports.createPO = functions
 //   router.use(route.path, route.route);
 // });
 
-// app.use("/", router); 
+// app.use("/", router);
 // exports.api = functions.region("asia-northeast3").https.onRequest(app)
