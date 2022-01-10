@@ -91,6 +91,7 @@ export interface PurchaseMaterials{
     preTaxAmount: number,
     tax: number,
     taxAmount: number,
+    totalAmount: number,
     supplier: string,
     deliveryDate: string
 }
