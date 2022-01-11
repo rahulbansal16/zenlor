@@ -3,7 +3,7 @@
 import { Table, Tooltip } from "antd"
 import ZenlorTags from "../../components/ZenlorTags"
 import { functions } from "../../firebase"
-import { FETCH_DATA, FETCH_PO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
+import { FETCH_DATA, FETCH_PO, FETCH_PURCHASE_MATERIALS_INFO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
 
 const performCalculation = (item, type) => {
   
@@ -209,8 +209,8 @@ const initialState = {
                 },             
                {
                   title: "Pending",
-                  dataIndex: "pendingOrdersQty",
-                  key: "pendingOrdersQty",
+                  dataIndex: "pendingQty",
+                  key: "pendingQty",
                   editable: true,
                 },              
               ]
@@ -576,6 +576,16 @@ const taskReducer = (state = initialState, action) => {
                 ...state,
                 styleCodeInfo
             }
+        }
+        case FETCH_PURCHASE_MATERIALS_INFO: {
+          const {data}= action.payload;
+          let newState = JSON.parse(JSON.stringify(state))
+          newState.createPO.dataSource = [...data]
+          // newState.purchaseOrder = {
+          //   ...state.purchaseOrder,
+          //   dataSource: formatPurchaseOrder(data)
+          // }
+          return newState; 
         }
         case FETCH_PO: {
             const {data}= action.payload;

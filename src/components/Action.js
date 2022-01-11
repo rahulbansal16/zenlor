@@ -9,7 +9,7 @@ import { useLocation } from "react-router";
 import React,{ useEffect, useContext, useState, useRef } from "react";
 import { functions } from "../firebase";
 import { generateUId, getCurrentTime } from "../util";
-import { fetchPOs, insertRow, updateCell } from "../redux/actions";
+import { fetchPOs, fetchPurchaseMaterialsInfo, insertRow, updateCell } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ActionBar from "./ActionBar";
 import useFilter from "../hooks/useFilter";
@@ -124,7 +124,7 @@ const Action = ({ type }) => {
       if (styleCodes[0] !== "")
         return dataSource.filter((item) => styleCodes.includes(item.styleCode) || !item.styleCode);
     }
-    if (type === "purchaseOrder"){
+    if (type === "createPO"){
       const id = new URLSearchParams(search).get('id')??',';
       const ids = id.split(',')
       if (ids[0] !== "") 
@@ -133,18 +133,22 @@ const Action = ({ type }) => {
     return dataSource;
   };
 
+  // 
   const onFinish = async (data) => {
     const action = data.action;
+    const {company} = user;
+
     console.log("The data is", data);
     if (action === "createPO") {
       const selectedIds = selectedRows.map ( row => row.id)
-      let createPO = functions.httpsCallable("createPO");
-      const result = await createPO({
-        bom: dataSource.filter(item => selectedIds.includes(item.id)),
-        createdAt: getCurrentTime(),
+      let upsertPurchaseMaterialsInfo = functions.httpsCallable("upsertPurchaseMaterialsInfo");
+      const result = await upsertPurchaseMaterialsInfo({
+        purchaseMaterials: dataSource.filter(item => selectedIds.includes(item.id)),
+        company
+        // createdAt: getCurrentTime(),
       });
       console.log("The result is", result.data);
-      dispatch(fetchPOs(result.data))
+      dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterials))
       history.push('/action/'+action)
     } else if (action === "orderMaterials"){
       const selectedStyleCodes = selectedRows.map ( row => row.styleCode)

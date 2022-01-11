@@ -1,4 +1,4 @@
-import { FETCH_DATA, FETCH_PO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO} from "./actionType"
+import { FETCH_DATA, FETCH_PO, FETCH_PURCHASE_MATERIALS_INFO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO} from "./actionType"
 export const fetchDataAction = (data) => ({
     type: FETCH_DATA,
     payload: {...data}
@@ -23,6 +23,13 @@ export const fetchPOs = (pos) => ({
         data: pos
     }
 })
+export const fetchPurchaseMaterialsInfo = (purchaseMaterials) =>({
+    type: FETCH_PURCHASE_MATERIALS_INFO,
+    payload: {
+        data: purchaseMaterials
+    }
+})
+
 export const updateCell = (row, type) => ({
     type: UPDATE_CELL,
     payload: {
