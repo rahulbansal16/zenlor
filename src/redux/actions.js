@@ -30,11 +30,12 @@ export const fetchPurchaseMaterialsInfo = (purchaseMaterials) =>({
     }
 })
 
-export const updateCell = (row, type) => ({
+export const updateCell = (row, type, company) => ({
     type: UPDATE_CELL,
     payload: {
         row,
-        type
+        type,
+        company
     }
 })
 

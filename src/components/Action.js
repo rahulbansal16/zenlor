@@ -171,34 +171,9 @@ const Action = ({ type }) => {
       cell: EditableCell
     }
   };
-  const saveCellToServer = (item, type) => {
-    let methodName = "";
-    const {company} = user;
-    let payload = { company}
-    switch(type){
-      case "createPO":
-        methodName = "upsertPurchaseMaterialsInfo"
-        payload = {
-          ...payload,
-          purchaseMaterials: [item]
-        }
-        break;
-      case "orderMaterials":
-        methodName = "upsertBOMInfo";
-        payload = {
-          ...payload,
-          boms: [item]
-        }
-        break;
-      default:
-
-        methodName = "";
-    }
-    const method = functions.httpsCallable(methodName)
-    return method(payload);
-  }
 
   const column = filteredColumns.map((col) => {
+    const {company}= user;
     if (!col.editable) {
       return col;
     }
@@ -212,8 +187,7 @@ const Action = ({ type }) => {
         title: col.title,
         handleSave:async (e) => {
           console.log("The e in update cell is", e)
-          dispatch(updateCell(e, type))
-          await saveCellToServer(e, type)
+          dispatch(updateCell(e, type, company))
         //   const updateStyleCodesInfo = functions.httpsCallable("actions")
         //  await updateStyleCodesInfo({
         //     item: e,

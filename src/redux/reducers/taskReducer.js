@@ -26,11 +26,37 @@ const performCalculation = (item, type) => {
     let value = item[property]
     if (map[property]){
      // eslint-disable-next-line no-eval
-     value = eval(map[property])
+     value = eval(map[property]).toFixed(2)
     }
     newItem[property] = value;
   }
   return newItem
+}
+
+const saveCellToServer = (item, type, company) => {
+  let methodName = "";
+  let payload = { company}
+  switch(type){
+    case "createPO":
+      methodName = "upsertPurchaseMaterialsInfo"
+      payload = {
+        ...payload,
+        purchaseMaterials: [item]
+      }
+      break;
+    case "orderMaterials":
+      methodName = "upsertBOMInfo";
+      payload = {
+        ...payload,
+        boms: [item]
+      }
+      break;
+    default:
+
+      methodName = "";
+  }
+  const method = functions.httpsCallable(methodName)
+  return method(payload);
 }
 
 const initialState = {
@@ -286,24 +312,25 @@ const initialState = {
                   key: "unit",
                 }
               ]
-            },{
-              title: "Quantity",
-              editable: true,
-              children:[
+            },
+            // {
+              // title: "Quantity",
+              // editable: true,
+              // children:[
                 {
                   title:"pending",
                   dataIndex:"pendingQty",
                   key:"pendingQty",
-                  editable: true
+                  // editable: true
                 },
                 {
                   title:"purchase",
                   dataIndex:"purchaseQty",
                   key:"purchaseQty",
                   editable: true
-                }
-              ]
-            },
+                },
+              // ]
+            // },
               {
                 title: "Rate",
                 dataIndex: "rate",
@@ -598,13 +625,14 @@ const taskReducer = (state = initialState, action) => {
             return newState;
         }
         case UPDATE_CELL: {
-            const {row, type} = action.payload;
+            const {row, type, company} = action.payload;
             let newState = JSON.parse(JSON.stringify(state));
             const newData = newState[type]["dataSource"];
             const index = newData.findIndex((item) => row.key === item.id);
             const item = newData[index];
             const newItem = performCalculation({...item, ...row},type)
             newData.splice(index, 1, newItem);
+            saveCellToServer(newItem, type, company)
             return newState
         }
         case INSERT_ROW: {
