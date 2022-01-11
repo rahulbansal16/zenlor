@@ -5,23 +5,24 @@ export interface StyleCodesInfo {
 
 export type Product = "Shirt" | "Trousers" | "Jeans" | "T-shirts"
 export type ProductType = "Wovenwear" | "Knitwear"
-export type ProductCategory = "Men Formal Shirt" | "Women Formal Shirt" | "Men T-Shirt" | "Women T-Shirt"
+export type ProductCategory = "Men Formal Shirt"
+| "Women Formal Shirt" | "Men T-Shirt" | "Women T-Shirt"
 export type FitType = "Slim" | "Regular" | "Custom"
 // export type ProductType
 
 // styleCode get, post, put, delete
 // styleCodes --> post
-// styleCodes --> GET 
+// styleCodes --> GET
 // styleCodes/:stylCodeId --> GET
 // styleCodes/:stylCodeId --> delete
-// styleCodes/:styleCodeId --> PUT 
+// styleCodes/:styleCodeId --> PUT
 
 export interface StyleCodes {
     id: string,
     styleCode: string,
     buyer?: string,
     brand: string
-    season?: string, 
+    season?: string,
     salesChannel?: string,
     product: Product,
     productType: ProductType,

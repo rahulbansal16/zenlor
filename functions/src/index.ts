@@ -543,10 +543,10 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
     confirmDate: Joi.string(),
     orderQty: Joi.number().required(),
     makeQty: Joi.number(),
-    deliveryDate: Joi.string()
+    deliveryDate: Joi.string(),
   }).options({allowUnknown: true}),
 })
-    .strict(true)
+    // .strict(true)
     .unknown(false);
 
 exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
@@ -584,10 +584,10 @@ const upsertBOMSchema = Joi.object<BOMInfo, true>({
     reqQty: Joi.number().required(),
     inventory: Joi.number(),
     activeOrdersQty: Joi.number(),
-    pendingOrdersQty: Joi.number()
+    pendingOrdersQty: Joi.number(),
   }).options({allowUnknown: true}),
 })
-    .strict(true)
+    // .strict(true)
     .unknown(false);
 
 exports.upsertBOMInfo = onCall<BOMInfo>({
@@ -615,10 +615,10 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
 const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
   company: Joi.string().required(),
   purchaseMaterials: Joi.array().items({
-    styleCode: Joi.string().required(), category: Joi.string().required(), type: Joi.string().required(), materialId: Joi.string().required(), materialDescription: Joi.string().required(), unit: Joi.string().required(), pendingQty: Joi.number().required(), purchaseQty: Joi.number().required(), rate: Joi.number().required(), discount: Joi.number().required(), preTaxAmount: Joi.number().required(), tax: Joi.number().required(), taxAmount: Joi.number().required(), totalAmount:Joi.number().required(), supplier: Joi.string().required(), deliveryDate: Joi.string()
+    styleCode: Joi.string().required(), category: Joi.string().required(), type: Joi.string().required(), materialId: Joi.string().required(), materialDescription: Joi.string().required(), unit: Joi.string().required(), pendingQty: Joi.number().required(), purchaseQty: Joi.number().required(), rate: Joi.number().required(), discount: Joi.number().required(), preTaxAmount: Joi.number().required(), tax: Joi.number().required(), taxAmount: Joi.number().required(), totalAmount: Joi.number().required(), supplier: Joi.string().required(), deliveryDate: Joi.string(),
   }).options({allowUnknown: true}),
 })
-    .strict(true)
+    // .strict(true)
     .unknown(false);
 
 exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
