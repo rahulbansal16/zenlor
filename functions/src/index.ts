@@ -615,7 +615,21 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
 const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
   company: Joi.string().required(),
   purchaseMaterials: Joi.array().items({
-    styleCode: Joi.string().required(), category: Joi.string().required(), type: Joi.string().required(), materialId: Joi.string().required(), materialDescription: Joi.string().required(), unit: Joi.string().required(), pendingQty: Joi.number().required(), purchaseQty: Joi.number().required(), rate: Joi.number().required(), discount: Joi.number().required(), preTaxAmount: Joi.number().required(), tax: Joi.number().required(), taxAmount: Joi.number().required(), totalAmount: Joi.number().required(), supplier: Joi.string().required(), deliveryDate: Joi.string(),
+    styleCode: Joi.string().required(), 
+    category: Joi.string().required(), 
+    type: Joi.string().required(), 
+    materialId: Joi.string().required(), 
+    materialDescription: Joi.string().required(),
+    unit: Joi.string().required(), 
+    pendingQty: Joi.number().default(0).required(), 
+    purchaseQty: Joi.number().default(0).required(), 
+    rate: Joi.number().default(0).required(),
+    discount: Joi.number().default(0), 
+    preTaxAmount: Joi.number().default(0), 
+    tax: Joi.number().default(0),
+    taxAmount: Joi.number().default(0),
+    totalAmount: Joi.number().default(0),
+    supplier: Joi.string().required(), deliveryDate: Joi.string(),
   }).options({allowUnknown: true}),
 })
     // .strict(true)
