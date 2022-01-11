@@ -562,11 +562,15 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
     }
     const styleCodesInfo = docData.styleCodesInfo??[];
     const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
-    return await admin.firestore().collection("data").doc(company).set( {
+    await admin.firestore().collection("data").doc(company).set( {
       styleCodesInfo: output,
     }, {
       merge: true,
     });
+    return {
+      company,
+      styleCodes: output,
+    };
   },
 });
 
@@ -584,7 +588,7 @@ const upsertBOMSchema = Joi.object<BOMInfo, true>({
     reqQty: Joi.number().required(),
     inventory: Joi.number(),
     activeOrdersQty: Joi.number(),
-    pendingOrdersQty: Joi.number(),
+    pendingQty: Joi.number(),
   }).options({allowUnknown: true}),
 })
     // .strict(true)
@@ -604,11 +608,15 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     const bomsInfo = docData.bomsInfo??[];
     // This will use stylecode plus materialId
     const output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
-    return await admin.firestore().collection("data").doc(company).set( {
+    await admin.firestore().collection("data").doc(company).set( {
       bomsInfo: output,
     }, {
       merge: true,
     });
+    return {
+      company,
+      bomsInfo: output,
+    };
   },
 });
 
@@ -620,16 +628,17 @@ const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
     type: Joi.string().required(),
     materialId: Joi.string().required(),
     materialDescription: Joi.string().required(),
-    unit: Joi.string().required(),
-    pendingQty: Joi.number().default(0).required(),
-    purchaseQty: Joi.number().default(0).required(),
-    rate: Joi.number().default(0).required(),
+    unit: Joi.string().default("pc"),
+    pendingQty: Joi.number().default(0),
+    purchaseQty: Joi.number().default(0),
+    rate: Joi.number().default(0),
     discount: Joi.number().default(0),
     preTaxAmount: Joi.number().default(0),
     tax: Joi.number().default(0),
     taxAmount: Joi.number().default(0),
     totalAmount: Joi.number().default(0),
-    supplier: Joi.string().required(), deliveryDate: Joi.string(),
+    supplier: Joi.string().default(""),
+    deliveryDate: Joi.string().default(""),
   }).options({allowUnknown: true}),
 })
     // .strict(true)
@@ -649,11 +658,15 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
     // This will use stylecode plus materialId
     const output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
-    return await admin.firestore().collection("data").doc(company).set( {
+    await admin.firestore().collection("data").doc(company).set( {
       purchaseMaterialsInfo: output,
     }, {
       merge: true,
     });
+    return {
+      company,
+      purchaseMaterials: output,
+    };
   },
 });
 

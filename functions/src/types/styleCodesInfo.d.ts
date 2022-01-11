@@ -69,7 +69,7 @@ export interface BOM {
     reqQty: number,
     inventory: number,
     activeOrdersQty: number,
-    pendingOrdersQty: number,
+    pendingQty: number,
 }
 
 export interface PurchaseMaterialsInfo{
