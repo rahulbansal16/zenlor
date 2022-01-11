@@ -104,6 +104,7 @@ const Action = ({ type }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const [selectedRows, setSelectedRows] = useState([]);
+  const user = useSelector(state => state.taskReducer.user);
   const action = useSelector((state) => state.taskReducer[type]);
   const isFetching = useSelector((state) => state.taskReducer.isFetching);
   const { search } = useLocation();
@@ -166,6 +167,32 @@ const Action = ({ type }) => {
       cell: EditableCell
     }
   };
+  const saveCellToServer = (item, type) => {
+    let methodName = "";
+    const {company} = user;
+    let payload = { company}
+    switch(type){
+      case "createPO":
+        methodName = "upsertPurchaseMaterialsInfo"
+        payload = {
+          ...payload,
+          purchaseMaterials: [item]
+        }
+        break;
+      case "orderMaterials":
+        methodName = "upsertBOMInfo";
+        payload = {
+          ...payload,
+          boms: [item]
+        }
+        break;
+      default:
+
+        methodName = "";
+    }
+    const method = functions.httpsCallable(methodName)
+    return method(payload);
+  }
 
   const column = filteredColumns.map((col) => {
     if (!col.editable) {
@@ -182,11 +209,12 @@ const Action = ({ type }) => {
         handleSave:async (e) => {
           console.log("The e in update cell is", e)
           dispatch(updateCell(e, type))
-          const updateStyleCodesInfo = functions.httpsCallable("actions")
-         await updateStyleCodesInfo({
-            item: e,
-            type
-          })
+          await saveCellToServer(e, type)
+        //   const updateStyleCodesInfo = functions.httpsCallable("actions")
+        //  await updateStyleCodesInfo({
+        //     item: e,
+        //     type
+        //   })
         }
       })
     };
