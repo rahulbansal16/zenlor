@@ -73,6 +73,5 @@ export const onCall = <T>(options: OnCallOptions<T>) =>
 //           return await options.handler[method](request, response);
 //         } catch (e) {
 //           logger.error(e.message);
-//           throw new functions.https.HttpsError(e.code ?? "internal", e.message);
 //         }
 //       });
