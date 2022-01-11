@@ -620,6 +620,19 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
   },
 });
 
+const defaultPurchaseMaterials: any = {
+  unit: "pc",
+  pendingQty: 0,
+  purchaseQty: 0,
+  rate: 0,
+  discount: 0,
+  preTaxAmount: 0,
+  tax: 0,
+  taxAmount: 0,
+  totalAmount: 0,
+  supplier: "",
+  deliveryDate: "",
+};
 const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
   company: Joi.string().required(),
   purchaseMaterials: Joi.array().items({
@@ -629,16 +642,16 @@ const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
     materialId: Joi.string().required(),
     materialDescription: Joi.string().required(),
     unit: Joi.string().default("pc"),
-    pendingQty: Joi.number().default(0),
-    purchaseQty: Joi.number().default(0),
-    rate: Joi.number().default(0),
-    discount: Joi.number().default(0),
-    preTaxAmount: Joi.number().default(0),
-    tax: Joi.number().default(0),
-    taxAmount: Joi.number().default(0),
-    totalAmount: Joi.number().default(0),
-    supplier: Joi.string().default(""),
-    deliveryDate: Joi.string().default(""),
+    pendingQty: Joi.number(),
+    purchaseQty: Joi.number(),
+    rate: Joi.number(),
+    discount: Joi.number(),
+    preTaxAmount: Joi.number(),
+    tax: Joi.number(),
+    taxAmount: Joi.number(),
+    totalAmount: Joi.number(),
+    supplier: Joi.string(),
+    deliveryDate: Joi.string(),
   }).options({allowUnknown: true}),
 })
     // .strict(true)
@@ -657,7 +670,9 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     }
     const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
     // This will use stylecode plus materialId
-    const output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
+    const output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials,
+        (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode,
+        defaultPurchaseMaterials);
     await admin.firestore().collection("data").doc(company).set( {
       purchaseMaterialsInfo: output,
     }, {
@@ -770,15 +785,15 @@ exports.actions = functions
       return output;
     });
 
-const upsertItemsInArray = (items: any[], newItems: any[], cmp = (a:any, b:any) => a.id === b.id ) => {
+const upsertItemsInArray = (items: any[], newItems: any[], cmp = (a:any, b:any) => a.id === b.id, obj?:any ) => {
   let output: any[] = [...items];
   for (const newItem of newItems) {
-    output = upsertItemInArray(output, newItem, cmp);
+    output = upsertItemInArray(output, newItem, cmp, obj);
   }
   return output;
 };
 
-const upsertItemInArray = (items: any[], newItem: any, cmp = (a: any, b: any) => a.id === b.id) => {
+const upsertItemInArray = (items: any[], newItem: any, cmp = (a: any, b: any) => a.id === b.id, obj?:any) => {
   let output = [];
   let inserted = false;
   // Add some code to remove the spaces around the value
@@ -796,6 +811,7 @@ const upsertItemInArray = (items: any[], newItem: any, cmp = (a: any, b: any) =>
   if (!inserted) {
     output = [{
       id: generateUId("", 8),
+      ...obj,
       ...newItem,
     }, ...output];
   }
