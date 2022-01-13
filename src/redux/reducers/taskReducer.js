@@ -59,7 +59,7 @@ const saveCellToServer = (item, type, company) => {
   return method(payload);
 }
 
-const initialState = {
+export const initialState = {
     user: {
         rolesFetched: false
     },
@@ -394,19 +394,19 @@ const initialState = {
       },
       {
         title: "Item Id",
-        dataIndex: "itemId",
-        key: "itemId",
+        dataIndex: "materialId",
+        key: "materialId",
         editable: true,
       },
-      {
-        title: "Item Description",
-        dataIndex: "itemDesc",
-        key: "itemDesc",
-      }, 
+      // {
+      //   title: "Item Description",
+      //   dataIndex: "itemDesc",
+      //   key: "itemDesc",
+      // }, 
       {
         title: "Qty",
-        dataIndex: "quantity",
-        key: "quantity",
+        dataIndex: "purchaseQty",
+        key: "purchaseQty",
         editable: true,
       },
       {
@@ -429,8 +429,8 @@ const initialState = {
       }, 
       {
         title: "Amount",
-        dataIndex: "amount",
-        key: "amount",
+        dataIndex: "totalAmount",
+        key: "totalAmount",
         editable: true,
       }],
       dataSource: []

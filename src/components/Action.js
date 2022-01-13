@@ -8,7 +8,7 @@ import Loader from "./Loader";
 import { useLocation } from "react-router";
 import React,{ useEffect, useContext, useState, useRef } from "react";
 import { functions } from "../firebase";
-import { generateUId, getCurrentTime } from "../util";
+import { downloadCsv, generateUId, getCurrentTime } from "../util";
 import { fetchPOs, fetchPurchaseMaterialsInfo, insertRow, updateCell } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ActionBar from "./ActionBar";
@@ -158,7 +158,17 @@ const Action = ({ type }) => {
       })
     } else if (action === "downloadPO"){
       console.log("In the action of downloadPO");
+      const upsertCreatePO = functions.httpsCallable("upsertCreatePO");
       const selectedIds = selectedRows.map ( row => row.id)
+      const result = await upsertCreatePO({
+        company,
+        createdAt: getCurrentTime(),
+        purchaseMaterials: selectedRows
+      });
+      console.log("The result is", result);
+      result.data.purchaseOrdersInfo.forEach(element => {
+        downloadCsv(element)
+      });
       history.push({
         pathname: `/action/purchaseOrder`,
         search: `id=${selectedIds}`

@@ -1,4 +1,7 @@
 import moment from "moment";
+import Papa from "papaparse";
+import { initialState } from "./redux/reducers/taskReducer";
+
 
 export const getTimeStamp = () => {
     return new Date().getTime()
@@ -80,13 +83,37 @@ export function jsonToCsv(json){
     
 }
 
-export function downloadCsv(fileContent, fileName){
-    var downloadLink = document.createElement("a");
-    var blob = new Blob([fileContent], { type: 'text/csv' });
-    var url = URL.createObjectURL(blob);
-    downloadLink.href = url;
-    downloadLink.download = fileName;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+export function downloadCsv(purchaseOrder){
+    const poFields= initialState.purchaseOrder.columns.map(item => item.key)
+    const poHeaders= initialState.purchaseOrder.columns.map(item => item.title)
+    const {supplier, id, deliveryDate, amount} = purchaseOrder
+    const topHeader = ['SUPPLIER',supplier,'','PO Number',id,'','Delivery',deliveryDate]
+    const lineItems = purchaseOrder.lineItems.map(item => poFields.map(field => item[field]||"."))
+    const footer = ['TOTAL', '','','','','','INR',amount||'.']
+    console.log("Line Items", lineItems);
+
+    const fileName = supplier+'_'+deliveryDate
+    let data =[[...topHeader], [...poHeaders], ...lineItems, [...footer]]
+    // data =[]
+    console.log(data)
+    const csv = Papa.unparse(data, {
+        greedy: true,
+        header: false,
+      });
+      const blob = new Blob([csv]);
+      const a = window.document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = `${fileName || "table"}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+    // var downloadLink = document.createElement("a");
+    // var blob = new Blob([fileContent], { type: 'text/csv' });
+    // var url = URL.createObjectURL(blob);
+    // downloadLink.href = url;
+    // downloadLink.download = fileName;
+    // document.body.appendChild(downloadLink);
+    // downloadLink.click();
+    // document.body.removeChild(downloadLink);
 }
