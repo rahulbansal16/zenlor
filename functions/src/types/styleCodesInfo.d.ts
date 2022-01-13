@@ -74,6 +74,7 @@ export interface BOM {
 
 export interface PurchaseMaterialsInfo{
     purchaseMaterials: PurchaseMaterials[]
+    createdAt: string
     company: string
 }
 
@@ -106,6 +107,7 @@ export interface PurchaseOrder {
     id: string,
     purchaseOrderId: string,
     lineItems: PurchaseOrderLineItems[],
+    amount: number,
     status: string,
     supplier: string
     createdAt: string,

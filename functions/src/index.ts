@@ -8,7 +8,7 @@ import * as moment from "moment";
 import * as Joi from "joi";
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
-import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrdersInfo, StyleCodesInfo} from "./types/styleCodesInfo";
+import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -16,6 +16,12 @@ admin.initializeApp();
 admin.firestore().settings({
   ignoreUndefinedProperties: true,
 });
+
+export enum POStatus{
+  ACTIVE="ACTIVE",
+  COMPLETED="COMPLETED",
+  CANCELLED="CANCELLED"
+}
 
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const DEFAULT_COMPANY = "test";
@@ -635,6 +641,7 @@ const defaultPurchaseMaterials: any = {
 };
 const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
   company: Joi.string().required(),
+  createdAt: Joi.string(),
   purchaseMaterials: Joi.array().items({
     styleCode: Joi.string().required(),
     category: Joi.string().required(),
@@ -845,6 +852,109 @@ exports.updateStyleCodesInfo = functions
       }, {merge: true});
       return obj;
     });
+
+
+const upsertCreatePOSchema = Joi.object<PurchaseMaterialsInfo, true>({
+  company: Joi.string().required(),
+  createdAt: Joi.string(),
+  purchaseMaterials: Joi.array().items({
+    styleCode: Joi.string().required(),
+    category: Joi.string().required(),
+    type: Joi.string().required(),
+    materialId: Joi.string().required(),
+    materialDescription: Joi.string().required(),
+    unit: Joi.string().required(),
+    pendingQty: Joi.number().required(),
+    purchaseQty: Joi.number().required(),
+    rate: Joi.number().required(),
+    discount: Joi.number().required(),
+    preTaxAmount: Joi.number().required(),
+    tax: Joi.number().required(),
+    taxAmount: Joi.number().required(),
+    totalAmount: Joi.number().required(),
+    supplier: Joi.string().required(),
+    deliveryDate: Joi.string().required(),
+  }).options({allowUnknown: true}),
+})
+// .strict(true)
+    .unknown(false);
+
+exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
+  name: "upsertCreatePO",
+  schema: upsertCreatePOSchema,
+  handler: async (data, context) => {
+    const supplierMap: any = {};
+    let total = 0;
+    const {company, purchaseMaterials, createdAt} = data;
+    const doc = await admin.firestore().collection("data").doc(company).get();
+    const docData = doc.data();
+    if (!docData) {
+      throw Error("Document is not prsent for the company");
+    }
+    const purchaseOrdersInfo = docData.purchaseOrdersInfo??[];
+    const bomsInfo = docData.bomsInfo??[];
+
+    for (let item of purchaseMaterials) {
+      item = item as PurchaseMaterials;
+      const supplier = item.supplier.trim().toLowerCase();
+      const bom: BOM = bomsInfo.find((bomItem: BOM) => bomItem.styleCode === item.styleCode && bomItem.materialId === item.materialId);
+      if (!bom) {
+        throw Error("The material is not present in the bom");
+      }
+      if (item.purchaseQty <= 0) {
+        throw Error("The purchaseQty can not be zero");
+      }
+      if (bom.pendingQty < item.purchaseQty) {
+        throw Error("The order can not have more value than the pendingQty");
+      }
+      bom.activeOrdersQty += item.purchaseQty;
+      bom.pendingQty -= item.purchaseQty;
+      const {styleCode, totalAmount} = item;
+      if (!supplierMap[supplier]) {
+        supplierMap[supplier] = [];
+      }
+      supplierMap[supplier].push({
+        sno: supplierMap[supplier].length + 1,
+        referenceId: styleCode,
+        ...item,
+        // itemId: id,
+        // itemDesc: description,
+        // quantity: poQty * consumption,
+        // unit: unit,
+        // rate: rate,
+        // tax: "",
+        // amount: amount,
+      });
+      total += totalAmount;
+    }
+    console.log("The supplier map is", supplierMap);
+    const purchaseOrders : PurchaseOrder[] = [];
+    for (const key in supplierMap) {
+      purchaseOrders.push({
+        id: generateUId("PO-", 10).toUpperCase(),
+        supplier: key,
+        createdAt,
+        purchaseOrderId: "",
+        deliveryDate: "",
+        amount: total,
+        status: POStatus.ACTIVE.toString(),
+        lineItems: supplierMap[key],
+      });
+    }
+    await admin.firestore().collection("data").doc(company).set(
+        {
+          bomsInfo,
+          purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
+        }
+        , {
+          merge: true,
+        });
+    return {
+      bomsInfo,
+      purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
+    };
+  },
+});
 
 exports.createPO = functions
     .region("asia-northeast3")
