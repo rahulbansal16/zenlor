@@ -893,6 +893,8 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     }
     const purchaseOrdersInfo = docData.purchaseOrdersInfo??[];
     const bomsInfo = docData.bomsInfo??[];
+    const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
+    let deliveryDate="";
 
     for (let item of purchaseMaterials) {
       item = item as PurchaseMaterials;
@@ -905,8 +907,9 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         throw Error("The purchaseQty can not be zero");
       }
       if (bom.pendingQty < item.purchaseQty) {
-        throw Error("The order can not have more value than the pendingQty");
+        throw Error("The order can not have more value than the pendingQty"+bom.pendingQty+" "+item.purchaseQty+" "+item.materialId);
       }
+      deliveryDate = item.deliveryDate;
       bom.activeOrdersQty += item.purchaseQty;
       bom.pendingQty -= item.purchaseQty;
       const {styleCode, totalAmount} = item;
@@ -935,23 +938,28 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         supplier: key,
         createdAt,
         purchaseOrderId: "",
-        deliveryDate: "",
+        deliveryDate,
         amount: total,
         status: POStatus.ACTIVE.toString(),
         lineItems: supplierMap[key],
       });
     }
+    // const new = purchaseMaterialsInfo.filter(()=>());
+    const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId) !== (x.styleCode+x.materialId)));
+
     await admin.firestore().collection("data").doc(company).set(
         {
           bomsInfo,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
+          purchaseMaterials: result,
         }
         , {
           merge: true,
         });
     return {
       bomsInfo,
-      purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
+      purchaseOrdersInfo: [...purchaseOrders],
+      purchaseMaterials: result,
     };
   },
 });
