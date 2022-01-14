@@ -169,10 +169,11 @@ const Action = ({ type }) => {
       result.data.purchaseOrdersInfo.forEach(element => {
         downloadCsv(element)
       });
-      history.push({
-        pathname: `/action/purchaseOrder`,
-        search: `id=${selectedIds}`
-      })
+      dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo))
+      // history.push({
+      //   pathname: `/action/purchaseOrder`,
+      //   search: `id=${selectedIds}`
+      // })
     }
   };
   const components = {
