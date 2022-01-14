@@ -951,7 +951,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         {
           bomsInfo,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
-          purchaseMaterials: result,
+          purchaseMaterialsInfo: result,
         }
         , {
           merge: true,
@@ -959,7 +959,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     return {
       bomsInfo,
       purchaseOrdersInfo: [...purchaseOrders],
-      purchaseMaterials: result,
+      purchaseMaterialsInfo: result,
     };
   },
 });
