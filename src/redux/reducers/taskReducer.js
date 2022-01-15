@@ -83,7 +83,7 @@ export const initialState = {
     dashboard: {
         columns: [
           {
-            title: () => <Tooltip title="Style Code">Style Code</Tooltip> ,
+            title: "Style Code",
             dataIndex: "styleCode",
             key: "styleCode",
             filter: "multiSelect",
@@ -129,7 +129,7 @@ export const initialState = {
               editable: true
             },
             {
-              title: () => <Tooltip title="Order Quantity">Order Quantity</Tooltip>,
+              title: "Order Quantity",
               showSorterTooltip: false,
               width:100,
               dataIndex: "orderQuantity",
