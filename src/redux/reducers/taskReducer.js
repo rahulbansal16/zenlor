@@ -160,7 +160,7 @@ export const initialState = {
                }
               ]
             },
-            Table.SELECTION_COLUMN,
+            // Table.SELECTION_COLUMN,
           ],
         dataSource: []
     },
@@ -241,7 +241,7 @@ export const initialState = {
                 },              
               ]
               },
-              Table.SELECTION_COLUMN,
+              // Table.SELECTION_COLUMN,
             ],
             actions:[
 
@@ -377,7 +377,7 @@ export const initialState = {
                 key: "deliveryDate",
                 editable: true,
               },
-              Table.SELECTION_COLUMN 
+              // Table.SELECTION_COLUMN 
             ],
             dataSource: []
     },
