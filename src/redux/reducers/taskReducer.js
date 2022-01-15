@@ -37,6 +37,13 @@ const saveCellToServer = (item, type, company) => {
   let methodName = "";
   let payload = { company}
   switch(type){
+    case "dashboard": 
+      methodName = "upsertStyleCodesInfo"
+      payload = {
+        ...payload,
+        styleCodes: [item]
+      }      
+      break;
     case "createPO":
       methodName = "upsertPurchaseMaterialsInfo"
       payload = {
@@ -52,7 +59,6 @@ const saveCellToServer = (item, type, company) => {
       }
       break;
     default:
-
       methodName = "";
   }
   const method = functions.httpsCallable(methodName)
@@ -82,7 +88,7 @@ export const initialState = {
             key: "styleCode",
             filter: "multiSelect",
             showSorterTooltip: false,
-            width:150,
+            // width:150,
             fixed: true
           },
             {
@@ -111,7 +117,7 @@ export const initialState = {
               dataIndex: "orderNo",
               showSorterTooltip: false,
               key: "orderNo",
-              width:100,
+              width:150,
               editable: true
             },
             {
@@ -133,6 +139,7 @@ export const initialState = {
             {
               title: "To Make Quantity",
               dataIndex: "toMakeQuantity",
+              width:100,
               key: "toMakeQty",
               editable: true
             },
