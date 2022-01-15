@@ -15,9 +15,9 @@ const performCalculation = (item, type) => {
   
     },
     createPO: {
-      preTaxAmount: `${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}`,
-      taxAmount: `${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`,
-      totalAmount: `${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}+${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`
+      preTaxAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}`,
+      taxAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`,
+      totalAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}+${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`
     }
   }
   const map = calculationMap[type];
