@@ -613,7 +613,7 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     }
     const bomsInfo = docData.bomsInfo??[];
     // This will use stylecode plus materialId
-    const output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode);
+    const output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) && oldItem.styleCode === newItem.styleCode);
     await admin.firestore().collection("data").doc(company).set( {
       bomsInfo: output,
     }, {
@@ -678,7 +678,7 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
     // This will use stylecode plus materialId
     const output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials,
-        (oldItem, newItem) => oldItem.materialId === newItem.materialId && oldItem.styleCode === newItem.styleCode,
+        (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) && oldItem.styleCode === newItem.styleCode,
         defaultPurchaseMaterials);
     await admin.firestore().collection("data").doc(company).set( {
       purchaseMaterialsInfo: output,
@@ -899,7 +899,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     for (let item of purchaseMaterials) {
       item = item as PurchaseMaterials;
       const supplier = item.supplier.trim().toLowerCase();
-      const bom: BOM = bomsInfo.find((bomItem: BOM) => bomItem.styleCode === item.styleCode && bomItem.materialId === item.materialId);
+      const bom: BOM = bomsInfo.find((bomItem: BOM) => bomItem.styleCode === item.styleCode && (bomItem.materialId + bomItem.materialDescription ) === (item.materialId + bomItem.materialDescription));
       if (!bom) {
         throw Error("The material is not present in the bom");
       }
@@ -945,7 +945,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
       });
     }
     // const new = purchaseMaterialsInfo.filter(()=>());
-    const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId) !== (x.styleCode+x.materialId)));
+    const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
 
     await admin.firestore().collection("data").doc(company).set(
         {
