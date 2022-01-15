@@ -687,7 +687,7 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     });
     return {
       company,
-      purchaseMaterials: output,
+      purchaseMaterialsInfo: output,
     };
   },
 });

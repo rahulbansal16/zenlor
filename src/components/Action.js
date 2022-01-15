@@ -104,12 +104,19 @@ const Action = ({ type }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const [selectedRows, setSelectedRows] = useState([]);
+  // const [selectedRowsKeys, setSelectedRowsKeys] = useState([])
   const user = useSelector(state => state.taskReducer.user);
   const action = useSelector((state) => state.taskReducer[type]);
   const isFetching = useSelector((state) => state.taskReducer.isFetching);
   const { search } = useLocation();
   const { columns, dataSource } = action;
   const filteredColumns = useFilter(columns, dataSource);
+
+  useEffect(()=>{
+    console.log("Calling for type", type)
+    // setSelectedRowsKeys([])
+    setSelectedRows([])
+  },[type, action])
 
   if (isFetching) {
     return <Loader />;
@@ -148,8 +155,8 @@ const Action = ({ type }) => {
         // createdAt: getCurrentTime(),
       });
       console.log("The result is", result.data);
-      dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterials))
-      history.push('/action/'+action)
+      dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo))
+      setTimeout(()=>history.push('/action/'+action) ,1000)
     } else if (action === "orderMaterials"){
       const selectedStyleCodes = selectedRows.map ( row => row.styleCode)
       history.push({
@@ -262,10 +269,12 @@ const Action = ({ type }) => {
         sticky={true}
         components={components}
         rowSelection={{
-          fixed:'right',
-          type: "checkbox",
+          // fixed:'right',
+          // type: "checkbox",
+          // selectedRowKeys:{selectedRowsKeys},
           onChange: (selectedRowKeys, selectedRows) => {
             // let selectedStyleCode = selectedRows.map ( row => row.styleCode)
+            // setSelectedRowsKeys(selectedRowKeys)
             setSelectedRows(selectedRows);
           },
         }}
