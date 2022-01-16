@@ -8,7 +8,7 @@ import * as moment from "moment";
 import * as Joi from "joi";
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
-import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials} from "./types/styleCodesInfo";
+import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials, StyleCodes} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -21,6 +21,15 @@ export enum POStatus{
   ACTIVE="ACTIVE",
   COMPLETED="COMPLETED",
   CANCELLED="CANCELLED"
+}
+
+export enum MaterialStatus {
+  ALL_IN="ALL_IN",
+  NOT_ORDERED="NOT_ORDERED",
+  PART_ORDERED="PARTIAL_ORDERED",
+  FULLY_ORDERED="FULLY_ORDERED",
+  UNKNOWN="UNKNOWN",
+  ORDERING_REQUIRED = "ORDERING_REQUIRED"
 }
 
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -471,6 +480,34 @@ exports.dataInsights = functions
       const {company} = await getCompany(data, context);
       return getAggregate(company || "test");
     });
+  
+const getMaterialStatus = (styleCode: string, boms: BOM[]) : MaterialStatus => {
+  const materials = boms.filter( bom => bom.styleCode === styleCode);
+  const allIn = materials.every( item => item.inventory??0 >= item.reqQty )
+  if (allIn){
+    return MaterialStatus.ALL_IN;
+  }
+  const orderingRequired = materials.some( item => item.pendingQty??0 > 0);
+  if (!orderingRequired){
+    return MaterialStatus.ORDERING_REQUIRED;
+  }
+  const fullyOrdered = materials.filter(item => item.pendingQty??0 > 0).every( item => (item.activeOrdersQty??0 > 0 ) && (item.activeOrdersQty??0 >= item.reqQty));
+  if (fullyOrdered){
+    return MaterialStatus.FULLY_ORDERED;
+  }
+
+  const partialOrdered = materials.filter(item => item.pendingQty??0 > 0).some(item => item.activeOrdersQty??0 > 0);
+  if(partialOrdered){
+    return MaterialStatus.PART_ORDERED;
+  }
+
+  const noOrder = materials.filter(item => item.pendingQty??0 > 0).every( item => item.activeOrdersQty??0 <= 0);
+  if (noOrder){
+    return MaterialStatus.NOT_ORDERED;
+  }
+
+  return MaterialStatus.UNKNOWN;
+}
 
 exports.getData = functions
     .region("asia-northeast3")
@@ -487,7 +524,20 @@ exports.getData = functions
       const companyData = companyDoc.data();
       // companyData["aggregate"] = {...await getAggregate(company)}
       console.log("The getData result is", companyData);
-      return companyData;
+      if (!companyData){
+        throw Error("The company does not exist " + company);
+      }
+      let styleCodesInfo = companyData.styleCodesInfo??[];
+      styleCodesInfo = styleCodesInfo as StyleCodes[]
+      const bomsInfo = companyData.bomsInfo??[];
+      styleCodesInfo = styleCodesInfo.map( (styleCode: StyleCodes)=> ({
+        ...styleCode,
+        materialStatus: getMaterialStatus(styleCode.styleCode, bomsInfo)
+      }))
+      return {
+        ...companyData,
+        styleCodesInfo: styleCodesInfo
+      };
     });
 
 /**

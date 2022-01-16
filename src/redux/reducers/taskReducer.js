@@ -132,15 +132,15 @@ export const initialState = {
               title: "Order Quantity",
               showSorterTooltip: false,
               width:100,
-              dataIndex: "orderQuantity",
-              key: "orderQuantity",
+              dataIndex: "orderQty",
+              key: "orderQty",
               editable: true
             },
             {
               title: "To Make Quantity",
-              dataIndex: "toMakeQuantity",
+              dataIndex: "makeQty",
               width:100,
-              key: "toMakeQty",
+              key: "makeQty",
               editable: true
             },
             {
@@ -149,24 +149,23 @@ export const initialState = {
               key: "deliveryDate",
               editable: true
             },
-            {
-              title: "Material Status",
-              children : [
+            // {
+              // children : [
                {
-                title:"Purchase",
-                dataIndex: "purchaseStatus",
-                key: "purchaseStatus",
-                editable: true,
-                render: () => <ZenlorTags text="partial order"></ZenlorTags>
+                title:"Material Status",
+                dataIndex: "materialStatus",
+                key: "materialStatus",
+                // editable: true,
+                // render: () => <ZenlorTags text="partial order"></ZenlorTags>
                },
-               {
-                title:"Inventory",
-                dataIndex: "inventoryStatus",
-                key: "inventoryStatus",
-                editable: true
-               }
-              ]
-            },
+              //  {
+              //   title:"Inventory",
+              //   dataIndex: "inventoryStatus",
+              //   key: "inventoryStatus",
+              //   editable: true
+              //  },
+              // ]
+            // },
             // Table.SELECTION_COLUMN,
           ],
         dataSource: []
