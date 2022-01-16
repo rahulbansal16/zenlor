@@ -67,9 +67,9 @@ export interface BOM {
     unit: string,
     placement: string,
     reqQty: number,
-    inventory: number,
-    activeOrdersQty: number,
-    pendingQty: number,
+    inventory?: number,
+    activeOrdersQty?: number,
+    pendingQty?: number,
 }
 
 export interface PurchaseMaterialsInfo{
