@@ -8,7 +8,7 @@ import Loader from "./Loader";
 import { useLocation } from "react-router";
 import React,{ useEffect, useContext, useState, useRef } from "react";
 import { functions } from "../firebase";
-import { downloadCsv, generateUId, getCurrentTime } from "../util";
+import { downloadCsv, generateUId, getCurrentTime, purchaseMaterialKey } from "../util";
 import { fetchPOs, fetchPurchaseMaterialsInfo, insertRow, updateCell } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ActionBar from "./ActionBar";
@@ -135,7 +135,7 @@ const Action = ({ type }) => {
       const id = new URLSearchParams(search).get('id')??',';
       const ids = id.split(',')
       if (ids[0] !== "") 
-        return dataSource.filter( item => ids.includes(item.id))
+        return dataSource.filter( item => ids.includes(purchaseMaterialKey(item)))
     }
     return dataSource;
   };
@@ -156,7 +156,13 @@ const Action = ({ type }) => {
       });
       console.log("The result is", result.data);
       dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo))
-      setTimeout(()=>history.push('/action/'+action) ,1000)
+      const selectedItems = selectedRows.map(purchaseMaterialKey)
+      history.push({
+        pathname: `/action/${action}`,
+        search: `id=${selectedItems}`
+      })
+        // '/action/'+action)
+
     } else if (action === "orderMaterials"){
       const selectedStyleCodes = selectedRows.map ( row => row.styleCode)
       history.push({
