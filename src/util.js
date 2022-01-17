@@ -83,6 +83,11 @@ export function jsonToCsv(json){
     
 }
 
+export function purchaseMaterialKey(item){
+    const {styleCode, materialId, materialDescription} = item
+    return styleCode.toLowerCase().trim() + materialId.toLowerCase().trim() + materialDescription.toLowerCase().trim()
+}
+
 export function downloadCsv(purchaseOrder){
     const poFields= initialState.purchaseOrder.columns.map(item => item.key)
     const poHeaders= initialState.purchaseOrder.columns.map(item => item.title)
