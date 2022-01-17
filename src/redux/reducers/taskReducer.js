@@ -567,7 +567,10 @@ const taskReducer = (state = initialState, action) => {
                 // name,
                 createPO: {
                     ...state.createPO,
-                    dataSource: action.payload.purchaseMaterialsInfo
+                    dataSource: action.payload.purchaseMaterialsInfo.map( item => ({
+                      ...item,
+                      id: item.styleCode + item.materialId.trim() + item.materialDescription.trim()
+                    }))
                 },
                 orderMaterials: {
                     ...state.orderMaterials,
@@ -613,7 +616,10 @@ const taskReducer = (state = initialState, action) => {
         case FETCH_PURCHASE_MATERIALS_INFO: {
           const {data}= action.payload;
           let newState = JSON.parse(JSON.stringify(state))
-          newState.createPO.dataSource = [...data]
+          newState.createPO.dataSource = data.map( item => ({
+            ...item,
+            id: item.styleCode + item.materialId.trim() + item.materialDescription.trim()
+          }))
           // newState.purchaseOrder = {
           //   ...state.purchaseOrder,
           //   dataSource: formatPurchaseOrder(data)
