@@ -150,7 +150,10 @@ const Action = ({ type }) => {
       const selectedIds = selectedRows.map ( row => row.id)
       let upsertPurchaseMaterialsInfo = functions.httpsCallable("upsertPurchaseMaterialsInfo");
       const result = await upsertPurchaseMaterialsInfo({
-        purchaseMaterials: dataSource.filter(item => selectedIds.includes(item.id)),
+        purchaseMaterials: dataSource.filter(item => selectedIds.includes(item.id)).map( item => ({
+          item,
+          id: 'po' + item.id
+        })),
         company
         // createdAt: getCurrentTime(),
       });
