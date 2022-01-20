@@ -9,10 +9,10 @@ import FourNotFour from "../auth/FourNotFour";
 import moment from "moment";
 import Header from "../components/Header";
 
-const loadForm = (initialValues, department, process, onFinish, departmentsData) => {
+const loadForm = (initialValues, department, process, onFinish, departmentsData, styleCode) => {
     const departmentData = departmentsData.filter( departmentData => departmentData.id === department)
     if (departmentData && departmentData.length > 0){
-        return <FormLayout initialValues={initialValues} formFields = {departmentData[0]["form"][process.toLowerCase()]} onFinish = {onFinish}/>
+        return <FormLayout initialValues={initialValues} formFields = {departmentData[0]["form"][process.toLowerCase()]} onFinish = {onFinish} styleCode={styleCode}/>
     } else  {
         <FourNotFour/>
     }
@@ -68,7 +68,7 @@ const FormLoader = ({initialValues, department: departmentId, header = () => {}}
             <ProcessHeader process={process} styleCode={styleCode}/>
             {header()}
             <div className = "mg-y">
-                {loadForm(initialValues, departmentId, process, onFinish, form)}
+                {loadForm(initialValues, departmentId, process, onFinish, form, styleCode)}
             </div>
         </div>
     )
