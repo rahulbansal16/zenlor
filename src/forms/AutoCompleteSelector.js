@@ -1,20 +1,18 @@
 import {AutoComplete, Select} from "antd"
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import AutoCompleteSelector from "./AutoCompleteSelector";
 
 // StyleCode Name on the Top
 
-const StyleCodeInput = ({onSelectCb}) => {
+const AutoCompleteSelector = ({onSelectCb, data, label}) => {
 
-    const styleCodes = useSelector( state => state.taskReducer.styleCodes)
-    return <AutoCompleteSelector label={"Enter code"} onSelectCb={onSelectCb} data={styleCodes}/>
+    // const styleCodes = useSelector(state => state.taskReducer.styleCodes)
 
     const [options, setOptions] = useState([]);
 
     useEffect( () => {
         // console.log("The result is")
-        setOptions(styleCodes.map( item => {
+        setOptions(data.map( item => {
             const {id, name} = item
             return {
                     value: name,
@@ -22,7 +20,7 @@ const StyleCodeInput = ({onSelectCb}) => {
                     text:name
                 }
         } ))
-    }, [styleCodes])
+    }, [])
     // const [results, setResults] = useState([])
 
     // useEffect( () => {
@@ -38,7 +36,7 @@ const StyleCodeInput = ({onSelectCb}) => {
         // }
         term = term.trim()
         term = term.toUpperCase()
-        const scoredTasks =  styleCodes.map(styleCode  => {
+        const scoredTasks =  data.map(styleCode  => {
             const {id, name} = styleCode
             let score = 0
             if (name.includes(term) || name.includes(term.toLowerCase())){
@@ -73,10 +71,9 @@ const StyleCodeInput = ({onSelectCb}) => {
         console.log('onSelect', value);
         onSelectCb(value)
     };
-    return <div>
-            <Select
+    return <Select
                 showSearch
-                label="Enter code"
+                label={label}
                 dropdownMatchSelectWidth={252}
                 style={{ width: 300 }}
                 options={options}
@@ -84,6 +81,5 @@ const StyleCodeInput = ({onSelectCb}) => {
                 onSelect={onSelect}
                 onSearch={handleSearch}
             ></Select>
-    </div>
 }
-export default StyleCodeInput
+export default AutoCompleteSelector
