@@ -40,19 +40,16 @@ const formItemLayout = {
     },
   };
 
-const inputField = (type, idx, autoSuggestData) => {
-  if (!type)
+const inputField = (name, idx, autoSuggestData) => {
+  if (name === "autosuggestkey")
+    return AutoCompleteSelector({
+    onSelectCb: () => {},
+    data: autoSuggestData,
+    label: "Choose the Value",
+  });
     return (
       <InputNumber inputMode="numeric" autoFocus={idx === 0} size="large" />
     );
-
-  if (type === "autosuggest")
-    return AutoCompleteSelector({
-      onSelectCb: () => {},
-      data: autoSuggestData,
-      // data: [{ id: 12, name: "v", value: "2" }, "b", "c"],
-      label: "Choose the Value",
-    });
 };
 
 const FormLayout = ({initialValues, formFields, onFinish, styleCode}) => {
@@ -64,7 +61,7 @@ const FormLayout = ({initialValues, formFields, onFinish, styleCode}) => {
       name: item.materialId
   }))
   console.log("The materials are ", materials);
-
+  // const [fieldName, setFieldName] = useState("default");
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false)
   const history = useHistory()
@@ -83,14 +80,20 @@ const FormLayout = ({initialValues, formFields, onFinish, styleCode}) => {
               onFinish={(data) => {
                   console.log(data);
                   setLoading(true)
-                  onFinish(data)
+                  if (data["autosuggestkey"]){
+                    let obj = {}
+                    obj[data["autosuggestkey"]] = data["autosuggestvalue"]
+                    onFinish(obj)
+                  } else {
+                    onFinish(data)
+                  }
               }}
           >
               {formFields.map (
-                  ({label, field:name, type}, idx) => <Form.Item label={label} name ={name} key={idx} rules={[{
+                  ({label, field:name }, idx) => <Form.Item label={label} name ={name} key={idx} rules={[{
                       required: true,
                       message: "Please Enter a value"
-                  }]}>{inputField(type, idx, materials)}</Form.Item>)}
+                  }]}>{inputField(name, idx, materials)}</Form.Item>)}
                   <div className = "wd-100 fx-sp-bt">
                       <Button danger onClick = {() => history.goBack()} className="wd-45" icon={<LeftOutlined/>}>Back</Button>
                       <Button type="primary" htmlType="submit" loading={loading} className="wd-45" icon={<CheckOutlined />} >Submit</Button>
