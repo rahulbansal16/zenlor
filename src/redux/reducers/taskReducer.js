@@ -567,7 +567,7 @@ const taskReducer = (state = initialState, action) => {
                 // name,
                 createPO: {
                     ...state.createPO,
-                    dataSource: action.payload.purchaseMaterialsInfo.map( item => ({
+                    dataSource: (action.payload.purchaseMaterialsInfo||[]).map( item => ({
                       ...item,
                       id: item.styleCode + item.materialId.trim() + item.materialDescription.trim()
                     }))
