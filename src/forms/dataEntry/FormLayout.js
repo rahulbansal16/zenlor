@@ -65,6 +65,19 @@ const FormLayout = ({initialValues, formFields, onFinish, styleCode}) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false)
   const history = useHistory()
+  const processInitialValue = (value) => {
+    if(!value){
+      return {}
+    }
+    const firstKey = Object.keys(value)?.[0];
+    if (firstKey && firstKey.startsWith('.')){
+      return {
+        'autosuggestkey': firstKey.substring(1),
+        'autosuggestvalue': value[firstKey]
+      }
+    }
+    return value || {}
+  }
   return (
           <Form
               {...formItemLayout}
@@ -72,7 +85,7 @@ const FormLayout = ({initialValues, formFields, onFinish, styleCode}) => {
                   marginLeft:'8px',
                   marginRight:'8px'
               }}
-              initialValues={initialValues || {}}
+              initialValues={processInitialValue(initialValues)}
               size="large"
               name="styleCodeEditor"
               align="left"
@@ -82,7 +95,7 @@ const FormLayout = ({initialValues, formFields, onFinish, styleCode}) => {
                   setLoading(true)
                   if (data["autosuggestkey"]){
                     let obj = {}
-                    obj[data["autosuggestkey"]] = data["autosuggestvalue"]
+                    obj['.'+data["autosuggestkey"]] = data["autosuggestvalue"]
                     onFinish(obj)
                   } else {
                     onFinish(data)
