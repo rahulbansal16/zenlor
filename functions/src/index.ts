@@ -481,6 +481,11 @@ exports.dataInsights = functions
       return getAggregate(company || "test");
     });
 
+
+const calculatePendingQty = (item:BOM) => {
+  const {reqQty, inventory, activeOrdersQty, issueQty} = item;
+  return reqQty - (inventory||0) - (activeOrdersQty||0) - (issueQty||0);
+};
 const getMaterialStatus = (styleCode: string, boms: BOM[]) : MaterialStatus => {
   const materials = boms.filter( (bom) => bom.styleCode === styleCode);
   const allIn = materials.every( (item) => (item.inventory??0) >= item.reqQty );
@@ -491,17 +496,17 @@ const getMaterialStatus = (styleCode: string, boms: BOM[]) : MaterialStatus => {
   // if (!orderingRequired) {
   //   return MaterialStatus.ORDERING_REQUIRED;
   // }
-  const fullyOrdered = materials.filter((item) => (item.pendingQty??0) > 0).every( (item) => ((item.activeOrdersQty??0) > 0 ) && ((item.activeOrdersQty??0) >= item.reqQty));
+  const fullyOrdered = materials.filter((item) => calculatePendingQty(item) > 0).every( (item) => ((item.activeOrdersQty??0) > 0 ) && ((item.activeOrdersQty??0) >= item.reqQty));
   if (fullyOrdered) {
     return MaterialStatus.FULLY_ORDERED;
   }
 
-  const partialOrdered = materials.filter((item) => (item.pendingQty??0) > 0).some((item) => (item.activeOrdersQty??0) > 0);
+  const partialOrdered = materials.filter((item) => calculatePendingQty(item) > 0).some((item) => (item.activeOrdersQty??0) > 0);
   if (partialOrdered) {
     return MaterialStatus.PART_ORDERED;
   }
 
-  const noOrder = materials.filter((item) => (item.pendingQty??0) > 0).every( (item) => (item.activeOrdersQty??0) <= 0);
+  const noOrder = materials.filter((item) => calculatePendingQty(item) > 0).every( (item) => (item.activeOrdersQty??0) <= 0);
   if (noOrder) {
     return MaterialStatus.NOT_ORDERED;
   }
