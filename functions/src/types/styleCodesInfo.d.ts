@@ -41,7 +41,7 @@ export interface StyleCodes {
     confirmDate: string,
     orderQty: number,
     makeQty: number,
-    deliveryDate: string,
+    deliveryDate: number,
     unitSellingPrice?:number,
     xsSizeQty?:number,
     sSizeQty?:number,
@@ -70,6 +70,7 @@ export interface BOM {
     inventory?: number,
     activeOrdersQty?: number,
     pendingQty?: number,
+    issueQty?: number
 }
 
 export interface PurchaseMaterialsInfo{
@@ -86,6 +87,7 @@ export interface PurchaseMaterials{
     materialId: string,
     materialDescription: string,
     unit: string,
+    status: string,
     pendingQty: number,
     purchaseQty: number,
     rate: number,
@@ -119,4 +121,21 @@ export interface PurchaseOrderLineItems {
     styleCode: string
     materialId: string,
     quantity: string
+}
+
+
+// All the inventory will be directly inserted by the user
+export interface InventoryInfo {
+    company: string,
+    createdAt: string,
+    inventoryItems: InventoryItems[]
+}
+
+export interface InventoryItems {
+    // id: string,
+    materialId: string,
+    materialDescription: string,
+    inventory: number,
+    issue: number,
+    activeOrdersQty: number
 }
