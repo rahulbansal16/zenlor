@@ -1121,14 +1121,16 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     const purchaseOrdersInfo = docData.purchaseOrdersInfo??[];
     const bomsInfo = docData.bomsInfo??[];
     const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
+    const inventory: InventoryItems[] = docData.inventoryInfo??[]
+    const styleCodes: StyleCodes[] = docData.styleCodesInfo??[]
     let deliveryDate="";
 
     for (let item of purchaseMaterials) {
       item = item as PurchaseMaterials;
       const supplier = item.supplier.trim().toLowerCase();
-      const bom: BOM = bomsInfo.find((bomItem: BOM) => bomItem.styleCode === item.styleCode && (bomItem.materialId + bomItem.materialDescription ) === (item.materialId + bomItem.materialDescription));
-      if (!bom) {
-        throw Error("The material is not present in the bom");
+      const inventoryItem: InventoryItems|undefined = inventory.find((inventoryItem : InventoryItems) => item.materialId === inventoryItem.materialId && inventoryItem.materialDescription === item.materialDescription);
+      if (!inventoryItem) {
+        throw Error("The material Entry is not present in the gloabl inventory");
       }
       if (item.purchaseQty <= 0) {
         throw Error("The purchaseQty can not be zero");
@@ -1143,9 +1145,8 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         bom.activeOrdersQty = 0;
       }
       deliveryDate = item.deliveryDate;
-      bom.activeOrdersQty += item.purchaseQty;
-      bom.pendingQty -= item.purchaseQty;
-      console.log("The bom Items are activeOrdersQty pendingQty", bom.activeOrdersQty, bom.pendingQty);
+      inventoryItem.activeOrdersQty += item.purchaseQty;
+      // console.log("The bom Items are activeOrdersQty pendingQty", bom.activeOrdersQty, bom.pendingQty);
       const {styleCode, totalAmount} = item;
       if (!supplierMap[supplier]) {
         supplierMap[supplier] = [];
@@ -1178,12 +1179,16 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         lineItems: supplierMap[key],
       });
     }
+    const distributedInventory = distributeInventory(styleCodes, bomsInfo, inventory);
+    let result = populatePurhcaseMaterialsFromBOM(distributedInventory.bomsInfo, purchaseMaterialsInfo)
+    result = result.filter( (item:PurchaseMaterials) => item.pendingQty > 0)
     // const new = purchaseMaterialsInfo.filter(()=>());
-    const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
+    // const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
 
     await admin.firestore().collection("data").doc(company).set(
         {
-          bomsInfo,
+          bomsInfo: distributedInventory.bomsInfo,
+          inventory: distributedInventory.inventoryInfo,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
           purchaseMaterialsInfo: result,
         }
