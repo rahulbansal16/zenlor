@@ -667,14 +667,30 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     if (!docData) {
       throw Error("The company does not exist" + company);
     }
+    const styleCodesInfo:StyleCodes[] = docData.styleCodesInfo;
+    if (!styleCodesInfo){
+      throw Error("StyleCodes Not Present")
+    }
     const bomsInfo = docData.bomsInfo??[];
     const oldPurchaseMaterials = docData.purchaseMaterialsInfo??[];
+    const inventory = docData.inventoryInfo??[];
     // This will use stylecode plus materialId
-    const output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) && oldItem.styleCode === newItem.styleCode);
+    const output = upsertItemsInArray(bomsInfo,
+        boms,
+        (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) && oldItem.styleCode === newItem.styleCode,
+        {
+          issueQty:0
+        },
+        (a, b) => ({...a, ...b, pendingQty: calculatePendingQty(b)})
+    );
     const purchaseMaterialsInfo = populatePurhcaseMaterialsFromBOM(output, oldPurchaseMaterials);
+    // const inventories: InventoryItems[] = [];
+    // const p = collectInventoryFromStyleCodes(output, inventories);
+    const p = distributeInventory(styleCodesInfo, output, inventory)
     await admin.firestore().collection("data").doc(company).set( {
-      bomsInfo: output,
+      bomsInfo: p.bomsInfo,
       purchaseMaterialsInfo,
+      inventoryInfo: p.inventoryInfo
     }, {
       merge: true,
     });
