@@ -139,6 +139,13 @@ const Action = ({ type }) => {
       const ids = id.split(',')
       if (ids[0] !== "") 
         return dataSource.filter( item => ids.includes(purchaseMaterialKey(item)))
+    } 
+    if (type === "purchaseOrder"){
+      const id = new URLSearchParams(search).get('id')??',';
+      const ids = id.split(',')
+      // console.log("The length of styleCodes is", styleCodes)
+      if (ids[0] !== "")
+        return dataSource.filter((item) => ids.includes(item.purchaseOrderId) || !item.purchaseOrderId);
     }
     return dataSource;
   };

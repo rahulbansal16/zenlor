@@ -119,8 +119,9 @@ export interface PurchaseOrder {
 
 export interface PurchaseOrderLineItems {
     id: string,
-    styleCode: string
+    // styleCode: string
     materialId: string,
+    materialDescription: string,
     quantity: string
 }
 

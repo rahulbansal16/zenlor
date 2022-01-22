@@ -399,56 +399,39 @@ export const initialState = {
             dataSource: []
     },
     purchaseOrder: {
-      columns: [{
-        title: "S.No",
-        dataIndex: "sno",
-        key: "sno",
+      columns: [
+        // id: string,
+        // purchaseOrderId: string,
+        // lineItems: PurchaseOrderLineItems[],
+        // amount: number,
+        // status: string,
+        // supplier: string
+        // createdAt: string,
+        // deliveryDate: string
+      {
+        title: "PO Id",
+        dataIndex: "purchaseOrderId",
+        key: "purchaseOrderId",
       },
       {
-        title: "Reference Id",
-        dataIndex: "referenceId",
-        key: "referenceId",
+        title: "Status",
+        dataIndex: "status",
+        key: "status",
       },
       {
-        title: "Item Id",
-        dataIndex: "materialId",
-        key: "materialId",
-        editable: true,
-      },
-      // {
-      //   title: "Item Description",
-      //   dataIndex: "itemDesc",
-      //   key: "itemDesc",
-      // }, 
-      {
-        title: "Qty",
-        dataIndex: "purchaseQty",
-        key: "purchaseQty",
-        editable: true,
+        title: "Supplier",
+        dataIndex: "supplier",
+        key: "supplier",
       },
       {
-        title: "Unit",
-        dataIndex: "unit",
-        key: "unit",
-        editable: true,
+        title: "Delivery Date",
+        dataIndex: "deliveryDate",
+        key: "deliveryDate"
       },
-      {
-        title: "Rate",
-        dataIndex: "rate",
-        key: "rate",
-        editable: true,
-      },
-      {
-        title: "Tax",
-        dataIndex: "tax",
-        key: "tax",
-        editable: true,
-      }, 
       {
         title: "Amount",
-        dataIndex: "totalAmount",
-        key: "totalAmount",
-        editable: true,
+        dataIndex: "amount",
+        key: "amount",
       }],
       dataSource: []
     },
@@ -593,7 +576,7 @@ const taskReducer = (state = initialState, action) => {
                  },
                  purchaseOrder: {
                    ...state.purchaseOrder,
-                   dataSource: formatPurchaseOrder(purchaseOrders)
+                   dataSource: action?.payload?.purchaseOrdersInfo??[]
                  },
                 form: form  || state.form
             }
