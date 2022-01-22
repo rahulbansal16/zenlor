@@ -1000,7 +1000,7 @@ exports.actions = functions
 
 const upsertItemsInArray = <T>(items: T[],
   newItems: T[],
-  cmp = (a:any, b:any) => a.id === b.id, obj?:T,
+  cmp = (a:any, b:any) => a.id === b.id, obj?:any,
   mergeObj?:(a:T, b:T)=>T) => {
   let output: any[] = [...items];
   for (const newItem of newItems) {
