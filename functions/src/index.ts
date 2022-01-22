@@ -1181,6 +1181,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     }
     const distributedInventory = distributeInventory(styleCodes, bomsInfo, inventory);
     let result = populatePurhcaseMaterialsFromBOM(distributedInventory.bomsInfo, purchaseMaterialsInfo)
+    // Update the filter to deleted for those items which are removed because the pendingQty is less than equal to zero
     result = result.filter( (item:PurchaseMaterials) => item.pendingQty > 0)
     // const new = purchaseMaterialsInfo.filter(()=>());
     // const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
