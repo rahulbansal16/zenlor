@@ -85,7 +85,7 @@ export function jsonToCsv(json){
 
 export function purchaseMaterialKey(item){
     const {styleCode, materialId, materialDescription} = item
-    return styleCode.toLowerCase().trim() + materialId.toLowerCase().trim() + materialDescription.toLowerCase().trim()
+    return /*styleCode.toLowerCase().trim() +*/ materialId.toLowerCase().trim() + materialDescription.toLowerCase().trim()
 }
 
 export function downloadCsv(purchaseOrder){

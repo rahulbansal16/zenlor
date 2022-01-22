@@ -295,12 +295,13 @@ export const initialState = {
     },
     createPO: {
             columns: [
-              {
-              title: "Style Code",
-              dataIndex: "styleCode",
-              filter: "multiSelect",
-              key: "styleCode",
-            },{
+            //   {
+            //   title: "Style Code",
+            //   dataIndex: "styleCode",
+            //   filter: "multiSelect",
+            //   key: "styleCode",
+            // },
+            {
               title: "Material",
               children: [
                 {

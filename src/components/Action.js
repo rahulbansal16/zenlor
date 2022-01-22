@@ -55,7 +55,10 @@ const EditableCell = ({
       [dataIndex]: record[dataIndex]
     });
   };
-
+  let isDate = false;
+  if (dataIndex){
+    isDate = dataIndex.includes("Date");
+  }
   const save = async () => {
     try {
       const values = await form.validateFields();
@@ -147,15 +150,15 @@ const Action = ({ type }) => {
 
     console.log("The data is", data);
     if (action === "createPO") {
-      const selectedIds = selectedRows.map ( row => row.id)
-      let upsertPurchaseMaterialsInfo = functions.httpsCallable("upsertPurchaseMaterialsInfo");
-      const result = await upsertPurchaseMaterialsInfo({
-        purchaseMaterials: dataSource.filter(item => selectedIds.includes(item.id)),
-        company
-        // createdAt: getCurrentTime(),
-      });
-      console.log("The result is", result.data);
-      dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo))
+      // const selectedIds = selectedRows.map ( row => row.id)
+      // let upsertPurchaseMaterialsInfo = functions.httpsCallable("upsertPurchaseMaterialsInfo");
+      // const result = await upsertPurchaseMaterialsInfo({
+      //   purchaseMaterials: dataSource.filter(item => selectedIds.includes(item.id)),
+      //   company
+      //   // createdAt: getCurrentTime(),
+      // });
+      // console.log("The result is", result.data);
+      // dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo))
       const selectedItems = selectedRows.map(purchaseMaterialKey)
       history.push({
         pathname: `/action/${action}`,
