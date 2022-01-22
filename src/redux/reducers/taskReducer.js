@@ -410,8 +410,8 @@ export const initialState = {
         // deliveryDate: string
       {
         title: "PO Id",
-        dataIndex: "purchaseOrderId",
-        key: "purchaseOrderId",
+        dataIndex: "id",
+        key: "id",
       },
       {
         title: "Status",
