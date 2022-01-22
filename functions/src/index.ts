@@ -690,6 +690,49 @@ const defaultPurchaseMaterials: any = {
   supplier: "",
   deliveryDate: "",
 };
+
+const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:PurchaseMaterials[]) => {
+  const mp:any = {};
+  for (const bom of boms) {
+    const key = bom.materialId + "|" + bom.materialDescription;
+    if (mp[key]) {
+      mp[key] = {
+        ...mp[key],
+        ...bom,
+        pendingQty: bom.pendingQty + mp[key].pendingQty,
+      };
+    } else {
+      mp[key] = {
+        ...bom,
+      };
+    }
+  }
+
+  const mergedBoms = [];
+  for (const key in mp) {
+    mergedBoms.push({
+      ...mp[key],
+    });
+  }
+  const purchaseMaterialsInfo = upsertItemsInArray(purchaseMaterials as unknown as BOM[],
+      mergedBoms,
+      (a: PurchaseMaterials, b: BOM)=> a.materialId === b.materialId && a.materialDescription === b.materialDescription,
+      {
+        purchaseQty: 0,
+        rate: 0,
+        discount: 0,
+        preTaxAmount: 0,
+        tax: 0,
+        taxAmount: 0,
+        totalAmount: 0,
+        supplier: "",
+        deliveryDate: "",
+        status: "active",
+      }
+  );
+  return purchaseMaterialsInfo;
+};
+
 const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
   company: Joi.string().required(),
   createdAt: Joi.string(),
