@@ -684,10 +684,10 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
         },
         (a, b) => ({...a, ...b, pendingQty: calculatePendingQty(b)})
     );
-    const purchaseMaterialsInfo = populatePurhcaseMaterialsFromBOM(output, oldPurchaseMaterials);
     // const inventories: InventoryItems[] = [];
     // const p = collectInventoryFromStyleCodes(output, inventories);
     const p = distributeInventory(styleCodesInfo, output, inventory)
+    const purchaseMaterialsInfo = populatePurhcaseMaterialsFromBOM(p.bomsInfo, oldPurchaseMaterials);
     await admin.firestore().collection("data").doc(company).set( {
       bomsInfo: p.bomsInfo,
       purchaseMaterialsInfo,
