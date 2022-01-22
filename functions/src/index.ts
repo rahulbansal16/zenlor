@@ -1135,15 +1135,6 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
       if (item.purchaseQty <= 0) {
         throw Error("The purchaseQty can not be zero");
       }
-      if (!bom.pendingQty) {
-        bom.pendingQty = bom.reqQty;
-      }
-      if (bom.pendingQty < item.purchaseQty) {
-        throw Error("The order can not have more value than the pendingQty"+bom.pendingQty+" "+item.purchaseQty+" "+item.materialId);
-      }
-      if (!bom.activeOrdersQty) {
-        bom.activeOrdersQty = 0;
-      }
       deliveryDate = item.deliveryDate;
       inventoryItem.activeOrdersQty += item.purchaseQty;
       // console.log("The bom Items are activeOrdersQty pendingQty", bom.activeOrdersQty, bom.pendingQty);
