@@ -858,17 +858,14 @@ const upsertItemInArray = <T>(items: T[],
   newItem: T,
   cmp = (a: any, b: any) => a.id === b.id,
   defaultObj?:any,
-  mergeOb?:( a:T, b:T)=> T) => {
+  mergeObj:( a:T, b:T)=> T= (a:T, b:T) => ({...a, ...b})) => {
   let output = [];
   let inserted = false;
   // Add some code to remove the spaces around the value
   for (const item of items) {
     if (cmp(item, newItem)) {
       inserted = true;
-      output.push({
-        ...item,
-        ...newItem,
-      });
+      output.push(mergeObj(item, newItem));
     } else {
       output.push(item);
     }
