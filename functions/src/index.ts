@@ -864,6 +864,109 @@ exports.upsertPurchaseOrdersInfo = onCall<PurchaseOrdersInfo>({
 //       );
 //       return data;
 //     });
+const collectInventoryFromStyleCodes = (boms: BOM[], inventories: InventoryItems[]) => {
+  const mp:any = {};
+  for (const bom of boms) {
+    const key = bom.materialId + "|" + bom.materialDescription;
+    if (mp[key]) {
+      mp[key].inventory += bom.inventory??0;
+      mp[key].activeOrdersQty += bom.activeOrdersQty??0;
+    } else {
+      mp[key] = {
+        inventory: bom.inventory??0,
+        activeOrdersQty: bom.activeOrdersQty??0,
+      };
+    }
+    bom.inventory = 0;
+    bom.activeOrdersQty = 0;
+    bom.pendingQty = calculatePendingQty(bom);
+  }
+  for (const inventory of inventories) {
+    const key = inventory.materialId +"|"+ inventory.materialDescription;
+    if (mp[key]) {
+      inventory.inventory += mp[key].inventory;
+      inventory.activeOrdersQty += mp[key].activeOrdersQty;
+      delete mp[key];
+    }
+  }
+  if (Object.keys(mp).length === 0) {
+    return;
+  }
+  for (const key in mp) {
+    const [materialId, materialDescription] = key.split("|");
+    inventories.push({
+      materialId,
+      materialDescription,
+      ...mp[key],
+      issue: 0,
+    });
+  }
+  return {
+    boms,
+    inventory: inventories,
+  };
+};
+
+// How will you distribute the activeOrders
+const distributeInventory = (
+    styleCodesInfo:StyleCodes[],
+    allBoms:BOM[],
+    inventory:InventoryItems[]
+  ) : {bomsInfo:BOM[], inventoryInfo:InventoryItems[]}=> {
+
+  const activeStyleCodes:StyleCodes[] = styleCodesInfo.filter((item: StyleCodes) => item.status === "active");
+  // activeStyleCodes.sort((a: StyleCodes, b: StyleCodes) => a.deliveryDate - b.deliveryDate);
+
+  if (!inventory) {
+    throw new Error("No Global Inventory");
+  }
+
+  if (!allBoms) {
+    return {
+      bomsInfo: allBoms,
+      inventoryInfo: inventory
+    };
+  }
+  collectInventoryFromStyleCodes(allBoms, inventory);
+  for (const activeStyleCode of activeStyleCodes) {
+    // const boms = allBoms.filter((item: BOM) => item.styleCode === activeStyleCode.styleCode)
+    for (let bom of allBoms) {
+      bom = bom as BOM;
+      if (bom.styleCode !== activeStyleCode.styleCode) {
+        continue;
+      }
+      assignInventoryToBOMItem(bom, inventory);
+    }
+  }
+  return {
+    bomsInfo: allBoms,
+    inventoryInfo: inventory,
+  };
+  // await admin.firestore().collection("data").doc(company).set({
+  //   bomsInfo: allBoms,
+  //   inventoryInfo: inventory
+  // }
+  //   ,{ merge: true})
+};
+
+const assignInventoryToBOMItem = (bom: BOM, inventory: InventoryItems[]) => {
+  const inventoryNeed = Math.max(bom.reqQty - (bom.issueQty??0), 0);
+  const globalInventory = inventory.find(
+      (item:InventoryItems) => item.materialId === bom.materialId && item.materialDescription === bom.materialDescription
+  );
+  if (!globalInventory) {
+    bom.inventory = 0;
+    bom.activeOrdersQty = 0;
+    return;
+  }
+  bom.inventory = Math.min(inventoryNeed, globalInventory.inventory);
+  globalInventory.inventory -= bom.inventory;
+  if (bom.inventory < inventoryNeed) {
+    bom.activeOrdersQty = Math.min(globalInventory.activeOrdersQty, inventoryNeed-bom.inventory);
+    globalInventory.activeOrdersQty -= bom.activeOrdersQty;
+  }
+  bom.pendingQty = calculatePendingQty(bom);
+};
 
 exports.actions = functions
     .region("asia-northeast3")
