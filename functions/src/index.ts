@@ -663,16 +663,20 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
       throw Error("The company does not exist" + company);
     }
     const bomsInfo = docData.bomsInfo??[];
+    const oldPurchaseMaterials = docData.purchaseMaterialsInfo??[];
     // This will use stylecode plus materialId
     const output = upsertItemsInArray(bomsInfo, boms, (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) && oldItem.styleCode === newItem.styleCode);
+    const purchaseMaterialsInfo = populatePurhcaseMaterialsFromBOM(output, oldPurchaseMaterials);
     await admin.firestore().collection("data").doc(company).set( {
       bomsInfo: output,
+      purchaseMaterialsInfo,
     }, {
       merge: true,
     });
     return {
       company,
       bomsInfo: output,
+      purchaseMaterialsInfo,
     };
   },
 });
