@@ -210,6 +210,11 @@ export const initialState = {
                     key: "consumption",
                   }, 
                   {
+                    title:"Wastage",
+                    dataIndex: "wastage",
+                    key: "wastage"
+                  },
+                  {
                     title: "Unit",
                     dataIndex: "unit",
                     key: "unit",
@@ -239,6 +244,11 @@ export const initialState = {
                   dataIndex: "activeOrdersQty",
                   key: "activeOrdersQty",
                 },             
+                {
+                  title:"Issued",
+                  dataIndex:"issueQty",
+                  key: "issueQty"
+                },
                {
                   title: "Pending",
                   dataIndex: "pendingQty",

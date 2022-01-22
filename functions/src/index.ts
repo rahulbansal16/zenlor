@@ -646,6 +646,7 @@ const upsertBOMSchema = Joi.object<BOMInfo, true>({
     materialId: Joi.string().required(),
     materialDescription: Joi.string().required(),
     consumption: Joi.number().required(),
+    wastage: Joi.number().required(),
     placement: Joi.string().required(),
     reqQty: Joi.number().required(),
     inventory: Joi.number(),

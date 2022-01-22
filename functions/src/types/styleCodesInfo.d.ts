@@ -64,6 +64,7 @@ export interface BOM {
     materialId: string,
     materialDescription: string,
     consumption: number,
+    wastage: number,
     unit: string,
     placement: string,
     reqQty: number,
