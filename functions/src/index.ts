@@ -8,7 +8,7 @@ import * as moment from "moment";
 import * as Joi from "joi";
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
-import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials, StyleCodes} from "./types/styleCodesInfo";
+import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials, StyleCodes, InventoryItems} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -600,6 +600,7 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
     orderQty: Joi.number().required(),
     makeQty: Joi.number(),
     deliveryDate: Joi.string(),
+    status: Joi.string().default("active"),
   }).options({allowUnknown: true}),
 })
     // .strict(true)
@@ -842,15 +843,22 @@ exports.actions = functions
       return output;
     });
 
-const upsertItemsInArray = (items: any[], newItems: any[], cmp = (a:any, b:any) => a.id === b.id, obj?:any ) => {
+const upsertItemsInArray = <T>(items: T[],
+  newItems: T[],
+  cmp = (a:any, b:any) => a.id === b.id, obj?:T,
+  mergeObj?:(a:T, b:T)=>T) => {
   let output: any[] = [...items];
   for (const newItem of newItems) {
-    output = upsertItemInArray(output, newItem, cmp, obj);
+    output = upsertItemInArray<T>(output, newItem, cmp, obj, mergeObj );
   }
   return output;
 };
 
-const upsertItemInArray = (items: any[], newItem: any, cmp = (a: any, b: any) => a.id === b.id, obj?:any) => {
+const upsertItemInArray = <T>(items: T[],
+  newItem: T,
+  cmp = (a: any, b: any) => a.id === b.id,
+  defaultObj?:any,
+  mergeOb?:( a:T, b:T)=> T) => {
   let output = [];
   let inserted = false;
   // Add some code to remove the spaces around the value
@@ -868,7 +876,7 @@ const upsertItemInArray = (items: any[], newItem: any, cmp = (a: any, b: any) =>
   if (!inserted) {
     output = [{
       id: generateUId("", 8),
-      ...obj,
+      ...defaultObj,
       ...newItem,
     }, ...output];
   }
