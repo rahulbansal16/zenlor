@@ -293,6 +293,84 @@ export const initialState = {
                 poQty: 20
             }]
     },
+    inwardMaterial: {
+      columns: [
+        {
+          title:"S.No",
+          dataIndex:"",
+          key:""
+        },
+        {
+          title: "Category",
+          dataIndex: "category",
+          key:"category"
+
+        },
+        {
+          title:"Type",
+          dataIndex:"type",
+          key:"type"
+        },
+        {
+          title: "Reference",
+          dataIndex: "styleCode",
+          key:"styleCode"
+   
+        },
+        {
+          title:"Material Id",
+          dataIndex: "materialId",
+          key: "materialId"
+        },
+        {
+          title: "Material Description",
+          dataIndex: "materialDescription",
+          key:"materialDescription"
+  
+        },
+        {
+          title:"unit",
+          dataIndex:"unit",
+          key:"unit"
+        },
+        {
+          title: "Order Qty",
+          dataIndex: "purchaseQty",
+          key:"purchaseQty"
+        },
+        {
+          title:"Received Qty",
+          dataIndex:"receivedQty",
+          key:"receivedQty",
+          editable: true
+        },
+        {
+          title: "Received Date",
+          dataIndex: "receivedDate",
+          key:"receivedDate",
+          editable: true
+        },        
+        {
+          title:"Rejected Qty",
+          dataIndex:"rejectedQty",
+          key:"rejectedQty",
+          editable: true
+        },
+        {
+          title: "Rejected Reason",
+          dataIndex: "rejectedReason",
+          key:"rejectedReason",
+          editable: true
+        },
+        {
+          title: "Accepted Qty",
+          dataIndex: "acceptedQty",
+          key:"acceptedQty",
+          editable: true
+        },
+      ],
+      dataSource:[]
+    },
     createPO: {
             columns: [
             //   {
@@ -542,6 +620,18 @@ const formatPurchaseOrder = (purchaseOrders) => {
   return formatedPurchaseOrders
 }
 
+const formatLineItems = (purchaseOrders) => {
+  let lineItems = []
+  for(let purchaseOrder of purchaseOrders){
+    const data = purchaseOrder?.lineItems?.map( item => ({
+      ...item,
+      purchaseOrderId: purchaseOrder.id,
+    }))
+    lineItems = lineItems.concat(data)
+  }
+  return lineItems
+}
+
 const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
@@ -577,6 +667,10 @@ const taskReducer = (state = initialState, action) => {
                  purchaseOrder: {
                    ...state.purchaseOrder,
                    dataSource: action?.payload?.purchaseOrdersInfo??[]
+                 },
+                 inwardMaterial: {
+                   ...state.inwardMaterial,
+                   dataSource: formatLineItems(action?.payload?.purchaseOrdersInfo??[])
                  },
                 form: form  || state.form
             }

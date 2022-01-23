@@ -66,7 +66,18 @@ const actions = {
           value: "orderMaterials"
       },
   ],
-  purchaseOrder:[]
+  purchaseOrder:[
+    {
+      key: "View Line Items",
+      value: "viewLineItems"
+    },
+    {
+      key: "Inward Material",
+      value: "inwardMaterial"
+    }
+  ],
+  inwardMaterial: [
+  ]
 };
 
 const ActionBar = ({type, onFinish}) => {

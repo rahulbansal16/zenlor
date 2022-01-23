@@ -17,7 +17,8 @@ const header = {
   orderMaterials: "BOM",
   createPO: "Purchase Orders",
   dashboard: "Dashboard",
-  purchaseOrder: "Purhcase Orders"
+  purchaseOrder: "Purhcase Orders",
+  inwardMaterial: "GRN"
 }
 const EditableContext = React.createContext(null);
 const EditableRow = ({ index, ...props }) => {
@@ -143,9 +144,11 @@ const Action = ({ type }) => {
     if (type === "purchaseOrder"){
       const id = new URLSearchParams(search).get('id')??',';
       const ids = id.split(',')
-      // console.log("The length of styleCodes is", styleCodes)
       if (ids[0] !== "")
         return dataSource.filter((item) => ids.includes(item.purchaseOrderId) || !item.purchaseOrderId);
+    } 
+    if (type === "inwardMaterial"){
+
     }
     return dataSource;
   };
@@ -197,6 +200,13 @@ const Action = ({ type }) => {
       //   pathname: `/action/purchaseOrder`,
       //   search: `id=${selectedIds}`
       // })
+    } else if (action === "inwardMaterial"){
+     history.push({
+       pathname: `/action/${data.action}`,
+       search: `ids=${1}`
+     }) 
+    } else if (action === "viewLineItems") {
+
     }
   };
   const components = {
