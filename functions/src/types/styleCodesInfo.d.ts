@@ -141,3 +141,26 @@ export interface InventoryItems {
     issue: number,
     activeOrdersQty: number
 }
+
+export interface GRNInfo {
+    company: string,
+    createdAt: string,
+    GRN: GRNItems[]
+}
+
+export interface GRNItems {
+    id: string,
+    purchaseOrderId: string,
+    category: string,
+    type: string,
+    styleCode: string,
+    materialId: string,
+    materialDescription: string,
+    unit: string,  
+    purchaseQty: number,
+    receivedQty: number,
+    receivedDate: string,
+    rejectedQty: number,
+    rejectedReason: string,
+    acceptedQty: number
+}

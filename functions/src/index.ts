@@ -8,7 +8,7 @@ import * as moment from "moment";
 import * as Joi from "joi";
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
-import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials, StyleCodes, InventoryItems} from "./types/styleCodesInfo";
+import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials, StyleCodes, InventoryItems, GRN, GRNItems, InventoryInfo} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -1194,6 +1194,108 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     };
   },
 });
+
+const upsertCreateGRNSchema = Joi.object<GRN, true>({
+  company: Joi.string().required(),
+  createdAt: Joi.string(),
+  GRN: Joi.array().items({
+    id: Joi.string().required(),
+    purchaseOrderId: Joi.string().required(),
+    category: Joi.string().required(),
+    type: Joi.string().required(),
+    styleCode: Joi.string().required(),
+    materialId: Joi.string().required(),
+    materialDescription: Joi.string().required(),
+    unit: Joi.string().required(),  
+    purchaseQty: Joi.number().required(),
+    receivedQty: Joi.number().required(),
+    receivedDate: Joi.string().required(),
+    rejectedQty: Joi.number().required(),
+    rejectedReason: Joi.string().required(),
+    acceptedQty: Joi.number().required() 
+  }).options({allowUnknown: true}),
+})
+// .strict(true)
+    .unknown(false);
+
+exports.upsertGRN = onCall<GRN>({
+  name: "upsertGRN",
+  schema: upsertCreateGRNSchema,
+  handler: async(data, context) => {
+    console.log("The data is", data);
+    const {company, grn} = data;
+    const doc = await admin.firestore().collection("data").doc(company).get();
+    const docData = doc.data();
+    if (!docData) {
+      throw Error("The company does not exist" + company);
+    }
+    const grnInfo = docData.GRNInfo??[];
+    const output = upsertItemsInArray(grnInfo, grn, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId && 
+    oldItem.materialId === newItem.materialId && 
+    oldItem.materialDescription === newItem.materialDescription);
+    await admin.firestore().collection("data").doc(company).set( {
+      GRNInfo: output,
+    }, {
+      merge: true,
+    });
+    return {
+      company,
+      GRNInfo: output,
+    };
+  }
+})
+
+const upsertCreateInventorySchema = Joi.object<InventoryInfo, true>({
+  company: Joi.string().required(),
+  createdAt: Joi.string(),
+  inventoryItems: Joi.array().items({
+    materialId: Joi.string().required(),
+    materialDescription: Joi.string().required(),
+    issue: Joi.number().required(),
+    activeOrdersQty: Joi.string().required(),
+    inventory: Joi.number().required() 
+  }).options({allowUnknown: true}),
+})
+// .strict(true)
+    .unknown(false);
+
+exports.upsertInventory = onCall<GRN>({
+  name: "upsertInventory",
+  schema: upsertCreateInventorySchema,
+  handler: async(data, context) => {
+    console.log("The data is", data);
+    const {company, inventory} = data;
+    const doc = await admin.firestore().collection("data").doc(company).get();
+    const docData = doc.data();
+    if (!docData) {
+      throw Error("The company does not exist" + company);
+    }
+    const inventoryInfo = docData.inventoryInfo??[];
+    const bomsInfo = docData.bomsInfo??[];
+    const styleCodesInfo = docData.styleCodesInfo??[];
+    const result = collectInventoryFromStyleCodes(inventoryInfo, bomsInfo)
+    const collectedInventory = result?.inventory;
+    if (!collectedInventory){
+      throw Error("Inventory Collection Failed")
+    }
+    const output = upsertItemsInArray(collectedInventory, inventory, (oldItem: InventoryItems, newItem: InventoryItems) => oldItem.materialId === newItem.materialId 
+    &&  oldItem.materialDescription === newItem.materialDescription);
+
+    const p = distributeInventory(styleCodesInfo, result.boms, output)
+
+    await admin.firestore().collection("data").doc(company).set( {
+      inventoryInfo: p.inventoryInfo,
+      bomsInfo: p.bomsInfo
+    }, {
+      merge: true,
+    });
+    return {
+      company,
+      inventoryInfo: p.inventoryInfo,
+      bomsInfo: p.bomsInfo
+    };
+  }
+})
 
 exports.createPO = functions
     .region("asia-northeast3")
