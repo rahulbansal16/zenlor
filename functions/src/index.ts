@@ -484,7 +484,7 @@ exports.dataInsights = functions
 
 const calculatePendingQty = (item:BOM) => {
   const {reqQty, inventory, activeOrdersQty, issueQty} = item;
-  return reqQty - (inventory||0) - (activeOrdersQty||0) - (issueQty||0);
+  return (reqQty||0) - (inventory||0) - (activeOrdersQty||0) - (issueQty||0);
 };
 const getMaterialStatus = (styleCode: string, boms: BOM[]) : MaterialStatus => {
   const materials = boms.filter( (bom) => bom.styleCode === styleCode);
@@ -1178,14 +1178,14 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     result = result.filter( (item:PurchaseMaterials) => item.pendingQty > 0);
     // const new = purchaseMaterialsInfo.filter(()=>());
     // const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
-    let grn: GRNItems[] = mapPOToGRN(purchaseOrders);
+    const grn: GRNItems[] = mapPOToGRN(purchaseOrders);
     await admin.firestore().collection("data").doc(company).set(
         {
           bomsInfo: distributedInventory.bomsInfo,
           inventoryInfo: distributedInventory.inventoryInfo,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
           purchaseMaterialsInfo: result,
-          GRNInfo: grn
+          GRNInfo: grn,
         }
         , {
           merge: true,
@@ -1233,17 +1233,47 @@ exports.upsertGRN = onCall<GRN>({
       throw Error("The company does not exist" + company);
     }
     const grnInfo = docData.GRNInfo??[];
-    const output = upsertItemsInArray(grnInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
+    const grnInfoOutput = upsertItemsInArray(grnInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
     oldItem.materialId === newItem.materialId &&
     oldItem.materialDescription === newItem.materialDescription);
+
+    const inventory = grnInfoOutput.map( (output: GRNItems) => ({
+      materialId: output.materialId,
+      materialDescription: output.materialDescription,
+      inventory: output.acceptedQty,
+      purchaseQty: output.purchaseQty,
+    }));
+    const inventoryInfo = docData.inventoryInfo??[];
+    const bomsInfo = docData.bomsInfo??[];
+    const styleCodesInfo = docData.styleCodesInfo??[];
+    const result = collectInventoryFromStyleCodes(bomsInfo, inventoryInfo);
+    const collectedInventory = result?.inventory;
+    if (!collectedInventory) {
+      throw Error("Inventory Collection Failed");
+    }
+    const output = upsertItemsInArray(collectedInventory, inventory as any, (oldItem: InventoryItems, newItem: InventoryItems) => oldItem.materialId === newItem.materialId &&
+    oldItem.materialDescription === newItem.materialDescription,
+    undefined,
+    (oldItem: InventoryItems, newItem: any)=> ({
+      ...oldItem,
+      inventory: oldItem.inventory + newItem.inventory,
+      activeOrdersQty: oldItem.activeOrdersQty - newItem.purchaseQty,
+    }));
+
+    const p = distributeInventory(styleCodesInfo, result.boms, output);
+
     await admin.firestore().collection("data").doc(company).set( {
-      GRNInfo: output,
+      GRNInfo: grnInfoOutput,
+      inventoryInfo: p.inventoryInfo,
+      bomsInfo: p.bomsInfo,
     }, {
       merge: true,
     });
     return {
       company,
       GRNInfo: output,
+      inventoryInfo: p.inventoryInfo,
+      bomsInfo: p.bomsInfo,
     };
   },
 });
@@ -1361,12 +1391,11 @@ exports.createPO = functions
     });
 
 const mapPOToGRN = (purchaseOrders : PurchaseOrder []) : GRNItems[] => {
-
   let grnItems: GRNItems[]= [];
 
-  for (let purchaseOrder of purchaseOrders){
-    let data: GRNItems[] = purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
-      id: generateUId('GRN', 10),
+  for (const purchaseOrder of purchaseOrders) {
+    const data: GRNItems[] = purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
+      id: generateUId("GRN", 10),
       purchaseOrderId: purchaseOrder.id,
       category: item.category,
       type: item.type,
@@ -1378,13 +1407,12 @@ const mapPOToGRN = (purchaseOrders : PurchaseOrder []) : GRNItems[] => {
       receivedDate: "",
       rejectedQty: 0,
       rejectedReason: "",
-      acceptedQty: 0
-    }))
-    grnItems = grnItems.concat(data)
+      acceptedQty: 0,
+    }));
+    grnItems = grnItems.concat(data);
   }
   return grnItems;
-
-}
+};
 // Will pick it up when making the RestFul APIs
 // const router = express.Router();
 // const defaultRoutes = [

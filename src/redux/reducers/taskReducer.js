@@ -305,10 +305,15 @@ export const initialState = {
     },
     inwardMaterial: {
       columns: [
+        // {
+        //   title:"S.No",
+        //   dataIndex:"",
+        //   key:""
+        // },
         {
-          title:"S.No",
-          dataIndex:"",
-          key:""
+          title: "PO",
+          dataIndex: 'purchaseOrderId',
+          key: 'purchaseOrderId'
         },
         {
           title: "Category",
