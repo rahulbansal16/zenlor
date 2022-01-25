@@ -120,9 +120,12 @@ export interface PurchaseOrder {
 export interface PurchaseOrderLineItems {
     id: string,
     // styleCode: string
+    category: string,
+    unit: string,
+    type: string,
     materialId: string,
     materialDescription: string,
-    quantity: string
+    purchaseQty: number
 }
 
 
@@ -130,7 +133,7 @@ export interface PurchaseOrderLineItems {
 export interface InventoryInfo {
     company: string,
     createdAt: string,
-    inventoryItems: InventoryItems[]
+    inventory: InventoryItems[]
 }
 
 export interface InventoryItems {
@@ -153,10 +156,10 @@ export interface GRNItems {
     purchaseOrderId: string,
     category: string,
     type: string,
-    styleCode: string,
+    // styleCode: string,
     materialId: string,
     materialDescription: string,
-    unit: string,  
+    unit: string,
     purchaseQty: number,
     receivedQty: number,
     receivedDate: string,

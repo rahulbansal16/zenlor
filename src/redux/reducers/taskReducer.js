@@ -22,6 +22,9 @@ const performCalculation = (item, type) => {
   }
   const map = calculationMap[type];
   let newItem = {}
+  if(!map){
+    return item;
+  }
   for (const property in item){
     let value = item[property]
     if (map[property]){
@@ -56,6 +59,13 @@ const saveCellToServer = (item, type, company) => {
       payload = {
         ...payload,
         boms: [item]
+      }
+      break;
+    case "inwardMaterial":
+      methodName = "upsertGRN";
+      payload = {
+        ...payload,
+        GRN: [item]
       }
       break;
     default:

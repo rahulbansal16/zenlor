@@ -8,7 +8,7 @@ import * as moment from "moment";
 import * as Joi from "joi";
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
-import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials, StyleCodes, InventoryItems, GRN, GRNItems, InventoryInfo} from "./types/styleCodesInfo";
+import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -669,8 +669,8 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
       throw Error("The company does not exist" + company);
     }
     const styleCodesInfo:StyleCodes[] = docData.styleCodesInfo;
-    if (!styleCodesInfo){
-      throw Error("StyleCodes Not Present")
+    if (!styleCodesInfo) {
+      throw Error("StyleCodes Not Present");
     }
     const bomsInfo = docData.bomsInfo??[];
     const oldPurchaseMaterials = docData.purchaseMaterialsInfo??[];
@@ -680,18 +680,18 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
         boms,
         (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) && oldItem.styleCode === newItem.styleCode,
         {
-          issueQty:0
+          issueQty: 0,
         },
         (a, b) => ({...a, ...b, pendingQty: calculatePendingQty(b)})
     );
     // const inventories: InventoryItems[] = [];
     // const p = collectInventoryFromStyleCodes(output, inventories);
-    const p = distributeInventory(styleCodesInfo, output, inventory)
+    const p = distributeInventory(styleCodesInfo, output, inventory);
     const purchaseMaterialsInfo = populatePurhcaseMaterialsFromBOM(p.bomsInfo, oldPurchaseMaterials);
     await admin.firestore().collection("data").doc(company).set( {
       bomsInfo: p.bomsInfo,
       purchaseMaterialsInfo,
-      inventoryInfo: p.inventoryInfo
+      inventoryInfo: p.inventoryInfo,
     }, {
       merge: true,
     });
@@ -907,7 +907,10 @@ const collectInventoryFromStyleCodes = (boms: BOM[], inventories: InventoryItems
     }
   }
   if (Object.keys(mp).length === 0) {
-    return;
+    return {
+      boms,
+      inventory: inventories,
+    };
   }
   for (const key in mp) {
     const [materialId, materialDescription] = key.split("|");
@@ -929,8 +932,7 @@ const distributeInventory = (
     styleCodesInfo:StyleCodes[],
     allBoms:BOM[],
     inventory:InventoryItems[]
-  ) : {bomsInfo:BOM[], inventoryInfo:InventoryItems[]}=> {
-
+) : {bomsInfo:BOM[], inventoryInfo:InventoryItems[]}=> {
   const activeStyleCodes:StyleCodes[] = styleCodesInfo.filter((item: StyleCodes) => item.status === "active");
   // activeStyleCodes.sort((a: StyleCodes, b: StyleCodes) => a.deliveryDate - b.deliveryDate);
 
@@ -941,7 +943,7 @@ const distributeInventory = (
   if (!allBoms) {
     return {
       bomsInfo: allBoms,
-      inventoryInfo: inventory
+      inventoryInfo: inventory,
     };
   }
   collectInventoryFromStyleCodes(allBoms, inventory);
@@ -1121,8 +1123,8 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     const purchaseOrdersInfo = docData.purchaseOrdersInfo??[];
     const bomsInfo = docData.bomsInfo??[];
     const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
-    const inventory: InventoryItems[] = docData.inventoryInfo??[]
-    const styleCodes: StyleCodes[] = docData.styleCodesInfo??[]
+    const inventory: InventoryItems[] = docData.inventoryInfo??[];
+    const styleCodes: StyleCodes[] = docData.styleCodesInfo??[];
     let deliveryDate="";
 
     for (let item of purchaseMaterials) {
@@ -1171,18 +1173,19 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
       });
     }
     const distributedInventory = distributeInventory(styleCodes, bomsInfo, inventory);
-    let result = populatePurhcaseMaterialsFromBOM(distributedInventory.bomsInfo, purchaseMaterialsInfo)
+    let result = populatePurhcaseMaterialsFromBOM(distributedInventory.bomsInfo, purchaseMaterialsInfo);
     // Update the filter to deleted for those items which are removed because the pendingQty is less than equal to zero
-    result = result.filter( (item:PurchaseMaterials) => item.pendingQty > 0)
+    result = result.filter( (item:PurchaseMaterials) => item.pendingQty > 0);
     // const new = purchaseMaterialsInfo.filter(()=>());
     // const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
-
+    let grn: GRNItems[] = mapPOToGRN(purchaseOrders);
     await admin.firestore().collection("data").doc(company).set(
         {
           bomsInfo: distributedInventory.bomsInfo,
-          inventory: distributedInventory.inventoryInfo,
+          inventoryInfo: distributedInventory.inventoryInfo,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
           purchaseMaterialsInfo: result,
+          GRNInfo: grn
         }
         , {
           merge: true,
@@ -1206,13 +1209,13 @@ const upsertCreateGRNSchema = Joi.object<GRN, true>({
     styleCode: Joi.string().required(),
     materialId: Joi.string().required(),
     materialDescription: Joi.string().required(),
-    unit: Joi.string().required(),  
+    unit: Joi.string().required(),
     purchaseQty: Joi.number().required(),
     receivedQty: Joi.number().required(),
     receivedDate: Joi.string().required(),
     rejectedQty: Joi.number().required(),
     rejectedReason: Joi.string().required(),
-    acceptedQty: Joi.number().required() 
+    acceptedQty: Joi.number().required(),
   }).options({allowUnknown: true}),
 })
 // .strict(true)
@@ -1221,17 +1224,17 @@ const upsertCreateGRNSchema = Joi.object<GRN, true>({
 exports.upsertGRN = onCall<GRN>({
   name: "upsertGRN",
   schema: upsertCreateGRNSchema,
-  handler: async(data, context) => {
+  handler: async (data, context) => {
     console.log("The data is", data);
-    const {company, grn} = data;
+    const {company, GRN} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
     const docData = doc.data();
     if (!docData) {
       throw Error("The company does not exist" + company);
     }
     const grnInfo = docData.GRNInfo??[];
-    const output = upsertItemsInArray(grnInfo, grn, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId && 
-    oldItem.materialId === newItem.materialId && 
+    const output = upsertItemsInArray(grnInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
+    oldItem.materialId === newItem.materialId &&
     oldItem.materialDescription === newItem.materialDescription);
     await admin.firestore().collection("data").doc(company).set( {
       GRNInfo: output,
@@ -1242,27 +1245,27 @@ exports.upsertGRN = onCall<GRN>({
       company,
       GRNInfo: output,
     };
-  }
-})
+  },
+});
 
 const upsertCreateInventorySchema = Joi.object<InventoryInfo, true>({
   company: Joi.string().required(),
   createdAt: Joi.string(),
-  inventoryItems: Joi.array().items({
+  inventory: Joi.array().items({
     materialId: Joi.string().required(),
     materialDescription: Joi.string().required(),
     issue: Joi.number().required(),
     activeOrdersQty: Joi.string().required(),
-    inventory: Joi.number().required() 
+    inventory: Joi.number().required(),
   }).options({allowUnknown: true}),
 })
 // .strict(true)
     .unknown(false);
 
-exports.upsertInventory = onCall<GRN>({
+exports.upsertInventory = onCall<InventoryInfo>({
   name: "upsertInventory",
   schema: upsertCreateInventorySchema,
-  handler: async(data, context) => {
+  handler: async (data, context) => {
     console.log("The data is", data);
     const {company, inventory} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
@@ -1273,29 +1276,29 @@ exports.upsertInventory = onCall<GRN>({
     const inventoryInfo = docData.inventoryInfo??[];
     const bomsInfo = docData.bomsInfo??[];
     const styleCodesInfo = docData.styleCodesInfo??[];
-    const result = collectInventoryFromStyleCodes(inventoryInfo, bomsInfo)
+    const result = collectInventoryFromStyleCodes(inventoryInfo, bomsInfo);
     const collectedInventory = result?.inventory;
-    if (!collectedInventory){
-      throw Error("Inventory Collection Failed")
+    if (!collectedInventory) {
+      throw Error("Inventory Collection Failed");
     }
-    const output = upsertItemsInArray(collectedInventory, inventory, (oldItem: InventoryItems, newItem: InventoryItems) => oldItem.materialId === newItem.materialId 
-    &&  oldItem.materialDescription === newItem.materialDescription);
+    const output = upsertItemsInArray(collectedInventory, inventory, (oldItem: InventoryItems, newItem: InventoryItems) => oldItem.materialId === newItem.materialId &&
+    oldItem.materialDescription === newItem.materialDescription);
 
-    const p = distributeInventory(styleCodesInfo, result.boms, output)
+    const p = distributeInventory(styleCodesInfo, result.boms, output);
 
     await admin.firestore().collection("data").doc(company).set( {
       inventoryInfo: p.inventoryInfo,
-      bomsInfo: p.bomsInfo
+      bomsInfo: p.bomsInfo,
     }, {
       merge: true,
     });
     return {
       company,
       inventoryInfo: p.inventoryInfo,
-      bomsInfo: p.bomsInfo
+      bomsInfo: p.bomsInfo,
     };
-  }
-})
+  },
+});
 
 exports.createPO = functions
     .region("asia-northeast3")
@@ -1357,6 +1360,31 @@ exports.createPO = functions
       return [...purchaseOrders, ...(pastOrders || [])];
     });
 
+const mapPOToGRN = (purchaseOrders : PurchaseOrder []) : GRNItems[] => {
+
+  let grnItems: GRNItems[]= [];
+
+  for (let purchaseOrder of purchaseOrders){
+    let data: GRNItems[] = purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
+      id: generateUId('GRN', 10),
+      purchaseOrderId: purchaseOrder.id,
+      category: item.category,
+      type: item.type,
+      materialId: item.materialId,
+      materialDescription: item.materialDescription,
+      unit: item.unit,
+      purchaseQty: item.purchaseQty,
+      receivedQty: 0,
+      receivedDate: "",
+      rejectedQty: 0,
+      rejectedReason: "",
+      acceptedQty: 0
+    }))
+    grnItems = grnItems.concat(data)
+  }
+  return grnItems;
+
+}
 // Will pick it up when making the RestFul APIs
 // const router = express.Router();
 // const defaultRoutes = [
