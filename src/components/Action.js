@@ -1,5 +1,6 @@
-import {Table, Select, Button, Form, Input, Space, Affix, Tooltip } from "antd";
+import {Table, Select, Button, Form, Input, Space, Affix, Tooltip, DatePicker } from "antd";
 import { Table as ExportTable } from "ant-table-extensions";
+import moment from "moment";
 
 import { useDispatch, useSelector } from "react-redux";
 import { LeftOutlined, PlusOutlined, RightOutlined } from "@ant-design/icons";
@@ -44,6 +45,7 @@ const EditableCell = ({
   const [editing, setEditing] = useState(false);
   const inputRef = useRef(null);
   const form = useContext(EditableContext);
+  const isDate = dataIndex?.includes("Date")
   useEffect(() => {
     if (editing) {
       inputRef.current.focus();
@@ -52,19 +54,23 @@ const EditableCell = ({
 
   const toggleEdit = () => {
     setEditing(!editing);
-    form.setFieldsValue({
+    let fieldValue = {
       [dataIndex]: record[dataIndex]
-    });
+    }
+    if (isDate){
+      fieldValue[dataIndex] = moment(record[dataIndex])
+    }
+    form.setFieldsValue(fieldValue);
   };
-  let isDate = false;
-  if (dataIndex){
-    isDate = dataIndex.includes("Date");
-  }
   const save = async () => {
     try {
       const values = await form.validateFields();
       toggleEdit();
-      handleSave({ ...record, ...values });
+      let formattedValue = values
+      if (isDate){
+        formattedValue[dataIndex] = moment(values[dataIndex]).format("MMM DD YY")
+      }
+      handleSave({ ...record, ...formattedValue });
     } catch (errInfo) {
       console.log("Save failed:", errInfo);
     }
@@ -73,21 +79,41 @@ const EditableCell = ({
   let childNode = children;
 
   if (editable) {
+    const loadFormWithDate = () => {
+     return <Form.Item
+     style={{
+       margin: 0
+     }}
+     name={dataIndex}
+     rules={[
+       {
+         required: true,
+         message: `${title} is required.`
+       }
+     ]}
+   >
+     <DatePicker ref={inputRef}  onBlur={save} />
+    </Form.Item> 
+    }
+
+    const loadForm = () => {
+      return <Form.Item
+      style={{
+        margin: 0
+      }}
+      name={dataIndex}
+      rules={[
+        {
+          required: true,
+          message: `${title} is required.`
+        }
+      ]}
+    >
+      <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+     </Form.Item> 
+    }
     childNode = editing ? (
-      <Form.Item
-        style={{
-          margin: 0
-        }}
-        name={dataIndex}
-        rules={[
-          {
-            required: true,
-            message: `${title} is required.`
-          }
-        ]}
-      >
-        <Input ref={inputRef} onPressEnter={save} onBlur={save} />
-      </Form.Item>
+      isDate?loadFormWithDate():  loadForm()
     ) : (
       <Tooltip title={children}>
       <div
