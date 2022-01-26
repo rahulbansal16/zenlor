@@ -503,12 +503,12 @@ const getMaterialStatus = (styleCode: string, boms: BOM[]) : MaterialStatus => {
     return MaterialStatus.FULLY_ORDERED;
   }
 
-  const partialOrdered = materials.filter((item) => calculatePendingQty(item) > 0).some((item) => (item.activeOrdersQty??0) > 0);
+  const partialOrdered = materials.some((item) => (item.activeOrdersQty??0) > 0);
   if (partialOrdered) {
     return MaterialStatus.PART_ORDERED;
   }
 
-  const noOrder = materials.filter((item) => calculatePendingQty(item) > 0).every( (item) => (item.activeOrdersQty??0) <= 0);
+  const noOrder = materials.every( (item) => (item.activeOrdersQty??0) <= 0);
   if (noOrder) {
     return MaterialStatus.NOT_ORDERED;
   }
