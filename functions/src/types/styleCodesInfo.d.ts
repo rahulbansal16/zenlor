@@ -74,6 +74,23 @@ export interface BOM {
     issueQty?: number
 }
 
+export interface BOMInfoDto {
+    boms: BOMDto[],
+    company: string,   
+}
+
+export interface BOMDto {
+    styleCode: string,
+    category: string,
+    type: string,
+    materialId: string,
+    materialDescription: string,
+    consumption: number,
+    wastage: number,
+    unit: string,
+    placement: string,
+}
+
 export interface PurchaseMaterialsInfo{
     purchaseMaterials: PurchaseMaterials[]
     createdAt: string

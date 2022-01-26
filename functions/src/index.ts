@@ -8,7 +8,9 @@ import * as moment from "moment";
 import * as Joi from "joi";
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
-import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM, PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo} from "./types/styleCodesInfo";
+import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
+  BOMInfoDto, 
+  PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -636,8 +638,7 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
   },
 });
 
-
-const upsertBOMSchema = Joi.object<BOMInfo, true>({
+const upsertBOMSchema = Joi.object<BOMInfoDto, true>({
   company: Joi.string().required(),
   boms: Joi.array().items({
     styleCode: Joi.string().required(),
@@ -647,15 +648,21 @@ const upsertBOMSchema = Joi.object<BOMInfo, true>({
     materialDescription: Joi.string().required(),
     consumption: Joi.number().required(),
     wastage: Joi.number().required(),
+    unit: Joi.string().required(),
     placement: Joi.string().required(),
-    reqQty: Joi.number().required(),
-    inventory: Joi.number(),
-    activeOrdersQty: Joi.number(),
-    pendingQty: Joi.number(),
-  }).options({allowUnknown: true}),
+  }).options({allowUnknown: false}),
 })
-    // .strict(true)
+    .strict(true)
     .unknown(false);
+
+const join = <T,P>(a:T[], b:P[], cmp:(e:T, f:P)=> boolean): (T&P) [] => {
+  let output: any = []
+  output = a.map((item) => ({
+    ...item,
+    ...b.find(bitem => cmp(item, bitem))
+  }))
+  return output
+} 
 
 exports.upsertBOMInfo = onCall<BOMInfo>({
   name: "upsertBOMInfo",
@@ -672,16 +679,34 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     if (!styleCodesInfo) {
       throw Error("StyleCodes Not Present");
     }
-    const bomsInfo = docData.bomsInfo??[];
+    const bomsInfo: BOM[] = docData.bomsInfo??[];
     const oldPurchaseMaterials = docData.purchaseMaterialsInfo??[];
     const inventory = docData.inventoryInfo??[];
     // This will use stylecode plus materialId
+    const bomJoinedStyleCode = join(boms, styleCodesInfo, (a,b)=>a.styleCode === b.styleCode);
+    let mappedBOMDTO: BOM[] = bomJoinedStyleCode.map( bom => ({
+      styleCode: bom.styleCode,
+      category: bom.category,
+      type: bom.type,
+      materialId: bom.materialId,
+      materialDescription: bom.materialDescription,
+      consumption: bom.consumption,
+      wastage: bom.wastage,
+      unit: bom.unit,
+      placement: bom.placement,
+      issueQty: 0,
+      no: 1,
+      id: generateUId("BOM", 8),
+      reqQty: parseFloat((bom.makeQty*bom.consumption*(1+bom.wastage/100)).toFixed(2)),
+      inventory: 0,
+      activeOrdersQty: 0,
+      pendingQty: 0,
+    }))
     const output = upsertItemsInArray(bomsInfo,
-        boms,
-        (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) && oldItem.styleCode === newItem.styleCode,
-        {
-          issueQty: 0,
-        },
+        mappedBOMDTO,
+        (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) 
+        && oldItem.styleCode === newItem.styleCode,
+        undefined,
         (a, b) => ({...a, ...b, pendingQty: calculatePendingQty(b)})
     );
     // const inventories: InventoryItems[] = [];
