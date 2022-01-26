@@ -765,9 +765,28 @@ const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:Purchas
       ...mp[key],
     });
   }
-  const purchaseMaterialsInfo = upsertItemsInArray(purchaseMaterials as unknown as BOM[],
-      mergedBoms,
-      (a: PurchaseMaterials, b: BOM)=> a.materialId === b.materialId && a.materialDescription === b.materialDescription,
+  const mapMergedBomsToPurchaseMaterial:PurchaseMaterials[] = mergedBoms.map((item:BOM) => ({
+    id: generateUId("PM", 8),
+    styleCode: item.styleCode,
+    category: item.category,
+    type: item.type,
+    materialId: item.materialId,
+    materialDescription: item.materialDescription,
+    unit: item.unit,
+    pendingQty: calculatePendingQty(item),
+    purchaseQty: 0,
+    rate: 0,
+    discount: 0,
+    preTaxAmount: 0,
+    tax: 0,
+    taxAmount: 0,
+    totalAmount: 0,
+    supplier: "",
+    deliveryDate: ""
+  }))
+  const purchaseMaterialsInfo = upsertItemsInArray(purchaseMaterials,
+      mapMergedBomsToPurchaseMaterial,
+      (a: PurchaseMaterials, b: PurchaseMaterials)=> a.materialId === b.materialId && a.materialDescription === b.materialDescription,
       {
         purchaseQty: 0,
         rate: 0,
@@ -779,6 +798,7 @@ const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:Purchas
         supplier: "",
         deliveryDate: "",
         status: "active",
+        id: generateUId("PM", 8)
       }
   );
   return purchaseMaterialsInfo;

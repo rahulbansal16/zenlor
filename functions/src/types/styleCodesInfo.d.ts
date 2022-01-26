@@ -105,7 +105,6 @@ export interface PurchaseMaterials{
     materialId: string,
     materialDescription: string,
     unit: string,
-    status: string,
     pendingQty: number,
     purchaseQty: number,
     rate: number,
