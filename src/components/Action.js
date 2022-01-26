@@ -92,7 +92,7 @@ const EditableCell = ({
        }
      ]}
    >
-     <DatePicker ref={inputRef}  onBlur={save} />
+     <DatePicker ref={inputRef}  onBlur={save} format="MMM DD YY"/>
     </Form.Item> 
     }
 
