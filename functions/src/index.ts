@@ -484,9 +484,9 @@ exports.dataInsights = functions
     });
 
 
-const calculatePendingQty = (item:BOM) => {
+const calculatePendingQty = (item:BOM): number => {
   const {reqQty, inventory, activeOrdersQty, issueQty} = item;
-  return (reqQty||0) - (inventory||0) - (activeOrdersQty||0) - (issueQty||0);
+  return parseFloat(((reqQty||0) - (inventory||0) - (activeOrdersQty||0) - (issueQty||0)).toFixed(2));
 };
 const getMaterialStatus = (styleCode: string, boms: BOM[]) : MaterialStatus => {
   const materials = boms.filter( (bom) => bom.styleCode === styleCode);
@@ -782,8 +782,8 @@ const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:Purchas
     taxAmount: 0,
     totalAmount: 0,
     supplier: "",
-    deliveryDate: ""
-  }))
+    deliveryDate: "",
+  }));
   const purchaseMaterialsInfo = upsertItemsInArray(purchaseMaterials,
       mapMergedBomsToPurchaseMaterial,
       (a: PurchaseMaterials, b: PurchaseMaterials)=> a.materialId === b.materialId && a.materialDescription === b.materialDescription,
@@ -798,7 +798,7 @@ const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:Purchas
         supplier: "",
         deliveryDate: "",
         status: "active",
-        id: generateUId("PM", 8)
+        id: generateUId("PM", 8),
       }
   );
   return purchaseMaterialsInfo;
