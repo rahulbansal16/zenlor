@@ -76,7 +76,7 @@ export interface BOM {
 
 export interface BOMInfoDto {
     boms: BOMDto[],
-    company: string,   
+    company: string,
 }
 
 export interface BOMDto {

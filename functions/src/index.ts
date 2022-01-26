@@ -9,7 +9,7 @@ import * as Joi from "joi";
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
-  BOMInfoDto, 
+  BOMInfoDto,
   PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
@@ -655,14 +655,14 @@ const upsertBOMSchema = Joi.object<BOMInfoDto, true>({
     .strict(true)
     .unknown(false);
 
-const join = <T,P>(a:T[], b:P[], cmp:(e:T, f:P)=> boolean): (T&P) [] => {
-  let output: any = []
+const join = <T, P>(a:T[], b:P[], cmp:(e:T, f:P)=> boolean): (T&P) [] => {
+  let output: any = [];
   output = a.map((item) => ({
     ...item,
-    ...b.find(bitem => cmp(item, bitem))
-  }))
-  return output
-} 
+    ...b.find((bitem) => cmp(item, bitem)),
+  }));
+  return output;
+};
 
 exports.upsertBOMInfo = onCall<BOMInfo>({
   name: "upsertBOMInfo",
@@ -683,8 +683,8 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     const oldPurchaseMaterials = docData.purchaseMaterialsInfo??[];
     const inventory = docData.inventoryInfo??[];
     // This will use stylecode plus materialId
-    const bomJoinedStyleCode = join(boms, styleCodesInfo, (a,b)=>a.styleCode === b.styleCode);
-    let mappedBOMDTO: BOM[] = bomJoinedStyleCode.map( bom => ({
+    const bomJoinedStyleCode = join(boms, styleCodesInfo, (a, b)=>a.styleCode === b.styleCode);
+    const mappedBOMDTO: BOM[] = bomJoinedStyleCode.map( (bom) => ({
       styleCode: bom.styleCode,
       category: bom.category,
       type: bom.type,
@@ -701,11 +701,11 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
       inventory: 0,
       activeOrdersQty: 0,
       pendingQty: 0,
-    }))
+    }));
     const output = upsertItemsInArray(bomsInfo,
         mappedBOMDTO,
-        (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) 
-        && oldItem.styleCode === newItem.styleCode,
+        (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) &&
+        oldItem.styleCode === newItem.styleCode,
         undefined,
         (a, b) => ({...a, ...b, pendingQty: calculatePendingQty(b)})
     );
