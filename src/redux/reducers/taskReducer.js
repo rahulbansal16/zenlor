@@ -216,7 +216,7 @@ export const initialState = {
                   },
                   {
                     title: "Description",
-                    dataIndex: "description",
+                    dataIndex: "materialDescription",
                     key: "materialDescription",
                   },
                   {
