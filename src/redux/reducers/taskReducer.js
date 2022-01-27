@@ -18,6 +18,10 @@ const performCalculation = (item, type) => {
       preTaxAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}`,
       taxAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`,
       totalAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}+${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`
+    },
+    inwardMaterial: {
+      // rejectedQty: `${item.purchaseQty||0}-${item.acceptedQty||0}`,
+      acceptedQty: `${item.receivedQty||0}-${item.rejectedQty||0}`
     }
   }
   const map = calculationMap[type];
@@ -132,7 +136,7 @@ export const initialState = {
             },
             {
               title: "Order Confirmation",
-              width:100,
+              width: 200,
               dataIndex: "orderConfirmationDate",
               showSorterTooltip: false,
               key: "orderConfirmationDate",
@@ -156,6 +160,7 @@ export const initialState = {
             {
               title: "Delivery Date",
               dataIndex: "deliveryDate",
+              width: 200,
               key: "deliveryDate",
               editable: true
             },
@@ -519,7 +524,8 @@ export const initialState = {
       {
         title: "Delivery Date",
         dataIndex: "deliveryDate",
-        key: "deliveryDate"
+        key: "deliveryDate",
+        editable: true
       },
       {
         title: "Amount",
