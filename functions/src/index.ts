@@ -773,7 +773,7 @@ const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:Purchas
     materialId: item.materialId,
     materialDescription: item.materialDescription,
     unit: item.unit,
-    pendingQty: calculatePendingQty(item),
+    pendingQty: item.pendingQty || 0,
     purchaseQty: 0,
     rate: 0,
     discount: 0,
@@ -979,7 +979,7 @@ const distributeInventory = (
     inventory:InventoryItems[]
 ) : {bomsInfo:BOM[], inventoryInfo:InventoryItems[]}=> {
   const activeStyleCodes:StyleCodes[] = styleCodesInfo.filter((item: StyleCodes) => item.status === "active");
-  // activeStyleCodes.sort((a: StyleCodes, b: StyleCodes) => a.deliveryDate - b.deliveryDate);
+  activeStyleCodes.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());
 
   if (!inventory) {
     throw new Error("No Global Inventory");
