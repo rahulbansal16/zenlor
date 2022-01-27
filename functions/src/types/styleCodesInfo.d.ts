@@ -41,7 +41,7 @@ export interface StyleCodes {
     confirmDate: string,
     orderQty: number,
     makeQty: number,
-    deliveryDate: number,
+    deliveryDate: string,
     unitSellingPrice?:number,
     xsSizeQty?:number,
     sSizeQty?:number,
