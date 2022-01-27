@@ -418,8 +418,8 @@ export const initialState = {
                 },
                 {
                   title: "Description",
-                  dataIndex: "materialDecription",
-                  key: "materialDecription",
+                  dataIndex: "materialDescription",
+                  key: "materialDescription",
                 },
                 {
                   title: "Unit",
