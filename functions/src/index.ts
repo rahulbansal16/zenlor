@@ -684,7 +684,7 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     const inventory = docData.inventoryInfo??[];
     // This will use stylecode plus materialId
     const bomJoinedStyleCode = join(boms, styleCodesInfo, (a, b)=>a.styleCode === b.styleCode);
-    const mappedBOMDTO: BOM[] = bomJoinedStyleCode.map( (bom) => ({
+    const mappedBOMDTO: any = bomJoinedStyleCode.map( (bom) => ({
       styleCode: bom.styleCode,
       category: bom.category,
       type: bom.type,
@@ -694,19 +694,24 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
       wastage: bom.wastage,
       unit: bom.unit,
       placement: bom.placement,
-      issueQty: 0,
-      no: 1,
-      id: generateUId("BOM", 8),
+      // issueQty: 0,
+      // no: 1,
+      // id: generateUId("BOM", 8),
       reqQty: parseFloat((bom.makeQty*bom.consumption*(1+bom.wastage/100)).toFixed(2)),
-      inventory: 0,
-      activeOrdersQty: 0,
-      pendingQty: 0,
+      // inventory: 0,
+      // activeOrdersQty: 0,
+      // pendingQty: 0,
     }));
     const output = upsertItemsInArray(bomsInfo,
         mappedBOMDTO,
         (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) &&
         oldItem.styleCode === newItem.styleCode,
-        undefined,
+        {
+          issueQty: 0,
+          id: generateUId("BOM", 8),
+          inventory: 0,
+          activeOrdersQty: 0,
+        },
         (a, b) => ({...a, ...b, pendingQty: calculatePendingQty(b)})
     );
     // const inventories: InventoryItems[] = [];
