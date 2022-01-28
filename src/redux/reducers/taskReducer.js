@@ -137,9 +137,9 @@ export const initialState = {
             {
               title: "Order Confirmation",
               width: 200,
-              dataIndex: "orderConfirmationDate",
+              dataIndex: "confirmDate",
               showSorterTooltip: false,
-              key: "orderConfirmationDate",
+              key: "confirmDate",
               editable: true
             },
             {
