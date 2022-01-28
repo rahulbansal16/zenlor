@@ -87,14 +87,89 @@ export function purchaseMaterialKey(item){
     const {styleCode, materialId, materialDescription} = item
     return /*styleCode.toLowerCase().trim() +*/ materialId.toLowerCase().trim() + materialDescription.toLowerCase().trim()
 }
+const columns = [{
+    key: "materialId",
+    title: "Item ID"
+},{
+   key: "materialDescription",
+   title: "Item Desc."
+},{
+    key: "purchaseQty",
+    title: "QTY"
+},{
+    key: "unit",
+    title: "unit"
+},
+{
+    key: "rate",
+    title:"Rate"
+},
+{
+    key: "discount",
+    title:"Discount"
+},
+{
+    key: "preTaxAmount",
+    title:"Pre.Tax Amt"
+},
+{
+    key: "rate",
+    title:"Rate"
+},
+{
+    key: "discount",
+    title:"Discount"
+},
+{
+    key: "preTaxAmount",
+    title:"Pre.Tax Amt"
+},  
+{
+    key: "tax",
+    title:"Tax"
+},
+{
+    key: "taxAmount",
+    title:"Tax Amount"
+},
+{
+    key: "totalAmount",
+    title:"Total Amount"
+},  
+{
+    key: "deliveryDate",
+    title:"Delivery Date"
+},  
+]
+// category: "PACKAGING"
+// deliveryDate: "Jan 28 22"
+// discount: 1
+// id: "SSMRI024-BLACKPB777PB777"
+// key: "SSMRI024-BLACKPB777PB777"
+// materialDescription: "PB777 "
+// materialId: "PB777 "
+// pendingQty: 1827
+// preTaxAmount: 1437.48
+// purchaseQty: 121
+// rate: 12
+// referenceId: "SSMRI024-BLACK"
+// sno: 1
+// status: "active"
+// styleCode: "SSMRI024-BLACK"
+// supplier: "fdf"
+// tax: 23
+// taxAmount: 330.62
+// totalAmount: 1768.1
+// type: "POLYBAGS"
+// unit: "PC"
 
 export function downloadCsv(purchaseOrder){
-    const poFields= initialState.purchaseOrder.columns.map(item => item.key)
-    const poHeaders= initialState.purchaseOrder.columns.map(item => item.title)
+    const poFields= columns.map(item => item.key)
+    const poHeaders= columns.map(item => item.title)
     const {supplier, id, deliveryDate, amount} = purchaseOrder
     const topHeader = ['SUPPLIER',supplier,'','PO Number',id,'','Delivery',deliveryDate]
-    const lineItems = purchaseOrder.lineItems.map(item => poFields.map(field => item[field]||"."))
-    const footer = ['TOTAL', '','','','','','INR',amount||'.']
+    const lineItems = purchaseOrder.lineItems.map(item => poFields.map(field => item[field]||"0"))
+    const footer = ['TOTAL', '','','','','','','','','','INR',amount||'.']
     console.log("Line Items", lineItems);
 
     const fileName = supplier+'_'+deliveryDate
