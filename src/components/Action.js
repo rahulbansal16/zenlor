@@ -133,7 +133,8 @@ const EditableCell = ({
 const Action = ({ type }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowKeys, setSelectedRowsKeys] = useState([])
+  const [selectedRows, setSelectedRows] = useState([]) 
   // const [selectedRowsKeys, setSelectedRowsKeys] = useState([])
   const user = useSelector(state => state.taskReducer.user);
   const action = useSelector((state) => state.taskReducer[type]);
@@ -145,7 +146,7 @@ const Action = ({ type }) => {
   useEffect(()=>{
     console.log("Calling for type", type)
     // setSelectedRowsKeys([])
-    setSelectedRows([])
+    setSelectedRowsKeys([])
   },[type, action])
 
   if (isFetching) {
@@ -183,6 +184,7 @@ const Action = ({ type }) => {
   const onFinish = async (data) => {
     const action = data.action;
     const {company} = user;
+    // let selectedRows = selectedRowKeys
 
     console.log("The data is", data);
     if (action === "createPO") {
@@ -274,6 +276,14 @@ const Action = ({ type }) => {
       id: generateUId("", 8),
     },type))
   }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedRowsKeys(selectedRowKeys)
+      setSelectedRows(selectedRows)
+    },
+  };
   
   console.log("The type is", type);
   return (
@@ -320,16 +330,7 @@ const Action = ({ type }) => {
         size="small"
         sticky={true}
         components={components}
-        rowSelection={{
-          // fixed:'right',
-          // type: "checkbox",
-          // selectedRowKeys:{selectedRowsKeys},
-          onChange: (selectedRowKeys, selectedRows) => {
-            // let selectedStyleCode = selectedRows.map ( row => row.styleCode)
-            // setSelectedRowsKeys(selectedRowKeys)
-            setSelectedRows(selectedRows);
-          },
-        }}
+        rowSelection={rowSelection}
         columns={column}
         dataSource={applyFilter(dataSource).map((item) => ({
           ...item,
