@@ -1271,6 +1271,37 @@ const upsertCreateGRNSchema = Joi.object<GRN, true>({
 // .strict(true)
     .unknown(false);
 
+//  Use it to udpate the items.
+// It does not lead to firing up of the values
+
+exports.upsertGRNItem = onCall<GRN>({
+  name:"upsertGRNItem",
+  schema: upsertCreateGRNSchema,
+  handler: async(data, context) => {
+    console.log("The data is", data);
+    const {company, GRN} = data;
+    const doc = await admin.firestore().collection("data").doc(company).get();
+    const docData = doc.data();
+    if (!docData) {
+      throw Error("The company does not exist" + company);
+    }
+    const grnInfo = docData.GRNInfo;
+    if(!grnInfo){
+      throw Error("The GRN info does not exist")
+    }
+
+    const grnInfoOutput = upsertItemsInArray(grnInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
+    oldItem.materialId === newItem.materialId &&
+    oldItem.materialDescription === newItem.materialDescription);
+    
+    await admin.firestore().collection("data").doc(company).set( {
+      GRNInfo: grnInfoOutput,
+    }, {
+      merge: true,
+    });
+  }
+})
+    
 exports.upsertGRN = onCall<GRN>({
   name: "upsertGRN",
   schema: upsertCreateGRNSchema,
