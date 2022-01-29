@@ -3,7 +3,9 @@
 import { Table, Tooltip } from "antd"
 import ZenlorTags from "../../components/ZenlorTags"
 import { functions } from "../../firebase"
-import { FETCH_DATA, FETCH_PO, FETCH_PURCHASE_MATERIALS_INFO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
+import { FETCH_DATA, 
+  UPDATE_DATA, 
+  FETCH_PO, FETCH_PURCHASE_MATERIALS_INFO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
 
 const performCalculation = (item, type) => {
   
@@ -66,7 +68,7 @@ const saveCellToServer = (item, type, company) => {
       }
       break;
     case "inwardMaterial":
-      methodName = "upsertGRN";
+      methodName = "upsertGRNItem";
       payload = {
         ...payload,
         GRN: [item]
@@ -331,12 +333,12 @@ export const initialState = {
           dataIndex:"type",
           key:"type"
         },
-        {
-          title: "Reference",
-          dataIndex: "styleCode",
-          key:"styleCode"
+        // {
+        //   title: "Reference",
+        //   dataIndex: "styleCode",
+        //   key:"styleCode"
    
-        },
+        // },
         {
           title:"Material Id",
           dataIndex: "materialId",
@@ -691,10 +693,16 @@ const taskReducer = (state = initialState, action) => {
                  },
                  inwardMaterial: {
                    ...state.inwardMaterial,
-                   dataSource: formatLineItems(action?.payload?.purchaseOrdersInfo??[])
+                   dataSource: action?.payload?.GRNInfo??[]
                  },
                 form: form  || state.form
             }
+        }
+        case UPDATE_DATA: {
+          return {
+            ...state,
+            ...action.payload
+          }
         }
         case UPDATE_AUTH: {
             const {user} = action.payload

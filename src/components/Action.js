@@ -239,6 +239,16 @@ const Action = ({ type }) => {
      }) 
     } else if (action === "viewLineItems") {
 
+    } else if (action === "inwardItem"){
+      // This will do actualGRN as in updating the values in the db etc for the inventory
+      const upsertGRN = functions.httpsCallable("upsertGRN");
+      const result = await upsertGRN({
+        company,
+        createdAt: getCurrentTime(),
+        GRN: selectedRows
+      });
+      console.log("The result is ", result);
+      // dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo))
     }
   };
   const components = {
