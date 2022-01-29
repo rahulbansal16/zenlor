@@ -175,7 +175,10 @@ const Action = ({ type }) => {
         return dataSource.filter((item) => ids.includes(item.purchaseOrderId) || !item.purchaseOrderId);
     } 
     if (type === "inwardMaterial"){
-
+      const id = new URLSearchParams(search).get('poId')??',';
+      const ids = id.split(',')
+      if (ids[0] !== "")
+        return dataSource.filter((item) => ids.includes(item.purchaseOrderId) || !item.purchaseOrderId);
     }
     return dataSource;
   };
@@ -229,9 +232,10 @@ const Action = ({ type }) => {
       //   search: `id=${selectedIds}`
       // })
     } else if (action === "inwardMaterial"){
+     const poId = selectedRows.map(item => item.id)
      history.push({
        pathname: `/action/${data.action}`,
-       search: `ids=${1}`
+       search: `poId=${poId}`
      }) 
     } else if (action === "viewLineItems") {
 
