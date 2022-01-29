@@ -1175,6 +1175,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
     const inventory: InventoryItems[] = docData.inventoryInfo??[];
     const styleCodes: StyleCodes[] = docData.styleCodesInfo??[];
+    const grnInfo: GRNItems[] = docData.GRNInfo??[];
     let deliveryDate="";
 
     for (let item of purchaseMaterials) {
@@ -1235,7 +1236,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           inventoryInfo: distributedInventory.inventoryInfo,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
           purchaseMaterialsInfo: result,
-          GRNInfo: grn,
+          GRNInfo: [...grn, ...grnInfo]
         }
         , {
           merge: true,
@@ -1256,7 +1257,7 @@ const upsertCreateGRNSchema = Joi.object<GRN, true>({
     purchaseOrderId: Joi.string().required(),
     category: Joi.string().required(),
     type: Joi.string().required(),
-    styleCode: Joi.string().required(),
+    styleCode: Joi.string(),
     materialId: Joi.string().required(),
     materialDescription: Joi.string().required(),
     unit: Joi.string().required(),

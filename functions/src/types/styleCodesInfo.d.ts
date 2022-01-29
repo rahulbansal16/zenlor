@@ -173,6 +173,7 @@ export interface GRNItems {
     category: string,
     type: string,
     // styleCode: string,
+    status: string,
     materialId: string,
     materialDescription: string,
     unit: string,
