@@ -535,7 +535,7 @@ exports.getData = functions
         throw Error("The company does not exist " + company);
       }
       let styleCodesInfo = companyData.styleCodesInfo??[];
-      let GRNInfo = companyData.GRNInfo??[];
+      const GRNInfo = companyData.GRNInfo??[];
       styleCodesInfo = styleCodesInfo as StyleCodes[];
       const bomsInfo = companyData.bomsInfo??[];
       styleCodesInfo = styleCodesInfo.map( (styleCode: StyleCodes)=> ({
@@ -545,7 +545,7 @@ exports.getData = functions
       return {
         ...companyData,
         styleCodesInfo: styleCodesInfo,
-        GRNInfo: GRNInfo.filter((item:GRNItems) => item.status === "active")
+        GRNInfo: GRNInfo.filter((item:GRNItems) => item.status === "active"),
       };
     });
 
@@ -1238,7 +1238,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           inventoryInfo: distributedInventory.inventoryInfo,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
           purchaseMaterialsInfo: result,
-          GRNInfo: [...grn, ...grnInfo]
+          GRNInfo: [...grn, ...grnInfo],
         }
         , {
           merge: true,
@@ -1278,9 +1278,9 @@ const upsertCreateGRNSchema = Joi.object<GRN, true>({
 // It does not lead to firing up of the values
 
 exports.upsertGRNItem = onCall<GRN>({
-  name:"upsertGRNItem",
+  name: "upsertGRNItem",
   schema: upsertCreateGRNSchema,
-  handler: async(data, context) => {
+  handler: async (data, context) => {
     console.log("The data is", data);
     const {company, GRN} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
@@ -1289,22 +1289,22 @@ exports.upsertGRNItem = onCall<GRN>({
       throw Error("The company does not exist" + company);
     }
     const grnInfo = docData.GRNInfo;
-    if(!grnInfo){
-      throw Error("The GRN info does not exist")
+    if (!grnInfo) {
+      throw Error("The GRN info does not exist");
     }
 
     const grnInfoOutput = upsertItemsInArray(grnInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
     oldItem.materialId === newItem.materialId &&
     oldItem.materialDescription === newItem.materialDescription);
-    
+
     await admin.firestore().collection("data").doc(company).set( {
       GRNInfo: grnInfoOutput,
     }, {
       merge: true,
     });
-  }
-})
-    
+  },
+});
+
 exports.upsertGRN = onCall<GRN>({
   name: "upsertGRN",
   schema: upsertCreateGRNSchema,
@@ -1317,7 +1317,7 @@ exports.upsertGRN = onCall<GRN>({
       throw Error("The company does not exist" + company);
     }
     const grnInfo = docData.GRNInfo??[];
-    let activeGRNInfo = grnInfo.filter((item: GRNItems) => item.status === "active")
+    const activeGRNInfo = grnInfo.filter((item: GRNItems) => item.status === "active");
     let grnInfoOutput = upsertItemsInArray(activeGRNInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
     oldItem.materialId === newItem.materialId &&
     oldItem.materialDescription === newItem.materialDescription);
@@ -1347,16 +1347,16 @@ exports.upsertGRN = onCall<GRN>({
 
     const p = distributeInventory(styleCodesInfo, result.boms, output);
     // let grnAfterRemovingItem = grnInfoOutput.filter( item => )
-    let GRNDone = GRN.map( (item: GRNItems)=> ({
-      ...item, 
-      status:'done'
-    }))
+    const GRNDone = GRN.map( (item: GRNItems)=> ({
+      ...item,
+      status: "done",
+    }));
     grnInfoOutput = upsertItemsInArray(grnInfo, GRNDone, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
     oldItem.materialId === newItem.materialId &&
     oldItem.materialDescription === newItem.materialDescription);
 
     await admin.firestore().collection("data").doc(company).set( {
-      GRNInfo:  grnInfoOutput,
+      GRNInfo: grnInfoOutput,
       inventoryInfo: p.inventoryInfo,
       bomsInfo: p.bomsInfo,
     }, {
@@ -1364,7 +1364,7 @@ exports.upsertGRN = onCall<GRN>({
     });
     return {
       company,
-      GRNInfo: grnInfoOutput,
+      GRNInfo: grnInfoOutput.filter( (item) => item.status === "active"),
       inventoryInfo: p.inventoryInfo,
       bomsInfo: p.bomsInfo,
     };
@@ -1497,7 +1497,7 @@ const mapPOToGRN = (purchaseOrders : PurchaseOrder []) : GRNItems[] => {
       unit: item.unit,
       purchaseQty: item.purchaseQty,
       receivedQty: 0,
-      status: 'active',
+      status: "active",
       receivedDate: "",
       rejectedQty: 0,
       rejectedReason: "",

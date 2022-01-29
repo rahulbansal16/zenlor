@@ -76,8 +76,10 @@ const actions = {
       value: "inwardMaterial"
     }
   ],
-  inwardMaterial: [
-  ]
+  inwardMaterial: [{
+    key: "Inward Item",
+    value:"inwardItem"
+  }]
 };
 
 const ActionBar = ({type, onFinish}) => {

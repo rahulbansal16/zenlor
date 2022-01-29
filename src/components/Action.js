@@ -10,7 +10,7 @@ import { useLocation } from "react-router";
 import React,{ useEffect, useContext, useState, useRef } from "react";
 import { functions } from "../firebase";
 import { downloadCsv, generateUId, getCurrentTime, purchaseMaterialKey } from "../util";
-import { fetchPOs, fetchPurchaseMaterialsInfo, insertRow, updateCell } from "../redux/actions";
+import { fetchPOs, fetchPurchaseMaterialsInfo, insertRow, updateCell, updateData } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ActionBar from "./ActionBar";
 import useFilter from "../hooks/useFilter";
@@ -248,7 +248,7 @@ const Action = ({ type }) => {
         GRN: selectedRows
       });
       console.log("The result is ", result);
-      // dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo))
+      dispatch(updateData(result.data))
     }
   };
   const components = {
