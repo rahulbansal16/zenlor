@@ -1431,7 +1431,7 @@ exports.createPO = functions
       const {bom, createdAt} = data;
       console.log("The bom is createdAt company", bom, createdAt, company);
       const supplierMap: any = {};
-      let totalAmount = 0;
+      const totalAmount:any = {};
 
       for (const item of bom) {
         const {supplier, styleCode, description, id, poQty, unit, rate, consumption} = item;
@@ -1439,6 +1439,7 @@ exports.createPO = functions
 
         if (!supplierMap[supplier]) {
           supplierMap[supplier] = [];
+          totalAmount[supplier] = 0;
         }
         const amount = (poQty || 0) * (rate || 0) * (consumption || 0);
         supplierMap[supplier].push({
@@ -1452,7 +1453,7 @@ exports.createPO = functions
           tax: "",
           amount: amount,
         });
-        totalAmount += amount;
+        totalAmount[supplier] += amount;
       }
       console.log("The supplier map is", supplierMap);
       const purchaseOrders = [];
@@ -1462,7 +1463,7 @@ exports.createPO = functions
           supplier: key,
           createdAt,
           deliveryDate: "",
-          amount: totalAmount,
+          amount: totalAmount[key],
           status: "active",
           data: supplierMap[key],
         });
