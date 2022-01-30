@@ -161,6 +161,17 @@ export interface InventoryItems {
     activeOrdersQty: number
 }
 
+export interface MaterialIssue {
+    styleCode:string,
+    materialIssue: MaterialIssueItem[]
+}
+
+export interface MaterialIssueItem {
+    materialId: string,
+    materialDescription: string,
+    issueAmount: number,
+}
+
 export interface GRNInfo {
     company: string,
     createdAt: string,

@@ -10,6 +10,7 @@ import * as Joi from "joi";
 import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
   BOMInfoDto,
+  MaterialIssue,
   PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
@@ -101,11 +102,25 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async
       .set(userInfo);
 });
 
-// const issueInventory = (material: MaterialIssue):BOMInfo[] => {
-//   const {styleCode, materialIssue} = material;
-//   console.log(styleCode, materialIssue)
-//   return [];
-// }
+const issueInventory = (material: MaterialIssue, bomsInfo: BOM[]):BOM[] => {
+  const {styleCode, materialIssue} = material;
+  console.log(styleCode, materialIssue);
+  const {materialId, materialDescription, issueAmount} = materialIssue[0];
+  const bom = bomsInfo.find( (item:BOM) => item.materialId == materialId && item.materialDescription === materialDescription && item.styleCode === styleCode);
+  if (!bom) {
+    throw Error("The material Does not exist for the stylecode cannot issue");
+  }
+  if (!bom.issueQty ) {
+    bom.issueQty = 0;
+  }
+  if (!bom.inventory) {
+    bom.inventory = 0;
+  }
+  bom.issueQty += issueAmount;
+  bom.inventory -= issueAmount;
+  bom.pendingQty = calculatePendingQty(bom);
+  return bomsInfo;
+};
 
 exports.addData = functions
     .region("asia-northeast3")
@@ -128,7 +143,7 @@ exports.addData = functions
         throw new Error("User Data is undefined");
       }
       const {company} = userData;
-      const {department, json, createdAt, modifiedAt, enteredAt} = body;
+      const {department, json, createdAt, modifiedAt, enteredAt, materialIssue} = body;
       console.log("The body is", body);
       const id = generateUId("", 15);
       const entry = {...json, createdAt, modifiedAt, id, status: "active", enteredAt};
@@ -147,6 +162,13 @@ exports.addData = functions
       const obj: any = {};
       /* tslint:disable-next-line */
       obj[department] = departmentData;
+      if (materialIssue) {
+        const boms = companyData.bomsInfo;
+        if (!boms) {
+          throw Error("Cannot issue without BOM entry");
+        }
+        obj["bomsInfo"] = issueInventory(materialIssue, boms);
+      }
       await admin.firestore().collection("data").doc(company).set(obj, {merge: true});
       return departmentData;
     });
