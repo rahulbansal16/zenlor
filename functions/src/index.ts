@@ -101,6 +101,12 @@ exports.addUser = functions.region("asia-northeast3").auth.user().onCreate(async
       .set(userInfo);
 });
 
+// const issueInventory = (material: MaterialIssue):BOMInfo[] => {
+//   const {styleCode, materialIssue} = material;
+//   console.log(styleCode, materialIssue)
+//   return [];
+// }
+
 exports.addData = functions
     .region("asia-northeast3")
     .https.onCall(async (body, context) => {
@@ -1165,7 +1171,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
   schema: upsertCreatePOSchema,
   handler: async (data, context) => {
     const supplierMap: any = {};
-    let total = 0;
+    const total : any= {};
     const {company, purchaseMaterials, createdAt} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
     const docData = doc.data();
@@ -1196,6 +1202,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
       const {styleCode, totalAmount} = item;
       if (!supplierMap[supplier]) {
         supplierMap[supplier] = [];
+        total[supplier] = 0;
       }
       supplierMap[supplier].push({
         sno: supplierMap[supplier].length + 1,
@@ -1209,7 +1216,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         // tax: "",
         // amount: amount,
       });
-      total += totalAmount;
+      total[supplier] += totalAmount;
     }
     console.log("The supplier map is", supplierMap);
     const purchaseOrders : PurchaseOrder[] = [];
@@ -1220,7 +1227,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         createdAt,
         purchaseOrderId: "",
         deliveryDate,
-        amount: total,
+        amount: total[key],
         status: POStatus.ACTIVE.toString(),
         lineItems: supplierMap[key],
       });
