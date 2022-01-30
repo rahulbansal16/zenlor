@@ -32,13 +32,16 @@ const FormLoader = ({initialValues, department: departmentId, header = () => {}}
 
     console.log("The styleCode is", styleCode, process)
 
-    const onFinish = async (values) => {
+    const onFinish = async (values, materialIssue) => {
         console.log("Calling onFinish", values)
         console.log("Will submit the values now")
         let createData = functions.httpsCallable('addData')
         let updateData = functions.httpsCallable('updateData')
         if (lineNumber === "null" || !lineNumber || lineNumber === null){
             lineNumber = undefined
+        }
+        if (materialIssue){
+            materialIssue["styleCode"] = styleCode;
         }
         const body = {
           department: departmentId,
@@ -50,6 +53,7 @@ const FormLoader = ({initialValues, department: departmentId, header = () => {}}
           enteredAt: getCurrentTime() ,
           modifiedAt: getCurrentTime(),
           json: { values, styleCode, process, lineNumber},
+          materialIssue
         };
         console.log("The body is", body)
         if (!id){

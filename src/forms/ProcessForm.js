@@ -25,8 +25,8 @@ const ProcessForm = ({ department }) => {
   const [day, setDay] = useState(0);
   const history = useHistory();
 
-  const onFinish = (value) => {
-    console.log("The value of the form is", value);
+  const onFinish = (value, materialIssue) => {
+    console.log("The value of the form is", value, materialIssue);
     const { styleCode, process } = value;
     history.push({
       pathname: `/${department}/form`,
@@ -57,10 +57,10 @@ const ProcessForm = ({ department }) => {
         name="styleCodeEditor"
         align="left"
         labelAlign="left"
-        onFinish={(data) => {
+        onFinish={(data, materialIssue) => {
           console.log(data);
           data["styleCode"] = styleCode;
-          onFinish(data);
+          onFinish(data, materialIssue);
         }}
       >
         <Form.Item

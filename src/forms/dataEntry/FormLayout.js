@@ -57,8 +57,8 @@ const FormLayout = ({initialValues, formFields, onFinish, styleCode}) => {
   console.log("The bomsInfo", bomsInfo, styleCode);
   const materials = bomsInfo.filter(item => item.styleCode === styleCode).map( item => ({
       id: item.materialId,
-      value: item.materialId,
-      name: item.materialId
+      value: item.materialId +":"+item.materialDescription,
+      name: item.materialId + ":"+item.materialDescription
   }))
   console.log("The materials are ", materials);
   // const [fieldName, setFieldName] = useState("default");
@@ -95,8 +95,17 @@ const FormLayout = ({initialValues, formFields, onFinish, styleCode}) => {
                   setLoading(true)
                   if (data["autosuggestkey"]){
                     let obj = {}
+                    const [materialId, materialDescription] = data["autosuggestkey"].split(":")
+                    let materialIssue = {
+                      styleCode: data.styleCode,
+                      materialIssue: [{
+                          materialId: materialId,
+                          materialDescription: materialDescription,
+                          issueAmount: data["autosuggestvalue"]
+                      }]
+                    }
                     obj['.'+data["autosuggestkey"]] = data["autosuggestvalue"]
-                    onFinish(obj)
+                    onFinish(obj, materialIssue)
                   } else {
                     onFinish(data)
                   }
