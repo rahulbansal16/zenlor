@@ -516,6 +516,8 @@ const calculatePendingQty = (item:BOM): number => {
   const {reqQty, inventory, activeOrdersQty, issueQty} = item;
   return parseFloat(((reqQty||0) - (inventory||0) - (activeOrdersQty||0) - (issueQty||0)).toFixed(2));
 };
+
+// Fabric, Trims, Labels, Packaging
 const getMaterialStatus = (styleCode: string, boms: BOM[]) : MaterialStatus => {
   const materials = boms.filter( (bom) => bom.styleCode === styleCode);
   const allIn = materials.every( (item) => (item.inventory??0) >= item.reqQty );
@@ -672,7 +674,7 @@ const upsertBOMSchema = Joi.object<BOMInfoDto, true>({
   company: Joi.string().required(),
   boms: Joi.array().items({
     styleCode: Joi.string().required(),
-    category: Joi.string().required(),
+    category: Joi.string().valid("FABRIC" , "TRIM", "LABEL" , "PACKING").required(),
     type: Joi.string().required(),
     materialId: Joi.string().required(),
     materialDescription: Joi.string().required(),

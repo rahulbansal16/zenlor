@@ -8,6 +8,7 @@ export type ProductType = "Wovenwear" | "Knitwear"
 export type ProductCategory = "Men Formal Shirt"
 | "Women Formal Shirt" | "Men T-Shirt" | "Women T-Shirt"
 export type FitType = "Slim" | "Regular" | "Custom"
+export type Category = "FABRIC" | "TRIM" | "LABEL" | "PACKING"
 // export type ProductType
 
 // styleCode get, post, put, delete
@@ -59,7 +60,7 @@ export interface BOM {
     id: string,
     styleCode: string,
     no: number,
-    category: string,
+    category: Category,
     type: string,
     materialId: string,
     materialDescription: string,
@@ -81,7 +82,7 @@ export interface BOMInfoDto {
 
 export interface BOMDto {
     styleCode: string,
-    category: string,
+    category: Category,
     type: string,
     materialId: string,
     materialDescription: string,
