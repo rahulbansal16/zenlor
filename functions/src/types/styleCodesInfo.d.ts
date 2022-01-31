@@ -8,7 +8,7 @@ export type ProductType = "Wovenwear" | "Knitwear"
 export type ProductCategory = "Men Formal Shirt"
 | "Women Formal Shirt" | "Men T-Shirt" | "Women T-Shirt"
 export type FitType = "Slim" | "Regular" | "Custom"
-export type Category = "FABRIC" | "TRIM" | "LABEL" | "PACKING"
+export type Category = "FABRIC" | "TRIM" | "LABEL" | "PACKAGING"
 // export type ProductType
 
 // styleCode get, post, put, delete
