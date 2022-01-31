@@ -172,6 +172,105 @@ export const initialState = {
                 title:"Material Status",
                 dataIndex: "materialStatus",
                 key: "materialStatus",
+                filterMode: 'tree',
+                filters: [
+                  {
+                    text: "PARTIAL_ORDERED",
+                    value: "PARTIAL_ORDERED",
+                    children: [
+                      {
+                        text: "FABRIC",
+                        value: "FABRIC:PARTIAL_ORDERED",
+                      },
+                      {
+                        text: "TRIM",
+                        value: "TRIM:PARTIAL_ORDERED",
+                      },
+                      {
+                        text: "LABEL",
+                        value: "LABEL:PARTIAL_ORDERED"
+                      },
+                      {
+                        text: "PACKAGING",
+                        value: "PACKAGING:PARTIAL_ORDERED"
+                      }
+                    ],
+                  },
+                  {
+                    text: "ALL_IN",
+                    value: "ALL_IN",
+                    children: [
+                      {
+                        text: "FABRIC",
+                        value: "FABRIC:ALL_IN"
+                      },
+                      {
+                        text: "TRIM",
+                        value: "TRIM:ALL_IN"
+                      },
+                      {
+                        text: "LABEL",
+                        value: "LABEL:ALL_IN"
+                      },
+                      {
+                        text: "PACKAGING",
+                        value: "PACKAGING:ALL_IN"
+                      }
+                      ]
+                  },
+                  {
+                    text: "NOT_ORDERED",
+                    value: "NOT_ORDERED",
+                    children: [
+                      {
+                        text: "FABRIC",
+                        value: "FABRIC:NOT_ORDERED"
+                      },
+                      {
+                        text: "TRIM",
+                        value: "TRIM:NOT_ORDERED"
+                      },
+                      {
+                        text: "LABEL",
+                        value: "LABEL:NOT_ORDERED"
+                      },
+                      {
+                        text: "PACKAGING",
+                        value: "PACKAGING:NOT_ORDERED"
+                      }
+                    ]
+                  },
+                  {
+                    text: "FULLY_ORDERED",
+                    value: "FULLY_ORDERED",
+                    children: [
+                      {
+                        text: "FABRIC",
+                        value: "FABRIC:FULLY_ORDERED"
+                      },
+                      {
+                        text: "TRIM",
+                        value: "TRIM:FULLY_ORDERED"
+                      },
+                      {
+                        text: "LABEL",
+                        value: "LABEL:FULLY_ORDERED"
+                      },
+                      {
+                        text: "PACKAGING",
+                        value: "PACKAGING:FULLY_ORDERED"
+                      }
+                    ]
+                  }
+                ],
+                onFilter: (value, record) => {
+                  const [category, status] = value.split(":")
+                  if(record.status){
+                    return record.status[category] === status
+                  } else {
+                    return true
+                  }
+                },
                 // editable: true,
                 // render: () => <ZenlorTags text="partial order"></ZenlorTags>
                },

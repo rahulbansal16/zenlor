@@ -520,8 +520,9 @@ const calculatePendingQty = (item:BOM): number => {
 // Fabric, Trims, Labels, Packaging
 const getMaterialStatus = (styleCode: string, boms: BOM[], category?: Category) : MaterialStatus => {
   let materials = boms.filter( (bom) => bom.styleCode === styleCode );
-  if (category)
-    materials = materials.filter(bom => bom.category === category)
+  if (category) {
+    materials = materials.filter((bom) => bom.category === category);
+  }
   const allIn = materials.every( (item) => (item.inventory??0) >= item.reqQty );
   if (allIn) {
     return MaterialStatus.ALL_IN;
@@ -573,12 +574,12 @@ exports.getData = functions
       styleCodesInfo = styleCodesInfo.map( (styleCode: StyleCodes)=> ({
         ...styleCode,
         materialStatus: getMaterialStatus(styleCode.styleCode, bomsInfo),
-        status : {
+        status: {
           FABRIC: getMaterialStatus(styleCode.styleCode, bomsInfo, "FABRIC"),
           TRIM: getMaterialStatus(styleCode.styleCode, bomsInfo, "TRIM"),
           LABEL: getMaterialStatus(styleCode.styleCode, bomsInfo, "LABEL"),
-          PACKAGING: getMaterialStatus(styleCode.styleCode, bomsInfo, "PACKAGING")
-        }
+          PACKAGING: getMaterialStatus(styleCode.styleCode, bomsInfo, "PACKAGING"),
+        },
       }));
       return {
         ...companyData,
@@ -682,7 +683,7 @@ const upsertBOMSchema = Joi.object<BOMInfoDto, true>({
   company: Joi.string().required(),
   boms: Joi.array().items({
     styleCode: Joi.string().required(),
-    category: Joi.string().valid("FABRIC" , "TRIM", "LABEL" , "PACKAGING").required(),
+    category: Joi.string().valid("FABRIC", "TRIM", "LABEL", "PACKAGING").required(),
     type: Joi.string().required(),
     materialId: Joi.string().required(),
     materialDescription: Joi.string().required(),
