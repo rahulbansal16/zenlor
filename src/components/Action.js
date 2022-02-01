@@ -302,7 +302,13 @@ const Action = ({ type }) => {
   console.log("The type is", type);
   return (
     <div>
-      {header[type].toUpperCase()}
+      <div>
+        {header[type].toUpperCase()}
+      </div>
+      
+      <Button onClick={()=>{
+        history.push('/action/inwardMaterial')        
+      }}>GRN</Button>
       <ExportTable
       // title={ () => header[type].toUpperCase() }
       // rowClassName={() => "editable-row"}
