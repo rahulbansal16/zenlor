@@ -803,7 +803,11 @@ const taskReducer = (state = initialState, action) => {
         case UPDATE_DATA: {
           return {
             ...state,
-            ...action.payload
+            inwardMaterial: {
+             ...state.inwardMaterial,
+             dataSource: action?.payload?.GRNInfo??[]
+            }
+            // ...action.payload.data
           }
         }
         case UPDATE_AUTH: {
