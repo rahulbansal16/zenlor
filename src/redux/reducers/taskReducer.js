@@ -292,6 +292,12 @@ export const initialState = {
                 dataIndex: "styleCode",
                 filter: "multiSelect",
                 key: "styleCode",
+              },
+              {
+                title: "Category",
+                dataIndex: "category",
+                key: "category",
+                filter: "multiSelect",
               },{
                 title: "MATERIAL",
                 children:[
@@ -299,11 +305,6 @@ export const initialState = {
                     title: "S.No",
                     dataIndex: "no",
                     key: "no",
-                  },
-                  {
-                    title: "Category",
-                    dataIndex: "category",
-                    key: "category",
                   },
                   {
                     title: "Type",
