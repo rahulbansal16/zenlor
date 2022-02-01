@@ -737,7 +737,7 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
       placement: bom.placement,
       // issueQty: 0,
       // no: 1,
-      // id: generateUId("BOM", 8),
+      id: generateUId("BOM", 8),
       reqQty: parseFloat((bom.makeQty*bom.consumption*(1+bom.wastage/100)).toFixed(2)),
       // inventory: 0,
       // activeOrdersQty: 0,
@@ -749,7 +749,7 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
         oldItem.styleCode === newItem.styleCode,
         {
           issueQty: 0,
-          id: generateUId("BOM", 8),
+          // id: generateUId("BOM", 8),
           inventory: 0,
           activeOrdersQty: 0,
         },
@@ -1357,12 +1357,12 @@ exports.upsertGRN = onCall<GRN>({
       throw Error("The company does not exist" + company);
     }
     const grnInfo = docData.GRNInfo??[];
-    const activeGRNInfo = grnInfo.filter((item: GRNItems) => item.status === "active");
-    let grnInfoOutput = upsertItemsInArray(activeGRNInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
-    oldItem.materialId === newItem.materialId &&
-    oldItem.materialDescription === newItem.materialDescription);
+    // const activeGRNInfo = grnInfo.filter((item: GRNItems) => item.status === "active");
+    // let grnInfoOutput = upsertItemsInArray(activeGRNInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
+    // oldItem.materialId === newItem.materialId &&
+    // oldItem.materialDescription === newItem.materialDescription);
 
-    const inventory = grnInfoOutput.map( (output: GRNItems) => ({
+    const inventory = GRN.map( (output: GRNItems) => ({
       materialId: output.materialId,
       materialDescription: output.materialDescription,
       inventory: output.acceptedQty,
@@ -1391,7 +1391,7 @@ exports.upsertGRN = onCall<GRN>({
       ...item,
       status: "done",
     }));
-    grnInfoOutput = upsertItemsInArray(grnInfo, GRNDone, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
+    const grnInfoOutput = upsertItemsInArray(grnInfo, GRNDone, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
     oldItem.materialId === newItem.materialId &&
     oldItem.materialDescription === newItem.materialDescription);
 
