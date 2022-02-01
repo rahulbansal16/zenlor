@@ -292,6 +292,7 @@ export const initialState = {
                 dataIndex: "styleCode",
                 filter: "multiSelect",
                 key: "styleCode",
+                width: 150
               },
               {
                 title: "Category",
@@ -301,11 +302,11 @@ export const initialState = {
               },{
                 title: "MATERIAL",
                 children:[
-                  {
-                    title: "S.No",
-                    dataIndex: "no",
-                    key: "no",
-                  },
+                  // {
+                  //   title: "S.No",
+                  //   dataIndex: "no",
+                  //   key: "no",
+                  // },
                   {
                     title: "Type",
                     dataIndex: "type",
@@ -366,14 +367,15 @@ export const initialState = {
                   dataIndex:"issueQty",
                   key: "issueQty"
                 },
-               {
-                  title: "Pending",
-                  dataIndex: "pendingQty",
-                  key: "pendingQty",
-                  editable: true,
-                },              
               ]
               },
+              {
+                title: "Pending",
+                dataIndex: "pendingQty",
+                key: "pendingQty",
+                editable: true,
+                filter: "multiSelect",
+              },  
               // Table.SELECTION_COLUMN,
             ],
             actions:[

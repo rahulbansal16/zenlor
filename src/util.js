@@ -111,18 +111,6 @@ const columns = [{
 {
     key: "preTaxAmount",
     title:"Pre.Tax Amt"
-},
-{
-    key: "rate",
-    title:"Rate"
-},
-{
-    key: "discount",
-    title:"Discount"
-},
-{
-    key: "preTaxAmount",
-    title:"Pre.Tax Amt"
 },  
 {
     key: "tax",
@@ -132,10 +120,6 @@ const columns = [{
     key: "taxAmount",
     title:"Tax Amount"
 },
-{
-    key: "totalAmount",
-    title:"Total Amount"
-},  
 {
     key: "deliveryDate",
     title:"Delivery Date"
@@ -169,7 +153,7 @@ export function downloadCsv(purchaseOrder){
     const {supplier, id, deliveryDate, amount} = purchaseOrder
     const topHeader = ['SUPPLIER',supplier,'','PO Number',id,'','Delivery',deliveryDate]
     const lineItems = purchaseOrder.lineItems.map(item => poFields.map(field => item[field]||"0"))
-    const footer = ['TOTAL', '','','','','','','','','','','INR',amount||'.']
+    const footer = ['TOTAL', '','','','','','','','INR',amount||'.']
     console.log("Line Items", lineItems);
 
     const fileName = supplier+'_'+deliveryDate
