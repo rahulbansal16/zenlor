@@ -1487,7 +1487,7 @@ exports.createPO = functions
           referenceId: styleCode,
           itemId: id,
           itemDesc: description,
-          quantity: poQty * consumption,
+          quantity: parseFloat((poQty * consumption).toFixed(2)),
           unit: unit,
           rate: rate,
           tax: "",
