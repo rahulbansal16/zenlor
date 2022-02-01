@@ -151,7 +151,7 @@ export function downloadCsv(purchaseOrder){
     const poFields= columns.map(item => item.key)
     const poHeaders= columns.map(item => item.title)
     const {supplier, id, deliveryDate, amount} = purchaseOrder
-    const topHeader = ['SUPPLIER',supplier,'','PO Number',id,'','Delivery',deliveryDate]
+    const topHeader = ['SUPPLIER',supplier,'','PO Number',id,'','PO Date',deliveryDate]
     const lineItems = purchaseOrder.lineItems.map(item => poFields.map(field => item[field]||"0"))
     const footer = ['TOTAL', '','','','','','','','INR',amount||'.']
     console.log("Line Items", lineItems);
