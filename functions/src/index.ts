@@ -785,7 +785,7 @@ const defaultPurchaseMaterials: any = {
   taxAmount: 0,
   totalAmount: 0,
   supplier: "",
-  deliveryDate: "",
+  deliveryDate: moment().format("MMM YY DD"),
 };
 
 const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:PurchaseMaterials[]) => {
@@ -828,7 +828,7 @@ const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:Purchas
     taxAmount: 0,
     totalAmount: 0,
     supplier: "",
-    deliveryDate: "",
+    deliveryDate: moment().format("MMM DD YY"),
   }));
   const purchaseMaterialsInfo = upsertItemsInArray(purchaseMaterials,
       mapMergedBomsToPurchaseMaterial,
@@ -1502,7 +1502,7 @@ exports.createPO = functions
           id: generateUId("", 10).toUpperCase(),
           supplier: key,
           createdAt,
-          deliveryDate: "",
+          deliveryDate: moment().format("MMM DD YY"),
           amount: totalAmount[key],
           status: "active",
           data: supplierMap[key],
@@ -1539,7 +1539,7 @@ const mapPOToGRN = (purchaseOrders : PurchaseOrder []) : GRNItems[] => {
       purchaseQty: item.purchaseQty,
       receivedQty: 0,
       status: "active",
-      receivedDate: "",
+      receivedDate: moment().format("MMM DD YY"),
       rejectedQty: 0,
       rejectedReason: "",
       acceptedQty: 0,
