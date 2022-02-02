@@ -648,7 +648,7 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
     orderQty: Joi.number().required(),
     makeQty: Joi.number(),
     deliveryDate: Joi.string(),
-    status: Joi.string().default("active"),
+    styleCodeStatus: Joi.string().default("active"),
   }).options({allowUnknown: true}),
 })
     // .strict(true)
@@ -1024,7 +1024,7 @@ const distributeInventory = (
     allBoms:BOM[],
     inventory:InventoryItems[]
 ) : {bomsInfo:BOM[], inventoryInfo:InventoryItems[]}=> {
-  const activeStyleCodes:StyleCodes[] = styleCodesInfo.filter((item: StyleCodes) => item.status === "active");
+  const activeStyleCodes:StyleCodes[] = styleCodesInfo.filter((item: StyleCodes) => item.styleCodeStatus === "active");
   activeStyleCodes.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());
 
   if (!inventory) {

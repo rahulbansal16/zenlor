@@ -49,7 +49,7 @@ export interface StyleCodes {
     mSizeQty?:number,
     xlSizeQty?:number,
     xxlSizeQty?:number,
-    status:string,
+    styleCodeStatus:string
 }
 export interface BOMInfo {
     boms: BOM[],
