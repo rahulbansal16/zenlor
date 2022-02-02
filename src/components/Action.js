@@ -307,7 +307,7 @@ const Action = ({ type }) => {
       </div>
       
       <Button onClick={()=>{
-        history.push('/action/inwardMaterial')        
+        history.push('/action/purchaseOrder')        
       }}>GRN</Button>
       <ExportTable
       // title={ () => header[type].toUpperCase() }
