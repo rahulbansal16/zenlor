@@ -175,50 +175,6 @@ export const initialState = {
                 filterMode: 'tree',
                 filters: [
                   {
-                    text: "PARTIAL_ORDERED",
-                    value: "PARTIAL_ORDERED",
-                    children: [
-                      {
-                        text: "FABRIC",
-                        value: "FABRIC:PARTIAL_ORDERED",
-                      },
-                      {
-                        text: "TRIM",
-                        value: "TRIM:PARTIAL_ORDERED",
-                      },
-                      {
-                        text: "LABEL",
-                        value: "LABEL:PARTIAL_ORDERED"
-                      },
-                      {
-                        text: "PACKAGING",
-                        value: "PACKAGING:PARTIAL_ORDERED"
-                      }
-                    ],
-                  },
-                  {
-                    text: "ALL_IN",
-                    value: "ALL_IN",
-                    children: [
-                      {
-                        text: "FABRIC",
-                        value: "FABRIC:ALL_IN"
-                      },
-                      {
-                        text: "TRIM",
-                        value: "TRIM:ALL_IN"
-                      },
-                      {
-                        text: "LABEL",
-                        value: "LABEL:ALL_IN"
-                      },
-                      {
-                        text: "PACKAGING",
-                        value: "PACKAGING:ALL_IN"
-                      }
-                      ]
-                  },
-                  {
                     text: "NOT_ORDERED",
                     value: "NOT_ORDERED",
                     children: [
@@ -241,6 +197,28 @@ export const initialState = {
                     ]
                   },
                   {
+                    text: "PARTIAL_ORDERED",
+                    value: "PARTIAL_ORDERED",
+                    children: [
+                      {
+                        text: "FABRIC",
+                        value: "FABRIC:PARTIAL_ORDERED",
+                      },
+                      {
+                        text: "TRIM",
+                        value: "TRIM:PARTIAL_ORDERED",
+                      },
+                      {
+                        text: "LABEL",
+                        value: "LABEL:PARTIAL_ORDERED"
+                      },
+                      {
+                        text: "PACKAGING",
+                        value: "PACKAGING:PARTIAL_ORDERED"
+                      }
+                    ],
+                  },
+                  {
                     text: "FULLY_ORDERED",
                     value: "FULLY_ORDERED",
                     children: [
@@ -261,6 +239,28 @@ export const initialState = {
                         value: "PACKAGING:FULLY_ORDERED"
                       }
                     ]
+                  },
+                  {
+                    text: "ALL_IN",
+                    value: "ALL_IN",
+                    children: [
+                      {
+                        text: "FABRIC",
+                        value: "FABRIC:ALL_IN"
+                      },
+                      {
+                        text: "TRIM",
+                        value: "TRIM:ALL_IN"
+                      },
+                      {
+                        text: "LABEL",
+                        value: "LABEL:ALL_IN"
+                      },
+                      {
+                        text: "PACKAGING",
+                        value: "PACKAGING:ALL_IN"
+                      }
+                      ]
                   }
                 ],
                 onFilter: (value, record) => {
