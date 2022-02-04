@@ -1427,38 +1427,38 @@ const upsertCreateInventorySchema = Joi.object<InventoryInfo, true>({
 
 
 exports.distributeInventory = functions
-.region("asia-northeast3")
-.https
-.onCall(async (data: { company: string }, context: any) => {
-  const {company} = data;
-  const doc = await admin.firestore().collection("data").doc(company).get();
-    const docData = doc.data();
-    if (!docData) {
-      throw Error("The company does not exist" + company);
-    }
-    const inventoryInfo = docData.inventoryInfo??[];
-    const bomsInfo = docData.bomsInfo??[];
-    const styleCodesInfo = docData.styleCodesInfo??[];
-    const result = collectInventoryFromStyleCodes(inventoryInfo, bomsInfo);
-    const collectedInventory = result?.inventory;
-    if (!collectedInventory) {
-      throw Error("Inventory Collection Failed");
-    }
+    .region("asia-northeast3")
+    .https
+    .onCall(async (data: { company: string }, context: any) => {
+      const {company} = data;
+      const doc = await admin.firestore().collection("data").doc(company).get();
+      const docData = doc.data();
+      if (!docData) {
+        throw Error("The company does not exist" + company);
+      }
+      const inventoryInfo = docData.inventoryInfo??[];
+      const bomsInfo = docData.bomsInfo??[];
+      const styleCodesInfo = docData.styleCodesInfo??[];
+      const result = collectInventoryFromStyleCodes(inventoryInfo, bomsInfo);
+      const collectedInventory = result?.inventory;
+      if (!collectedInventory) {
+        throw Error("Inventory Collection Failed");
+      }
 
-    const p = distributeInventory(styleCodesInfo, result.boms, result.inventory);
+      const p = distributeInventory(styleCodesInfo, result.boms, result.inventory);
 
-    await admin.firestore().collection("data").doc(company).set( {
-      inventoryInfo: p.inventoryInfo,
-      bomsInfo: p.bomsInfo,
-    }, {
-      merge: true,
+      await admin.firestore().collection("data").doc(company).set( {
+        inventoryInfo: p.inventoryInfo,
+        bomsInfo: p.bomsInfo,
+      }, {
+        merge: true,
+      });
+      return {
+        company,
+        inventoryInfo: p.inventoryInfo,
+        bomsInfo: p.bomsInfo,
+      };
     });
-    return {
-      company,
-      inventoryInfo: p.inventoryInfo,
-      bomsInfo: p.bomsInfo,
-    };
-})
 
 exports.upsertInventory = onCall<InventoryInfo>({
   name: "upsertInventory",
