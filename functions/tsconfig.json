@@ -1,16 +1,33 @@
 {
     "compilerOptions": {
+      "lib": [
+         "es2017",
+         "dom"
+       ],
       "module": "commonjs",
       "noImplicitReturns": true,
       "noUnusedLocals": true,
       "outDir": "lib",
       "sourceMap": true,
       "strict": true,
-      "target": "es2017"
+      "target": "es2017",
+      "declaration": false,
+      "strictPropertyInitialization": false,
+      "removeComments": true,
+      "noLib": false,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "baseUrl": "./",
+      "skipLibCheck": true,
     },
     "compileOnSave": true,
     "include": [
       "src"
+    ],
+    "exclude": [
+      "node_modules",
+      "**/*.spec.ts",
+      "src/nest-api/main.ts"
     ]
   }
   

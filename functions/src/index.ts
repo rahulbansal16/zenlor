@@ -20,6 +20,21 @@ admin.firestore().settings({
   ignoreUndefinedProperties: true,
 });
 
+// const createUnixSocketPool = async config => {
+//   const dbSocketPath = process.env.DB_SOCKET_PATH || '/cloudsql';
+
+//   // Establish a connection to the database
+//   return mysql.createPool({
+//     user: process.env.DB_USER, // e.g. 'my-db-user'
+//     password: process.env.DB_PASS, // e.g. 'my-db-password'
+//     database: process.env.DB_NAME, // e.g. 'my-database'
+//     // If connecting via unix domain socket, specify the path
+//     socketPath: `${dbSocketPath}/${process.env.INSTANCE_CONNECTION_NAME}`,
+//     // Specify additional properties here.
+//     ...config,
+//   });
+// };
+
 export enum POStatus{
   ACTIVE="ACTIVE",
   COMPLETED="COMPLETED",
@@ -1598,3 +1613,7 @@ const mapPOToGRN = (purchaseOrders : PurchaseOrder []) : GRNItems[] => {
 
 // app.use("/", router);
 // exports.api = functions.region("asia-northeast3").https.onRequest(app)
+import { NestServer } from "./nest-api/nest-server";
+
+// Functions Implementation
+export const api = functions.region("asia-northeast3").https.onRequest(NestServer);

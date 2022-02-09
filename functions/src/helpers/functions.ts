@@ -24,7 +24,7 @@ export const onCall = <T>(options: OnCallOptions<T>) =>
         logger.info("Validating data!");
         return await options.handler(validationResult.value, context);
       }
-    } catch (e) {
+    } catch (e: any) {
       logger.error(e.message);
       throw new functions.https.HttpsError(e.code ?? "internal", e.message);
     }
