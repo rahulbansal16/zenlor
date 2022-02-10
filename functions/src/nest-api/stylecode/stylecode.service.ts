@@ -17,19 +17,32 @@ export class StylecodeService {
   }
 
   findAll() {
-    return this.styleCodeRepository.find();
-    return `This action returns all stylecode`;
+    return this.styleCodeRepository.find({
+      where: {
+        isDeleted: 0
+      }
+    });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} stylecode`;
+    return this.styleCodeRepository.findOne({
+      where: {
+        id,
+        isDeleted: 0
+      }
+    });
   }
 
   update(id: number, updateStylecodeDto: UpdateStylecodeDto) {
-    return `This action updates a #${id} stylecode`;
+    return this.styleCodeRepository.update(id, updateStylecodeDto)
   }
 
   remove(id: number) {
-    return `This action removes a #${id} stylecode`;
+    return this.styleCodeRepository.update({
+      id
+    },{
+      isDeleted: 1
+    })
   }
+
 }

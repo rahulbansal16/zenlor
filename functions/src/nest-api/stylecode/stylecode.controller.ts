@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete} from "@nestjs/common";
+import {Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe} from "@nestjs/common";
 import {StylecodeService} from "./stylecode.service";
 import {CreateStylecodeDto} from "./dto/create-stylecode.dto";
 import {UpdateStylecodeDto} from "./dto/update-stylecode.dto";
@@ -8,7 +8,7 @@ export class StylecodeController {
   constructor(private readonly stylecodeService: StylecodeService) {}
 
   @Post()
-  // @UsePipes(new ValidationPipe({ transform: true }))
+  @UsePipes(new ValidationPipe({ transform: true }))
   create(@Body() createStylecodeDto: CreateStylecodeDto) {
     return this.stylecodeService.create(createStylecodeDto);
   }

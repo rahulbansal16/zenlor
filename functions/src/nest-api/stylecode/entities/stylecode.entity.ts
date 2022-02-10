@@ -32,4 +32,8 @@ export class Stylecode {
     @Column()
     styleCodeStatus:string;
 
+    @Column({
+        default: 0
+    })
+    isDeleted: number
 }
