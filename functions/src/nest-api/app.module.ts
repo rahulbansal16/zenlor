@@ -6,6 +6,8 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import { Stylecode } from "./stylecode/entities/stylecode.entity";
 import { StylecodeService } from "./stylecode/stylecode.service";
 import { StylecodeController } from "./stylecode/stylecode.controller";
+import { PurchaseordersModule } from './purchaseorders/purchaseorders.module';
+import { SuppliersModule } from './suppliers/suppliers.module';
 
 @Module({
   imports: [
@@ -22,7 +24,9 @@ import { StylecodeController } from "./stylecode/stylecode.controller";
     }),
     TypeOrmModule.forFeature([
       Stylecode
-    ])
+    ]),
+    PurchaseordersModule,
+    SuppliersModule
   ],
 })
 
