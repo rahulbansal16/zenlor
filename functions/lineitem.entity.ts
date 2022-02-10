@@ -1,8 +1,8 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from "typeorm";
-import { Purchaseorder } from "../../purchaseorders/entities/purchaseorder.entity";
+import { Purchaseorder } from "./lib/nest-api/purchaseorders/entities/purchaseorder.entity";
 
 @Entity()
-export class Lineitem {
+export class lineItem {
 
     @PrimaryGeneratedColumn()
     id: number;

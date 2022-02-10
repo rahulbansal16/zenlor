@@ -1,5 +1,5 @@
-import { lineItem } from "src/nest-api/lineitems/entities/lineitem.entity";
 import {IsNotEmpty } from 'class-validator';
+import { Lineitem } from '../../lineitems/entities/lineitem.entity';
 
 
 export class CreatePurchaseorderDto {
@@ -17,5 +17,5 @@ export class CreatePurchaseorderDto {
     supplierId: number;
 
     @IsNotEmpty()
-    lineItems: lineItem[];
+    lineItems: Lineitem[];
 }

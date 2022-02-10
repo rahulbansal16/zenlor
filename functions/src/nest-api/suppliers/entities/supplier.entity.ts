@@ -1,5 +1,5 @@
-import { Purchaseorder } from "src/nest-api/purchaseorders/entities/purchaseorder.entity";
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from "typeorm";
+import { Purchaseorder } from "../../purchaseorders/entities/purchaseorder.entity";
 
 @Entity()
 export class Supplier {

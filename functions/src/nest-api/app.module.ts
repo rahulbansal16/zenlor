@@ -6,8 +6,15 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import { Stylecode } from "./stylecode/entities/stylecode.entity";
 import { StylecodeService } from "./stylecode/stylecode.service";
 import { StylecodeController } from "./stylecode/stylecode.controller";
-import { PurchaseordersModule } from './purchaseorders/purchaseorders.module';
-import { SuppliersModule } from './suppliers/suppliers.module';
+import { Purchaseorder } from "./purchaseorders/entities/purchaseorder.entity";
+import { PurchaseordersController } from "./purchaseorders/purchaseorders.controller";
+import { PurchaseordersService } from "./purchaseorders/purchaseorders.service";
+import { Supplier } from "./suppliers/entities/supplier.entity";
+import { SuppliersController } from "./suppliers/suppliers.controller";
+import { SuppliersService } from "./suppliers/suppliers.service";
+import { Lineitem } from "./lineitems/entities/lineitem.entity";
+import { LineitemsController } from "./lineitems/lineitems.controller";
+import { LineitemsService } from "./lineitems/lineitems.service";
 
 @Module({
   imports: [
@@ -23,15 +30,18 @@ import { SuppliersModule } from './suppliers/suppliers.module';
       synchronize: true
     }),
     TypeOrmModule.forFeature([
-      Stylecode
+      Stylecode,
+      Purchaseorder,
+      Supplier,
+      Lineitem
     ]),
-    PurchaseordersModule,
-    SuppliersModule
+    // PurchaseordersModule,
+    // SuppliersModule
   ],
 })
 
 @Module({
-  controllers: [AppController, StylecodeController],
-  providers: [AppService, StylecodeService],
+  controllers: [AppController, StylecodeController, PurchaseordersController, SuppliersController, LineitemsController],
+  providers: [AppService, StylecodeService, PurchaseordersService, SuppliersService, LineitemsService],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
-import { lineItem } from "src/nest-api/lineitems/entities/lineitem.entity";
-import { Supplier } from "src/nest-api/suppliers/entities/supplier.entity";
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany} from "typeorm";
+import { Lineitem } from "../../lineitems/entities/lineitem.entity";
+import { Supplier } from "../../suppliers/entities/supplier.entity";
 
 @Entity()
 export class Purchaseorder {
@@ -21,9 +21,12 @@ export class Purchaseorder {
     @Column()
     deliveryDate: string;
 
+    @Column()
+    supplierId: number;
+
     @ManyToOne( type => Supplier, supplier => supplier.purchaseOrders)
     supplier: Supplier;
 
-    @OneToMany(type => lineItem, lineItem => lineItem.purchaseOrder)
-    lineItems: lineItem[]
+    @OneToMany(type => Lineitem, lineItem => lineItem.purchaseOrder)
+    lineItems: Lineitem[]
 }
