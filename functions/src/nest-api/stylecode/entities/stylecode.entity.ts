@@ -6,11 +6,30 @@ export class Stylecode {
     id: number;
 
     @Column()
-    firstName: string;
+    styleCode: string;
 
     @Column()
-    lastName: string;
+    brand: string;
 
-    @Column({default: true})
-    isActive: boolean;
+    @Column()
+    product: string;
+
+    @Column()
+    productType: string;
+
+    @Column()
+    confirmDate: string;
+
+    @Column()
+    orderQty: number;
+    
+    @Column()
+    makeQty: number;
+
+    @Column()
+    deliveryDate: string;
+
+    @Column()
+    styleCodeStatus:string;
+
 }

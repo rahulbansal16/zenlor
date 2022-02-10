@@ -2,8 +2,8 @@ import {Injectable} from "@nestjs/common";
 import {CreateStylecodeDto} from "./dto/create-stylecode.dto";
 import {UpdateStylecodeDto} from "./dto/update-stylecode.dto";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
 import {Stylecode} from "./entities/stylecode.entity";
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class StylecodeService {
@@ -13,7 +13,7 @@ export class StylecodeService {
   ) {}
 
   create(createStylecodeDto: CreateStylecodeDto) {
-    return "This action adds a new stylecode";
+    return this.styleCodeRepository.save(createStylecodeDto)
   }
 
   findAll() {

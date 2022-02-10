@@ -1,8 +1,11 @@
 import {Module} from "@nestjs/common";
 import {AppController} from "./app.controller";
 import {AppService} from "./app.service";
-import {StylecodeModule} from "./stylecode/stylecode.module";
+// import {StylecodeModule} from "./stylecode/stylecode.module";
 import {TypeOrmModule} from "@nestjs/typeorm";
+import { Stylecode } from "./stylecode/entities/stylecode.entity";
+import { StylecodeService } from "./stylecode/stylecode.service";
+import { StylecodeController } from "./stylecode/stylecode.controller";
 
 @Module({
   imports: [
@@ -15,13 +18,16 @@ import {TypeOrmModule} from "@nestjs/typeorm";
       password: "uCyiD8H2u2l8OACw",
       database: "staging",
       entities: ["lib/**/*.entity{.ts,.js}"],
+      synchronize: true
     }),
+    TypeOrmModule.forFeature([
+      Stylecode
+    ])
   ],
 })
 
 @Module({
-  imports: [StylecodeModule],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, StylecodeController],
+  providers: [AppService, StylecodeService],
 })
 export class AppModule {}

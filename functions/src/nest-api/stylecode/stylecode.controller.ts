@@ -8,6 +8,7 @@ export class StylecodeController {
   constructor(private readonly stylecodeService: StylecodeService) {}
 
   @Post()
+  // @UsePipes(new ValidationPipe({ transform: true }))
   create(@Body() createStylecodeDto: CreateStylecodeDto) {
     return this.stylecodeService.create(createStylecodeDto);
   }
