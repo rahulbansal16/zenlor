@@ -1,5 +1,5 @@
 import {IsNotEmpty } from 'class-validator';
-import { Lineitem } from '../../lineitems/entities/lineitem.entity';
+import { CreateLineitemDto } from '../../lineitems/dto/create-lineitem.dto';
 
 
 export class CreatePurchaseorderDto {
@@ -17,5 +17,5 @@ export class CreatePurchaseorderDto {
     supplierId: number;
 
     @IsNotEmpty()
-    lineItems: Lineitem[];
+    lineItems: CreateLineitemDto[];
 }
