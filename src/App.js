@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { Layout } from 'antd';
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import './App.less';
@@ -6,20 +7,26 @@ import Authorization from "./auth/Authorization";
 import Logout from "./auth/Logout";
 import Action from "./components/Action";
 import Login from "./container/Login";
-import { auth, functions} from "./firebase";
+import { auth, functions } from "./firebase";
 import Department from "./forms/dataEntry/Department";
 import EditForm from "./forms/EditForm";
 import FormLoader from './forms/FormLoader';
 import Home from "./forms/Home";
 import ProcessForm from './forms/ProcessForm';
 import { fetchDataAction, udpateRole, updateAuth } from "./redux/actions";
+import SideBar from "./SideBar";
 
 const renderPages = () => {
   return (
     <Switch>
-      <Route exact path="/" render = { (props) => <Department/>} />
-      <Route exact path="/action/:type" render = { (props) => <Action type={props.match.params.type}/>} />
-      <Route exact path="/logout" render = { (props) => <Logout/>} /> 
+      <Route exact path="/" render = { () => <Department/>} />
+      <Route exact path="/action/:type" render = { (props) => 
+        <Layout>
+          <SideBar></SideBar>
+          <Action type={props.match.params.type}/>
+        </Layout>
+      } />
+      <Route exact path="/logout" render = { () => <Logout/>} /> 
       <Route exact path="/login" render = {() => <Login/>} />
       <Route exact path="/:department">
          { (props) => <Authorization allowedRoles={["admin", "manager"]} department = {props.match.params.department}> 
