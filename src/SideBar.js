@@ -22,7 +22,11 @@ const SideBar = () => {
         setCollapsed(!collapsed)
     };
     return(
-        <Sider collapsible collapsed={collapsed}>
+        <Sider collapsible collapsed={collapsed}
+        style={{
+            height:'100vh'
+        }}
+        >
             <Button type="primary" onClick={toggleCollapsed}>
                 {collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
             </Button>
