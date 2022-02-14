@@ -8,6 +8,7 @@ import {
   Affix,
   Tooltip,
   DatePicker,
+  notification,
 } from "antd";
 import { Table as ExportTable } from "ant-table-extensions";
 import moment from "moment";
@@ -227,8 +228,13 @@ const Action = ({ type }) => {
   const onFinish = async (data) => {
     const action = data.action;
     const { company } = user;
-    // let selectedRows = selectedRowKeys
-
+    if (selectedRows.length === 0){
+      notification['warn']({
+        message: "No Row Selected",
+        description: "Please Select any row to continue"
+      })
+      return
+    }
     console.log("The data is", data);
     if (action === "createPO") {
       // const selectedIds = selectedRows.map ( row => row.id)
