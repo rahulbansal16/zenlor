@@ -185,3 +185,16 @@ export function downloadCsv(purchaseOrder){
     // downloadLink.click();
     // document.body.removeChild(downloadLink);
 }
+
+export const csvToJson = (csv) => {
+  let csdv = Papa.parse(csv, {
+    //     delimiter: ",",    // auto-detect
+    //     newline: "\n",    // auto-detect
+    //     quoteChar: '"',
+    //     escapeChar: '"',
+    header: true, // creates array of {head:value}
+    //     dynamicTyping: false, // convert values to numbers if possible
+    //     skipEmptyLines: true
+  });
+  return csdv.data;
+};

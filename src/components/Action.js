@@ -36,6 +36,8 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ActionBar from "./ActionBar";
 import useFilter from "../hooks/useFilter";
 import { Typography } from "antd";
+import { Row, Col, Divider } from 'antd';
+import AddNewModal from "./AddModal";
 
 const { Title } = Typography;
 
@@ -347,7 +349,15 @@ const Action = ({ type }) => {
         history.push('/action/purchaseOrder')        
       }}>GRN</Button> */}
       <Table
-        title={() => <Title level={4}>{header[type].toUpperCase()}</Title>}
+        title={() => <Row>
+              <Col span={22}>
+                <Title level={4}>{header[type].toUpperCase()}</Title>
+              </Col>
+              <Col span={2}>
+                <AddNewModal type={type} title={header[type]}/>
+                {/* <Button type="primary">Add New</Button> */}
+              </Col>
+          </Row>}
         // rowClassName={() => "editable-row"}
         // expandable={{
         //   expandedRowRender: record => <p style={{ margin: 0 }}>I am expandablee</p>,
