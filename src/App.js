@@ -6,6 +6,7 @@ import './App.less';
 import Authorization from "./auth/Authorization";
 import Logout from "./auth/Logout";
 import Action from "./components/Action";
+import AddNewForm from './components/AddNewForm';
 import Login from "./container/Login";
 import { auth, functions } from "./firebase";
 import Department from "./forms/dataEntry/Department";
@@ -20,6 +21,12 @@ const renderPages = () => {
   return (
     <Switch>
       <Route exact path="/" render = { () => <Department/>} />
+      <Route exact path="/action/:type/new" render = { (props) => 
+        <Layout>
+          <SideBar></SideBar>
+          <AddNewForm/>
+        </Layout>
+      } />
       <Route exact path="/action/:type" render = { (props) => 
         <Layout>
           <SideBar></SideBar>
