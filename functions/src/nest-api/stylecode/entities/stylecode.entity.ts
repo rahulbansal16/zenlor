@@ -1,4 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn} from "typeorm";
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from "typeorm";
+import { Bom } from "../../boms/entities/bom.entity";
 
 @Entity()
 export class Stylecode {
@@ -36,4 +37,7 @@ export class Stylecode {
         default: 0
     })
     isDeleted: number
+
+    @OneToMany( type => Bom, bom => bom.styleCode)
+    boms: Bom[]
 }

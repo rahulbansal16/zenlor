@@ -24,6 +24,9 @@ export class Purchaseorder {
     @Column()
     supplierId: number;
 
+    @Column()
+    purchaseOrderUrl: string;
+
     @ManyToOne( type => Supplier, supplier => supplier.purchaseOrders)
     supplier: Supplier;
 
