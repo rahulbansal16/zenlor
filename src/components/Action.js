@@ -174,6 +174,7 @@ const Action = ({ type }) => {
   const action = useSelector((state) => state.taskReducer[type]);
   const isFetching = useSelector((state) => state.taskReducer.isFetching);
   const { search } = useLocation();
+  const [loading, setLoading] = useState(false);
   const { columns, dataSource } = action;
   const filteredColumns = useFilter(columns, dataSource);
 
@@ -259,19 +260,35 @@ const Action = ({ type }) => {
         search: `styleCode=${selectedStyleCodes}`,
       });
     } else if (action === "downloadPO") {
+      setLoading(true)
       console.log("In the action of downloadPO");
       const upsertCreatePO = functions.httpsCallable("upsertCreatePO");
-      const selectedIds = selectedRows.map((row) => row.id);
-      const result = await upsertCreatePO({
-        company,
-        createdAt: getCurrentTime(),
-        purchaseMaterials: selectedRows,
-      });
-      console.log("The result is", result);
-      result.data.purchaseOrdersInfo.forEach((element) => {
-        downloadCsv(element);
-      });
-      dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo));
+      const selectedIds = selectedRows.map((row) => row.id)
+      let result = ""
+      try {
+          result = await upsertCreatePO({
+            company,
+          createdAt: getCurrentTime(),
+          purchaseMaterials: selectedRows,
+        });
+        notification["success"]({
+          message: "PO Created Successfully",
+          description: "PO is created successfully"
+        }) 
+        dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo));
+      } catch(e){
+       notification["error"] ({
+         message:"Error Creating PO",
+         description: e.message
+       })
+      }
+      // console.log("The result is", result);
+   
+      // result.data.purchaseOrdersInfo.forEach((element) => {
+      //   downloadCsv(element);
+      // });
+      setLoading(false)
+   
       // history.push({
       //   pathname: `/action/purchaseOrder`,
       //   search: `id=${selectedIds}`
@@ -354,6 +371,7 @@ const Action = ({ type }) => {
       {/* <Button onClick={()=>{
         history.push('/action/purchaseOrder')        
       }}>GRN</Button> */}
+      {loading?<Loader/>:<></>}
       <Table
         title={() => <Row>
               <Col span={22}>
