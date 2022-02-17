@@ -635,6 +635,13 @@ export const initialState = {
         title: "Amount",
         dataIndex: "amount",
         key: "amount",
+      },
+      {
+        title: "Download",
+        dataIndex: "fileUrl",
+        key: "fileUrl",
+        render : (text) => <a href={text}>Download</a>,
+
       }],
       dataSource: []
     },
