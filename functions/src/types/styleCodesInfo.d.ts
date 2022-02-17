@@ -127,6 +127,7 @@ export interface PurchaseOrder {
     id: string,
     purchaseOrderId: string,
     lineItems: PurchaseOrderLineItems[],
+    fileUrl?: string,
     amount: number,
     status: string,
     supplier: string
@@ -143,6 +144,14 @@ export interface PurchaseOrderLineItems {
     materialId: string,
     materialDescription: string,
     purchaseQty: number
+    rate: number,
+    discount: number,
+    preTaxAmount: number,
+    tax: number,
+    taxAmount: number,
+    totalAmount: number,
+    supplier: string,
+    deliveryDate: string
 }
 
 

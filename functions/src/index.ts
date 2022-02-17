@@ -6,6 +6,10 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as moment from "moment";
 import * as Joi from "joi";
+import * as path from "path";
+import * as os from "os";
+import * as excelJS from "exceljs"
+
 // import * as express from "express";
 import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
@@ -15,7 +19,12 @@ import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, P
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
-admin.initializeApp();
+// import * as file from "./zenlor-firebase-adminsdk-97xt1-7ebaf317cd.json"
+// console.log(file)
+const dirPath = path.join(__dirname, 'zenlor-firebase-adminsdk-97xt1-7ebaf317cd.json');
+admin.initializeApp({
+  credential: admin.credential.cert(dirPath),
+});
 admin.firestore().settings({
   ignoreUndefinedProperties: true,
 });
@@ -1306,6 +1315,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         });
     return {
       bomsInfo,
+      purchaseOrderFiles: urls,
       purchaseOrdersInfo: [...purchaseOrders],
       purchaseMaterialsInfo: result,
     };
@@ -1695,7 +1705,7 @@ const uploadFileToStorage = async (filePath: any, path: string) => {
 
 // app.use("/", router);
 // exports.api = functions.region("asia-northeast3").https.onRequest(app)
-import { NestServer } from "./nest-api/nest-server";
+// import { NestServer } from "./nest-api/nest-server";
 
 // Functions Implementation
-export const api = functions.region("asia-northeast3").https.onRequest(NestServer);
+// export const api = functions.region("asia-northeast3").https.onRequest(NestServer);
