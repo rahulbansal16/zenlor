@@ -120,7 +120,7 @@ const ActionBar = ({type, onFinish}) => {
             onChange={() => {}}
             allowClear
           >
-            {actions[type].map((action) => (
+            {(actions[type]??[]).map((action) => (
               <Option size="large" value={action.value} key = {action.key}>
                 {action.key}
               </Option>

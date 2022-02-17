@@ -24,6 +24,8 @@ const fetchAllKeys = (dataSource, column) => {
 }
 
 const useFilter = (columns, dataSource) => {
+    if (!columns || !dataSource) 
+     return []
     const columnsWithFilter = columns.map( column => {
         if (!column.filter)
             return column;
