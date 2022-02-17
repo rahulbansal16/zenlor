@@ -1286,6 +1286,12 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     result = result.filter( (item:PurchaseMaterials) => item.pendingQty > 0);
     // const new = purchaseMaterialsInfo.filter(()=>());
     // const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
+    let urls = []
+    for (let purchaseOrder of purchaseOrders){
+      const poUrl = await createPOFormatFile(company, purchaseOrder);
+      purchaseOrder.fileUrl = poUrl;
+      urls.push(poUrl)
+    }
     const grn: GRNItems[] = mapPOToGRN(purchaseOrders);
     await admin.firestore().collection("data").doc(company).set(
         {
@@ -1598,6 +1604,82 @@ const mapPOToGRN = (purchaseOrders : PurchaseOrder []) : GRNItems[] => {
   }
   return grnItems;
 };
+
+exports.formatPO = functions
+    .region("asia-northeast3")
+    .https
+    .onCall(async() => {
+      return await createPOFormatFile("test", {
+        supplier:"abc",
+        purchaseOrderId:"PO-123",
+        createdAt:"1st JAn",
+        lineItems:[{
+          id: 1,
+          // styleCode: string
+          category: "cloth",
+          unit: "pc",
+          type: "shirt",
+          materialId: "lala",
+          materialDescription: "mota-12",
+          purchaseQty: 2212
+        }]
+      } as unknown as PurchaseOrder)
+    })
+
+const createPOFormatFile = async (company: string, purchaseOrder : PurchaseOrder) => {
+
+  const workbook = new excelJS.Workbook();
+
+  const formateTemplateStream = readExcelTemplate();
+  await workbook.xlsx.read(formateTemplateStream);
+  const worksheet = workbook.getWorksheet('Sheet1');
+  // const data = transformPOToKeyValue(purchaseOrder);
+  fillWorksheet(worksheet, purchaseOrder);
+  const outputFile = path.join(os.tmpdir(), "output.xlsx");
+  await workbook.xlsx.writeFile(outputFile)
+  const fileUrl = await uploadFileToStorage(outputFile, `purchaseOrders/${company}/${purchaseOrder.id}.xlsx`)
+  return fileUrl
+}
+
+const readExcelTemplate = (fileName: string = "format/PurchaseOrder.xlsx") => {
+  const file = admin.storage().bucket("gs://zenlor.appspot.com").file(fileName)
+  return file.createReadStream()
+}
+
+const fillWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrder) => {
+  worksheet.getCell("B15").value = "C/O " + purchaseOrder.supplier
+  worksheet.getCell("G15").value = "Order No. " + purchaseOrder.id
+  worksheet.getCell("G19").value = "Order Date " + purchaseOrder.createdAt
+  worksheet.getCell("G22").value = purchaseOrder.deliveryDate
+  let total:any = {
+    preTaxAmount:0,
+    tax:0,
+    taxAmount:0,
+    totalAmount:0
+  }
+  for (let i = 0 ; i <  purchaseOrder.lineItems.length ; i++){
+    const lineItem = purchaseOrder.lineItems[i]
+    total.preTaxAmount += lineItem.preTaxAmount;
+    total.tax += lineItem.tax;
+    total.taxAmount += lineItem.taxAmount
+    total.totalAmount += lineItem.totalAmount
+    worksheet.insertRow(26 + i, ['', i+1, lineItem.materialId, lineItem.materialDescription, lineItem.unit, lineItem.purchaseQty, lineItem.rate, lineItem.discount, lineItem.preTaxAmount, lineItem.tax, lineItem.taxAmount, lineItem.totalAmount, lineItem.deliveryDate])
+  }
+  worksheet.insertRow(26 + purchaseOrder.lineItems.length, ['', 'Total', '', '', '', '', '', '', total.preTaxAmount, total.tax, total.taxAmount, total.totalAmount, ''])
+
+  return worksheet;
+}
+
+const uploadFileToStorage = async (filePath: any, path: string) => {
+ const [file] = await admin.storage().bucket("gs://zenlor.appspot.com").upload(filePath, {
+    destination: path,
+  })
+  const [downloadUrl] = await file.getSignedUrl({ 
+    action: 'read',
+    expires: 1744949418000
+  });
+  return downloadUrl
+}
 // Will pick it up when making the RestFul APIs
 // const router = express.Router();
 // const defaultRoutes = [
