@@ -687,7 +687,6 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
   name: "upsertyStyleCodesInfo",
   schema: insertStyleCodeSchema,
   handler: async (data, context) => {
-    console.log("The data is", data);
     const {company, styleCodes} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
     const docData = doc.data();
@@ -699,7 +698,8 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
     const inventoryInfo = docData.inventoryInfo??[];
     const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
     const result = distributeInventory(output, bomsInfo, inventoryInfo);
-    const newStyleCodesInfo = addMaterialStatusToStyleCode(output, bomsInfo);
+    let newStyleCodesInfo = addMaterialStatusToStyleCode(output, bomsInfo);
+    newStyleCodesInfo = newStyleCodesInfo.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
     await admin.firestore().collection("data").doc(company).set( {
       styleCodesInfo: newStyleCodesInfo,
       bomsInfo: result.bomsInfo,
@@ -709,7 +709,7 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
     });
     return {
       company,
-      styleCodes: newStyleCodesInfo,
+      styleCodesInfo: newStyleCodesInfo,
       bomsInfo: result.bomsInfo,
       inventoryInfo: result.inventoryInfo
     };
