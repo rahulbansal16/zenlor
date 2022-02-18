@@ -591,7 +591,7 @@ exports.getData = functions
       if (!companyData) {
         throw Error("The company does not exist " + company);
       }
-      let styleCodesInfo = companyData.styleCodesInfo??[];
+      let styleCodesInfo = (companyData.styleCodesInfo??[]).sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
       const GRNInfo = companyData.GRNInfo??[];
       styleCodesInfo = styleCodesInfo as StyleCodes[];
       const bomsInfo = companyData.bomsInfo??[];
