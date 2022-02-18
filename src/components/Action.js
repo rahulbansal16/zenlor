@@ -9,12 +9,13 @@ import {
   Tooltip,
   DatePicker,
   notification,
+  Result,
 } from "antd";
 import { Table as ExportTable } from "ant-table-extensions";
 import moment from "moment";
 
 import { useDispatch, useSelector } from "react-redux";
-import { LeftOutlined, PlusOutlined, RightOutlined } from "@ant-design/icons";
+import { LeftOutlined, PlusOutlined, RightOutlined, SmileOutlined } from "@ant-design/icons";
 // https://codesandbox.io/s/editable-cells-antd-4-17-4-forked-w3q20?file=/index.js:1809-1869
 import Loader from "./Loader";
 import { useLocation } from "react-router";
@@ -171,7 +172,7 @@ const Action = ({ type }) => {
   const [selectedRows, setSelectedRows] = useState([]);
   // const [selectedRowsKeys, setSelectedRowsKeys] = useState([])
   const user = useSelector((state) => state.taskReducer.user);
-  const action = useSelector((state) => state.taskReducer[type]);
+  const action = useSelector((state) => state.taskReducer[type] || {columns:undefined,dataSource:undefined});
   const isFetching = useSelector((state) => state.taskReducer.isFetching);
   const { search } = useLocation();
   const [loading, setLoading] = useState(false);
@@ -188,7 +189,16 @@ const Action = ({ type }) => {
     return <Loader />;
   }
 
+  if (!columns)
+    return    <Result
+          icon={<SmileOutlined/>}
+          title="We are working on it"
+          subTitle="We are actively building the functionality. Stay Tuned."
+      />
   const applyFilter = (dataSource) => {
+    if (!dataSource)
+     return dataSource
+
     if (type === "orderMaterials") {
       const styleCode = new URLSearchParams(search).get("styleCode") ?? ",";
       const styleCodes = styleCode.split(",");
