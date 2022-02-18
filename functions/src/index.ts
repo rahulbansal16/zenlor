@@ -573,6 +573,20 @@ const getMaterialStatus = (styleCode: string, boms: BOM[], category?: Category) 
   return MaterialStatus.UNKNOWN;
 };
 
+const addMaterialStatusToStyleCode = (styleCodesInfo: StyleCodes[], bomsInfo: BOM[]) : StyleCodes[]=> {
+  let updatedStyleCodes = styleCodesInfo.map( (styleCode: StyleCodes)=> ({
+    ...styleCode,
+    materialStatus: getMaterialStatus(styleCode.styleCode, bomsInfo),
+    status: {
+      FABRIC: getMaterialStatus(styleCode.styleCode, bomsInfo, "FABRIC"),
+      TRIM: getMaterialStatus(styleCode.styleCode, bomsInfo, "TRIM"),
+      LABEL: getMaterialStatus(styleCode.styleCode, bomsInfo, "LABEL"),
+      PACKAGING: getMaterialStatus(styleCode.styleCode, bomsInfo, "PACKAGING"),
+    },
+  }));
+  return updatedStyleCodes
+}
+
 exports.getData = functions
     .region("asia-northeast3")
     .https
@@ -595,16 +609,7 @@ exports.getData = functions
       const GRNInfo = companyData.GRNInfo??[];
       styleCodesInfo = styleCodesInfo as StyleCodes[];
       const bomsInfo = companyData.bomsInfo??[];
-      styleCodesInfo = styleCodesInfo.map( (styleCode: StyleCodes)=> ({
-        ...styleCode,
-        materialStatus: getMaterialStatus(styleCode.styleCode, bomsInfo),
-        status: {
-          FABRIC: getMaterialStatus(styleCode.styleCode, bomsInfo, "FABRIC"),
-          TRIM: getMaterialStatus(styleCode.styleCode, bomsInfo, "TRIM"),
-          LABEL: getMaterialStatus(styleCode.styleCode, bomsInfo, "LABEL"),
-          PACKAGING: getMaterialStatus(styleCode.styleCode, bomsInfo, "PACKAGING"),
-        },
-      }));
+      styleCodesInfo = addMaterialStatusToStyleCode(styleCodesInfo, bomsInfo);
       return {
         ...companyData,
         styleCodesInfo: styleCodesInfo,
@@ -690,15 +695,23 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
       throw Error("The company does not exist" + company);
     }
     const styleCodesInfo = docData.styleCodesInfo??[];
+    const bomsInfo = docData.bomsInfo??[];
+    const inventoryInfo = docData.inventoryInfo??[];
     const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
+    const result = distributeInventory(output, bomsInfo, inventoryInfo);
+    const newStyleCodesInfo = addMaterialStatusToStyleCode(output, bomsInfo);
     await admin.firestore().collection("data").doc(company).set( {
-      styleCodesInfo: output,
+      styleCodesInfo: newStyleCodesInfo,
+      bomsInfo: result.bomsInfo,
+      inventoryInfo: result.inventoryInfo
     }, {
       merge: true,
     });
     return {
       company,
-      styleCodes: output,
+      styleCodes: newStyleCodesInfo,
+      bomsInfo: result.bomsInfo,
+      inventoryInfo: result.inventoryInfo
     };
   },
 });
@@ -996,8 +1009,17 @@ exports.upsertPurchaseOrdersInfo = onCall<PurchaseOrdersInfo>({
 //       );
 //       return data;
 //     });
-const collectInventoryFromStyleCodes = (boms: BOM[], inventories: InventoryItems[]) => {
-  const mp:any = {};
+interface InventoryItem {
+  inventory: number,
+  activeOrdersQty: number
+}
+interface InventoryMap {[key: string]:  InventoryItem};
+
+const collectInventoryFromStyleCodes = (boms: BOM[], inventories: InventoryItems[]) : {
+  boms: BOM[],
+  inventory: InventoryItems[]
+} => {
+  const mp:InventoryMap = {};
   for (const bom of boms) {
     const key = bom.materialId + "|" + bom.materialDescription;
     if (mp[key]) {
@@ -1470,14 +1492,7 @@ exports.distributeInventory = functions
       const inventoryInfo = docData.inventoryInfo??[];
       const bomsInfo = docData.bomsInfo??[];
       const styleCodesInfo = docData.styleCodesInfo??[];
-      const result = collectInventoryFromStyleCodes(inventoryInfo, bomsInfo);
-      const collectedInventory = result?.inventory;
-      if (!collectedInventory) {
-        throw Error("Inventory Collection Failed");
-      }
-
-      const p = distributeInventory(styleCodesInfo, result.boms, result.inventory);
-
+      const p = distributeInventory(styleCodesInfo, bomsInfo, inventoryInfo);
       await admin.firestore().collection("data").doc(company).set( {
         inventoryInfo: p.inventoryInfo,
         bomsInfo: p.bomsInfo,
