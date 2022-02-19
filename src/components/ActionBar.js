@@ -95,9 +95,6 @@ const ActionBar = ({type, onFinish}) => {
         layout="inline"
         form = {form}
         {...formItemLayout}
-        style = {{
-          marginBottom:'40px'
-        }}
         size="medium"
         onFinish={async (data) => {
           await onFinish(data);

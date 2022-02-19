@@ -443,46 +443,47 @@ const Action = ({ type }) => {
                 <AddNewModal type={type} title={header[type]}/>
                 {/* <Button type="primary">Add New</Button> */}
               </Col>
-          </Row>
+      </Row>
+      <div style={{  overflowY: 'scroll', maxHeight:'85vh'}}>
       <ExportTable
         exportable
         style={{
           minHeight: "100vh",
         }}
-        summary={() => (
-          <Table.Summary fixed>
-            <Table.Summary.Row>
-              <Table.Summary.Cell>
-                {/* <Button
-                  type="primary"
-                  size="middle"
-                  onClick={() => insertRowHandler()}
-                >
-                  Add Entry
-                  <PlusOutlined />
-                </Button> */}
-              </Table.Summary.Cell>
-              {/* <Table.Summary.Cell>
-                         <div style={{display:'flex'}}>
-                          <Button>Plus</Button>
-                          <Button>Delete</Button>
-                      </div>
-            </Table.Summary.Cell> */}
-              {/* <div className="fx-sp-bt wd-100"> */}
+        // summary={() => (
+        //   <Table.Summary fixed>
+        //     <Table.Summary.Row>
+        //       <Table.Summary.Cell>
+        //         {/* <Button
+        //           type="primary"
+        //           size="middle"
+        //           onClick={() => insertRowHandler()}
+        //         >
+        //           Add Entry
+        //           <PlusOutlined />
+        //         </Button> */}
+        //       </Table.Summary.Cell>
+        //       {/* <Table.Summary.Cell>
+        //                  <div style={{display:'flex'}}>
+        //                   <Button>Plus</Button>
+        //                   <Button>Delete</Button>
+        //               </div>
+        //     </Table.Summary.Cell> */}
+        //       {/* <div className="fx-sp-bt wd-100"> */}
 
-              {/* <div style={{display:'flex'}}> */}
-              {/* <Button>Plus</Button>
-                  <Button>Delete</Button>
-                </div> */}
-              {/* </div> */}
-            </Table.Summary.Row>
-            <Table.Summary.Row>
-              <Table.Summary.Cell colSpan={12}>
-                <ActionBar type={type} onFinish={onFinish} />
-              </Table.Summary.Cell>
-            </Table.Summary.Row>
-          </Table.Summary>
-        )}
+        //       {/* <div style={{display:'flex'}}> */}
+        //       {/* <Button>Plus</Button>
+        //           <Button>Delete</Button>
+        //         </div> */}
+        //       {/* </div> */}
+        //     </Table.Summary.Row>
+        //     <Table.Summary.Row>
+        //       <Table.Summary.Cell colSpan={12}>
+        //         <ActionBar type={type} onFinish={onFinish} />
+        //       </Table.Summary.Cell>
+        //     </Table.Summary.Row>
+        //   </Table.Summary>
+        // )}
         bordered
         pagination={false}
         size="small"
@@ -495,6 +496,18 @@ const Action = ({ type }) => {
           key: item.id,
         }))}
       />
+      </div>
+
+      <div style={{
+        position: 'fixed',
+        paddingTop:'20px',
+        paddingLeft:'20px',
+        bottom: '10px',
+        height:'90px',
+        width: '100%'
+      }}>
+        <ActionBar type={type} onFinish={onFinish} />
+      </div>
       {/* <ActionBar type={type} onFinish={onFinish}/> */}
     </div>
   );
