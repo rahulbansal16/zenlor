@@ -446,7 +446,7 @@ const Action = ({ type }) => {
                 {/* <Button type="primary">Add New</Button> */}
               </Col>
       </Row>
-      <div style={{  overflowY: 'scroll', maxHeight:'88vh'}}>
+      <div style={{  overflowY: 'auto', maxHeight:'88vh'}}>
       <ExportTable
         exportable
         // summary={() => (
