@@ -696,14 +696,17 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
     const styleCodesInfo = docData.styleCodesInfo??[];
     const bomsInfo = docData.bomsInfo??[];
     const inventoryInfo = docData.inventoryInfo??[];
+    const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
     const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
-    const result = distributeInventory(output, bomsInfo, inventoryInfo);
+    const result = updateBomsInfoFromStyleCodes(output, bomsInfo, [...bomsInfo], inventoryInfo, purchaseMaterialsInfo);
+    // const result = distributeInventory(output, bomsInfo, inventoryInfo);
     let newStyleCodesInfo = addMaterialStatusToStyleCode(output, bomsInfo);
     newStyleCodesInfo = newStyleCodesInfo.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
     await admin.firestore().collection("data").doc(company).set( {
       styleCodesInfo: newStyleCodesInfo,
       bomsInfo: result.bomsInfo,
-      inventoryInfo: result.inventoryInfo
+      inventoryInfo: result.inventoryInfo,
+      purchaseMaterialsInfo: result.purchaseMaterialsInfo
     }, {
       merge: true,
     });
@@ -711,7 +714,8 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
       company,
       styleCodesInfo: newStyleCodesInfo,
       bomsInfo: result.bomsInfo,
-      inventoryInfo: result.inventoryInfo
+      inventoryInfo: result.inventoryInfo,
+      purchaseMaterialsInfo: result.purchaseMaterialsInfo
     };
   },
 });
@@ -742,6 +746,56 @@ const join = <T, P>(a:T[], b:P[], cmp:(e:T, f:P)=> boolean): (T&P) [] => {
   return output;
 };
 
+const updateBomsInfoFromStyleCodes = (styleCodes: StyleCodes[],
+   oldboms: BOM[],
+   newboms: BOM[],
+   inventory: InventoryItems[],
+   purchaseMaterials: PurchaseMaterials[]) : {
+     bomsInfo: BOM[],
+     purchaseMaterialsInfo: PurchaseMaterials[],
+     inventoryInfo: InventoryItems[]
+   } => {
+  const bomJoinedStyleCode = join(newboms, styleCodes, (a, b)=>a.styleCode === b.styleCode);
+  const mappedBOMDTO: any = bomJoinedStyleCode.map( (bom) => ({
+    styleCode: bom.styleCode,
+    category: bom.category,
+    type: bom.type,
+    materialId: bom.materialId,
+    materialDescription: bom.materialDescription,
+    consumption: bom.consumption,
+    wastage: bom.wastage,
+    unit: bom.unit,
+    placement: bom.placement,
+    // issueQty: 0,
+    // no: 1,
+    id: generateUId("BOM", 8),
+    reqQty: parseFloat((bom.makeQty*bom.consumption*(1+bom.wastage/100)).toFixed(2)),
+    // inventory: 0,
+    // activeOrdersQty: 0,
+    // pendingQty: 0,
+  }));
+
+  const output = upsertItemsInArray(oldboms,
+      mappedBOMDTO,
+      (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) &&
+      oldItem.styleCode === newItem.styleCode,
+      {
+        issueQty: 0,
+        // id: generateUId("BOM", 8),
+        inventory: 0,
+        activeOrdersQty: 0,
+      },
+      (a, b) => ({...a, ...b, pendingQty: calculatePendingQty(b)})
+  );
+  const p = distributeInventory(styleCodes, output, inventory);
+  const newPurchaseMaterials = populatePurhcaseMaterialsFromBOM(p.bomsInfo, purchaseMaterials);
+  return {
+    bomsInfo: p.bomsInfo,
+    purchaseMaterialsInfo: newPurchaseMaterials,
+    inventoryInfo: p.inventoryInfo
+  }
+}
+
 exports.upsertBOMInfo = onCall<BOMInfo>({
   name: "upsertBOMInfo",
   schema: upsertBOMSchema,
@@ -761,52 +815,18 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     const oldPurchaseMaterials = docData.purchaseMaterialsInfo??[];
     const inventory = docData.inventoryInfo??[];
     // This will use stylecode plus materialId
-    const bomJoinedStyleCode = join(boms, styleCodesInfo, (a, b)=>a.styleCode === b.styleCode);
-    const mappedBOMDTO: any = bomJoinedStyleCode.map( (bom) => ({
-      styleCode: bom.styleCode,
-      category: bom.category,
-      type: bom.type,
-      materialId: bom.materialId,
-      materialDescription: bom.materialDescription,
-      consumption: bom.consumption,
-      wastage: bom.wastage,
-      unit: bom.unit,
-      placement: bom.placement,
-      // issueQty: 0,
-      // no: 1,
-      id: generateUId("BOM", 8),
-      reqQty: parseFloat((bom.makeQty*bom.consumption*(1+bom.wastage/100)).toFixed(2)),
-      // inventory: 0,
-      // activeOrdersQty: 0,
-      // pendingQty: 0,
-    }));
-    const output = upsertItemsInArray(bomsInfo,
-        mappedBOMDTO,
-        (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) &&
-        oldItem.styleCode === newItem.styleCode,
-        {
-          issueQty: 0,
-          // id: generateUId("BOM", 8),
-          inventory: 0,
-          activeOrdersQty: 0,
-        },
-        (a, b) => ({...a, ...b, pendingQty: calculatePendingQty(b)})
-    );
-    // const inventories: InventoryItems[] = [];
-    // const p = collectInventoryFromStyleCodes(output, inventories);
-    const p = distributeInventory(styleCodesInfo, output, inventory);
-    const purchaseMaterialsInfo = populatePurhcaseMaterialsFromBOM(p.bomsInfo, oldPurchaseMaterials);
+    const result = updateBomsInfoFromStyleCodes(styleCodesInfo, bomsInfo, boms, inventory, oldPurchaseMaterials)
     await admin.firestore().collection("data").doc(company).set( {
-      bomsInfo: p.bomsInfo,
-      purchaseMaterialsInfo,
-      inventoryInfo: p.inventoryInfo,
+      bomsInfo: result.bomsInfo,
+      purchaseMaterialsInfo: result.purchaseMaterialsInfo,
+      inventoryInfo: result.inventoryInfo,
     }, {
       merge: true,
     });
     return {
       company,
-      bomsInfo: output,
-      purchaseMaterialsInfo,
+      bomsInfo: result.bomsInfo,
+      purchaseMaterialsInfo: result.bomsInfo,
     };
   },
 });
