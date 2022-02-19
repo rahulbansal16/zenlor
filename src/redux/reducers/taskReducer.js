@@ -1,85 +1,12 @@
 // import { FETCH_COMPLETE_TASKS, FETCH_INCOMPLETE_TASKS, UPDATE_TASK_STATUS } from "../actionType";
 
-import { Table, Tooltip } from "antd"
+import { notification, Table, Tooltip } from "antd"
 import ZenlorTags from "../../components/ZenlorTags"
 import { functions } from "../../firebase"
+import { performCalculation } from "../../util"
 import { FETCH_DATA, 
   UPDATE_DATA, 
   FETCH_PO, FETCH_PURCHASE_MATERIALS_INFO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
-
-const performCalculation = (item, type) => {
-  
-  const calculationMap = {
-    dashboard: {
-  
-    },
-    orderMaterials: {
-  
-    },
-    createPO: {
-      preTaxAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}`,
-      taxAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`,
-      totalAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}+${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`
-    },
-    inwardMaterial: {
-      // rejectedQty: `${item.purchaseQty||0}-${item.acceptedQty||0}`,
-      acceptedQty: `${item.receivedQty||0}-${item.rejectedQty||0}`
-    }
-  }
-  const map = calculationMap[type];
-  let newItem = {}
-  if(!map){
-    return item;
-  }
-  for (const property in item){
-    let value = item[property]
-    if (map[property]){
-     // eslint-disable-next-line no-eval
-     value = eval(map[property]).toFixed(2)
-    }
-    newItem[property] = value;
-  }
-  return newItem
-}
-
-const saveCellToServer = (item, type, company) => {
-  let methodName = "";
-  let payload = { company}
-  switch(type){
-    case "dashboard": 
-      methodName = "upsertStyleCodesInfo"
-      payload = {
-        ...payload,
-        styleCodes: [item]
-      }      
-      break;
-    case "createPO":
-      methodName = "upsertPurchaseMaterialsInfo"
-      payload = {
-        ...payload,
-        purchaseMaterials: [item]
-      }
-      break;
-    case "orderMaterials":
-      methodName = "upsertBOMInfo";
-      payload = {
-        ...payload,
-        boms: [item]
-      }
-      break;
-    case "inwardMaterial":
-      methodName = "upsertGRNItem";
-      payload = {
-        ...payload,
-        GRN: [item]
-      }
-      break;
-    default:
-      methodName = "";
-  }
-  const method = functions.httpsCallable(methodName)
-  return method(payload);
-}
 
 export const initialState = {
     user: {
@@ -322,11 +249,7 @@ export const initialState = {
                     dataIndex: "materialDescription",
                     key: "materialDescription",
                   },
-                  {
-                    title: "Consumption",
-                    dataIndex: "consumption",
-                    key: "consumption",
-                  }, 
+                 
                   {
                     title:"Wastage",
                     dataIndex: "wastage",
@@ -344,6 +267,12 @@ export const initialState = {
                   }
                 ]
               },
+              {
+                title: "Consumption",
+                dataIndex: "consumption",
+                key: "consumption",
+                editable: true
+              }, 
               {
                 title: "Quantity",
                 children:[              
@@ -373,7 +302,6 @@ export const initialState = {
                 title: "Pending",
                 dataIndex: "pendingQty",
                 key: "pendingQty",
-                editable: true,
                 filter: "multiSelect",
               },  
               // Table.SELECTION_COLUMN,
@@ -768,7 +696,7 @@ const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
             const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments, name, form} = action.payload
-            let purchaseOrders = action?.payload?.purchaseOrders??[]
+            const {createPO, orderMaterials, dashboard, purchaseOrder, inwardMaterial} = state;
             return {
                 ...state,
                 ...action.payload,
@@ -782,27 +710,27 @@ const taskReducer = (state = initialState, action) => {
                 // isFetching,
                 // name,
                 createPO: {
-                    ...state.createPO,
-                    dataSource: (action.payload.purchaseMaterialsInfo||[]).map( item => ({
+                    ...state.createPO, 
+                    dataSource: (action.payload.purchaseMaterialsInfo || createPO?.dataSource || []).map( item => ({
                       ...item,
                       id: item.styleCode + item.materialId.trim() + item.materialDescription.trim()
                     }))
                 },
                 orderMaterials: {
                     ...state.orderMaterials,
-                    dataSource: action?.payload?.bomsInfo??[]
+                    dataSource: action?.payload?.bomsInfo || orderMaterials?.dataSource || []
                 },
                 dashboard: {
                     ...state.dashboard,
-                    dataSource: action?.payload?.styleCodesInfo??[]
+                    dataSource: action?.payload?.styleCodesInfo || dashboard?.dataSource || []
                  },
                  purchaseOrder: {
                    ...state.purchaseOrder,
-                   dataSource: action?.payload?.purchaseOrdersInfo??[]
+                   dataSource: action?.payload?.purchaseOrdersInfo || purchaseOrder?.dataSource || []
                  },
                  inwardMaterial: {
                    ...state.inwardMaterial,
-                   dataSource: action?.payload?.GRNInfo??[]
+                   dataSource: action?.payload?.GRNInfo || inwardMaterial?.dataSource || []
                  },
                 form: form  || state.form
             }
@@ -874,7 +802,7 @@ const taskReducer = (state = initialState, action) => {
             const item = newData[index];
             const newItem = performCalculation({...item, ...row},type)
             newData.splice(index, 1, newItem);
-            saveCellToServer(newItem, type, company)
+            // saveCellToServer(newItem, type, company)
             return newState
         }
         case INSERT_ROW: {

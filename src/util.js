@@ -1,5 +1,6 @@
 import moment from "moment";
 import Papa from "papaparse";
+import { functions } from "./firebase";
 import { initialState } from "./redux/reducers/taskReducer";
 
 
@@ -184,6 +185,80 @@ export function downloadCsv(purchaseOrder){
     // document.body.appendChild(downloadLink);
     // downloadLink.click();
     // document.body.removeChild(downloadLink);
+}
+
+export const saveCellToServer = async (item, type, company) => {
+    let methodName = "";
+    let payload = { company}
+    switch(type){
+      case "dashboard": 
+        methodName = "upsertStyleCodesInfo"
+        payload = {
+          ...payload,
+          styleCodes: [item]
+        }      
+        break;
+      case "createPO":
+        methodName = "upsertPurchaseMaterialsInfo"
+        payload = {
+          ...payload,
+          purchaseMaterials: [item]
+        }
+        break;
+      case "orderMaterials":
+        methodName = "upsertBOMInfo";
+        payload = {
+          ...payload,
+          boms: [item]
+        }
+        break;
+      case "inwardMaterial":
+        methodName = "upsertGRNItem";
+        payload = {
+          ...payload,
+          GRN: [item]
+        }
+        break;
+      default:
+        methodName = "";
+    }
+    const method = functions.httpsCallable(methodName)
+    return await method(payload);
+}
+
+export const performCalculation = (item, type) => {
+  
+    const calculationMap = {
+      dashboard: {
+    
+      },
+      orderMaterials: {
+    
+      },
+      createPO: {
+        preTaxAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}`,
+        taxAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`,
+        totalAmount: `${item.purchaseQty||0}*${item.rate||0}*${((100-item.discount||0))/100}+${item.purchaseQty||0}*${item.rate||1}*${((100-item.discount||0))/100}*${(item.tax||0)/100}`
+      },
+      inwardMaterial: {
+        // rejectedQty: `${item.purchaseQty||0}-${item.acceptedQty||0}`,
+        acceptedQty: `${item.receivedQty||0}-${item.rejectedQty||0}`
+      }
+    }
+    const map = calculationMap[type];
+    let newItem = {}
+    if(!map){
+      return item;
+    }
+    for (const property in item){
+      let value = item[property]
+      if (map[property]){
+       // eslint-disable-next-line no-eval
+       value = eval(map[property]).toFixed(2)
+      }
+      newItem[property] = value;
+    }
+    return newItem
 }
 
 export const csvToJson = (csv) => {

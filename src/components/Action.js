@@ -11,7 +11,7 @@ import {
   notification,
   Result,
 } from "antd";
-import { Table as ExportTable } from "ant-table-extensions";
+// import { Table as ExportTable } from "ant-table-extensions";
 import moment from "moment";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -25,9 +25,11 @@ import {
   downloadCsv,
   generateUId,
   getCurrentTime,
+  performCalculation,
   purchaseMaterialKey,
 } from "../util";
 import {
+  fetchDataAction,
   fetchPOs,
   fetchPurchaseMaterialsInfo,
   insertRow,
@@ -164,6 +166,45 @@ const EditableCell = ({
 
   return <td {...restProps}>{childNode}</td>;
 };
+
+const saveCellToServer = async (item, type, company) => {
+  let methodName = "";
+  let payload = { company}
+  switch(type){
+    case "dashboard": 
+      methodName = "upsertStyleCodesInfo"
+      payload = {
+        ...payload,
+        styleCodes: [item]
+      }      
+      break;
+    case "createPO":
+      methodName = "upsertPurchaseMaterialsInfo"
+      payload = {
+        ...payload,
+        purchaseMaterials: [item]
+      }
+      break;
+    case "orderMaterials":
+      methodName = "upsertBOMInfo";
+      payload = {
+        ...payload,
+        boms: [item]
+      }
+      break;
+    case "inwardMaterial":
+      methodName = "upsertGRNItem";
+      payload = {
+        ...payload,
+        GRN: [item]
+      }
+      break;
+    default:
+      methodName = "";
+  }
+  const method = functions.httpsCallable(methodName)
+  return await method(payload);
+}
 
 const Action = ({ type }) => {
   const dispatch = useDispatch();
@@ -345,11 +386,21 @@ const Action = ({ type }) => {
         handleSave: async (e) => {
           console.log("The e in update cell is", e);
           dispatch(updateCell(e, type, company));
-          //   const updateStyleCodesInfo = functions.httpsCallable("actions")
-          //  await updateStyleCodesInfo({
-          //     item: e,
-          //     type
-          //   })
+
+          let newData = JSON.parse(JSON.stringify(dataSource));
+          const index = newData.findIndex((item) => e.key === item.id);
+          const item = newData[index];
+          const newItem = performCalculation({...item, ...e},type)
+          try {
+            const result = await saveCellToServer(newItem, type, company)
+            console.log("The result data is", result.data)
+            dispatch(fetchDataAction({...result.data}))
+          } catch(e){
+            notification["error"]({
+              message: "Error updating the cell",
+              description: e.message
+            })
+          }
         },
       }),
     };
