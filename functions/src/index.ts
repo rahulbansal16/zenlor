@@ -732,10 +732,10 @@ const upsertBOMSchema = Joi.object<BOMInfoDto, true>({
     wastage: Joi.number().required(),
     unit: Joi.string().required(),
     placement: Joi.string().required(),
-  }).options({allowUnknown: false}),
+  }).options({allowUnknown: true}),
 })
-    .strict(true)
-    .unknown(false);
+    .strict(false)
+    .unknown(true);
 
 const join = <T, P>(a:T[], b:P[], cmp:(e:T, f:P)=> boolean): (T&P) [] => {
   let output: any = [];
