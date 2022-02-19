@@ -433,8 +433,9 @@ const Action = ({ type }) => {
         history.push('/action/purchaseOrder')        
       }}>GRN</Button> */}
       {loading?<Loader/>:<></>}
-      <ExportTable
-        title={() => <Row>
+      <Row style = {{
+        marginTop:'10px'
+        }}>
               <Col span={22}>
                 <Title level={4}>{header[type].toUpperCase()}</Title>
               </Col>
@@ -442,11 +443,8 @@ const Action = ({ type }) => {
                 <AddNewModal type={type} title={header[type]}/>
                 {/* <Button type="primary">Add New</Button> */}
               </Col>
-          </Row>}
-        // rowClassName={() => "editable-row"}
-        // expandable={{
-        //   expandedRowRender: record => <p style={{ margin: 0 }}>I am expandablee</p>,
-        // }}
+          </Row>
+      <ExportTable
         exportable
         style={{
           minHeight: "100vh",
