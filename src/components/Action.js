@@ -428,7 +428,9 @@ const Action = ({ type }) => {
 
   console.log("The type is", type);
   return (
-    <div>
+    <div style = {{
+      maxWidth:'98vw'
+    }}>
       {/* <Button onClick={()=>{
         history.push('/action/purchaseOrder')        
       }}>GRN</Button> */}
@@ -444,12 +446,9 @@ const Action = ({ type }) => {
                 {/* <Button type="primary">Add New</Button> */}
               </Col>
       </Row>
-      <div style={{  overflowY: 'scroll', maxHeight:'85vh'}}>
+      <div style={{  overflowY: 'scroll', maxHeight:'88vh'}}>
       <ExportTable
         exportable
-        style={{
-          minHeight: "100vh",
-        }}
         // summary={() => (
         //   <Table.Summary fixed>
         //     <Table.Summary.Row>
@@ -503,7 +502,7 @@ const Action = ({ type }) => {
         paddingTop:'20px',
         paddingLeft:'20px',
         bottom: '10px',
-        height:'90px',
+        // height:'90px',
         width: '100%'
       }}>
         <ActionBar type={type} onFinish={onFinish} />
