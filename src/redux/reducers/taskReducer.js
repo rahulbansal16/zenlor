@@ -93,6 +93,12 @@ export const initialState = {
               key: "deliveryDate",
               editable: true
             },
+            {
+              title: "Status",
+              dataIndex: "materialStatus",
+              key: "status",
+              filter: "multiSelect"
+            },
             // {
               // children : [
                {
