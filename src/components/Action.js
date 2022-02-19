@@ -453,14 +453,14 @@ const Action = ({ type }) => {
           <Table.Summary fixed>
             <Table.Summary.Row>
               <Table.Summary.Cell>
-                <Button
+                {/* <Button
                   type="primary"
                   size="middle"
                   onClick={() => insertRowHandler()}
                 >
                   Add Entry
                   <PlusOutlined />
-                </Button>
+                </Button> */}
               </Table.Summary.Cell>
               {/* <Table.Summary.Cell>
                          <div style={{display:'flex'}}>
