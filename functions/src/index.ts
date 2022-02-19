@@ -853,7 +853,7 @@ const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:Purchas
       mp[key] = {
         ...mp[key],
         ...bom,
-        pendingQty: bom.pendingQty + mp[key].pendingQty,
+        pendingQty: parseFloat(bom.pendingQty + mp[key].pendingQty).toFixed(2),
       };
     } else {
       mp[key] = {
