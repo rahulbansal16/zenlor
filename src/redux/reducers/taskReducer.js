@@ -554,6 +554,11 @@ export const initialState = {
         key: "supplier",
       },
       {
+        title: "Created At",
+        dataIndex: "createdAt",
+        key: "createdAt"
+      },
+      {
         title: "Delivery Date",
         dataIndex: "deliveryDate",
         key: "deliveryDate",
