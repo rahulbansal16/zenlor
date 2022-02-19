@@ -11,7 +11,7 @@ import {
   notification,
   Result,
 } from "antd";
-// import { Table as ExportTable } from "ant-table-extensions";
+import { Table as ExportTable } from "ant-table-extensions";
 import moment from "moment";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -433,7 +433,7 @@ const Action = ({ type }) => {
         history.push('/action/purchaseOrder')        
       }}>GRN</Button> */}
       {loading?<Loader/>:<></>}
-      <Table
+      <ExportTable
         title={() => <Row>
               <Col span={22}>
                 <Title level={4}>{header[type].toUpperCase()}</Title>
