@@ -547,7 +547,7 @@ const getMaterialStatus = (styleCode: string, boms: BOM[], category?: Category) 
   if (category) {
     materials = materials.filter((bom) => bom.category === category);
   }
-  const allIn = materials.every( (item) => (item.inventory??0) >= item.reqQty );
+  const allIn = materials.every( (item) => ((item.inventory??0) + (item.issueQty??0)) >= item.reqQty );
   if (allIn) {
     return MaterialStatus.ALL_IN;
   }
@@ -555,7 +555,7 @@ const getMaterialStatus = (styleCode: string, boms: BOM[], category?: Category) 
   // if (!orderingRequired) {
   //   return MaterialStatus.ORDERING_REQUIRED;
   // }
-  const fullyOrdered = materials.filter((item) => calculatePendingQty(item) > 0).every( (item) => ((item.activeOrdersQty??0) > 0 ) && ((item.activeOrdersQty??0) >= item.reqQty));
+  const fullyOrdered = materials.filter((item) => calculatePendingQty(item) > 0).every( (item) => ((item.activeOrdersQty??0) > 0 ) && (((item.activeOrdersQty||0) +(item.inventory||0)+ (item.issueQty||0)) >= item.reqQty));
   if (fullyOrdered) {
     return MaterialStatus.FULLY_ORDERED;
   }
