@@ -104,7 +104,7 @@ const UploadFileModal = ({type, open}) => {
                 <Button icon={<UploadOutlined />}>Upload</Button>
             </Upload>
             <br></br>
-            Download <a href="https://sheets.google.com">csv</a> template
+            Download <a  target="_blank" rel="noreferrer" href="https://docs.google.com/spreadsheets/d/1bOTOm4xT00Rnqse0MMM567Q7SmBop7MgfMIRgiAMMr8/edit#gid=229857902">csv</a> template
         </Modal>
     )
 }
