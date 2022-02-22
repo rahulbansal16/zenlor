@@ -361,6 +361,28 @@ const Action = ({ type }) => {
       });
       console.log("The result is ", result);
       dispatch(updateData(result.data));
+    } else if (action === "cancelPO"){
+      // write some logic of canceling the PO
+      const cancelPO = functions.httpsCallable("cancelPO");
+      setLoading(true)
+      try {
+      const result = await cancelPO({
+        company,
+        purchaseOrders: selectedRows
+      })
+      dispatch(fetchDataAction(result.data))
+      notification["success"]({
+        message:"PO Cancelled",
+        description: "The POs are successfully cancelled" 
+      })
+    }
+    catch(e){
+      notification["error"]({
+        message:"Error Canceling PO",
+        description: e.message
+      })
+    }
+      setLoading(false)
     }
   };
   const components = {
@@ -429,7 +451,7 @@ const Action = ({ type }) => {
   console.log("The type is", type);
   return (
     <div style = {{
-      maxWidth:'98vw'
+      // maxWidth:'98vw'
     }}>
       {/* <Button onClick={()=>{
         history.push('/action/purchaseOrder')        
