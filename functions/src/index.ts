@@ -700,7 +700,7 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
     const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
     const result = updateBomsInfoFromStyleCodes(output, bomsInfo, [...bomsInfo], inventoryInfo, purchaseMaterialsInfo);
     // const result = distributeInventory(output, bomsInfo, inventoryInfo);
-    let newStyleCodesInfo = addMaterialStatusToStyleCode(output, bomsInfo);
+    let newStyleCodesInfo = addMaterialStatusToStyleCode(output, result.bomsInfo);
     newStyleCodesInfo = newStyleCodesInfo.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
     await admin.firestore().collection("data").doc(company).set( {
       styleCodesInfo: newStyleCodesInfo,
