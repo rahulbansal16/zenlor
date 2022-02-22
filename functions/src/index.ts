@@ -676,7 +676,7 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
     confirmDate: Joi.string(),
     orderQty: Joi.number().required(),
     makeQty: Joi.number(),
-    deliveryDate: Joi.string(),
+    deliveryDate: Joi.string().default(moment().format("DD MMM YY")),
     styleCodeStatus: Joi.string().default("active"),
   }).options({allowUnknown: true}),
 })
