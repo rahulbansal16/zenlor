@@ -1699,6 +1699,7 @@ const fillWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrde
   let total:any = {
     preTaxAmount:0,
     tax:0,
+    qty: 0,
     taxAmount:0,
     totalAmount:0
   }
@@ -1706,11 +1707,12 @@ const fillWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrde
     const lineItem = purchaseOrder.lineItems[i]
     total.preTaxAmount += lineItem.preTaxAmount;
     total.tax += lineItem.tax;
+    total.qty += lineItem.purchaseQty;
     total.taxAmount += lineItem.taxAmount
     total.totalAmount += lineItem.totalAmount
     worksheet.insertRow(26 + i, ['', i+1, lineItem.materialId, lineItem.materialDescription, lineItem.unit, lineItem.purchaseQty, lineItem.rate, lineItem.discount, lineItem.preTaxAmount, lineItem.tax, lineItem.taxAmount, lineItem.totalAmount, lineItem.deliveryDate])
   }
-  worksheet.insertRow(26 + purchaseOrder.lineItems.length, ['', 'Total', '', '', '', '', '', '', total.preTaxAmount, total.tax, total.taxAmount, total.totalAmount, ''])
+  worksheet.insertRow(26 + purchaseOrder.lineItems.length, ['', 'Total', '', '', '', total.qty, '', '', total.preTaxAmount, '', total.taxAmount, total.totalAmount, ''])
 
   return worksheet;
 }
