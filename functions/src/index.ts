@@ -672,7 +672,7 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
     styleCode: Joi.string().required(),
     brand: Joi.string().required(),
     product: Joi.string().required(),
-    orderNo: Joi.string().required(),
+    orderNo: Joi.string(),
     confirmDate: Joi.string(),
     orderQty: Joi.number().required(),
     makeQty: Joi.number(),
@@ -681,7 +681,7 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
   }).options({allowUnknown: true}),
 })
     // .strict(true)
-    .unknown(false);
+    .unknown(true);
 
 exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
   name: "upsertyStyleCodesInfo",
