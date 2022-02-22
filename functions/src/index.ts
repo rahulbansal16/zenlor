@@ -1694,7 +1694,7 @@ const readExcelTemplate = (fileName: string = "format/PurchaseOrder.xlsx") => {
 const fillWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrder) => {
   worksheet.getCell("B15").value = "C/O " + purchaseOrder.supplier
   worksheet.getCell("G15").value = "Order No. " + purchaseOrder.id
-  worksheet.getCell("G19").value = "Order Date " + purchaseOrder.createdAt
+  worksheet.getCell("G19").value = "Order Date " + moment(purchaseOrder.createdAt).format("DD MMM YY")
   worksheet.getCell("G22").value = purchaseOrder.deliveryDate
   let total:any = {
     preTaxAmount:0,
