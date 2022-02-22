@@ -72,6 +72,10 @@ const actions = {
       value: "viewLineItems"
     },
     {
+      key: "Cancel PO",
+      value: "cancelPO"
+    },
+    {
       key: "Inward Material",
       value: "inwardMaterial"
     }
