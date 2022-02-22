@@ -71,7 +71,7 @@ export interface BOM {
     reqQty: number,
     inventory?: number,
     activeOrdersQty?: number,
-    pendingQty?: number,
+    pendingQty: number,
     issueQty?: number
 }
 
