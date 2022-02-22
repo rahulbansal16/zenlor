@@ -32,13 +32,13 @@ const SideBar = () => {
         })
     }
     return(
-        <Sider collapsible collapsed={collapsed}
+        <Sider 
         style={{
             height:'100vh'
         }}
         >
             <Button type="primary" onClick={toggleCollapsed}>
-                {collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
+                {/* {collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>} */}
             </Button>
         <Menu
           defaultSelectedKeys={['styleDashboard']}
@@ -76,7 +76,7 @@ const SideBar = () => {
           {/* Item List	Goods Received Notes	Goods Consumed Notes	Goods Dispatched Notes */}
             <Menu.Item key="itemList">Item List</Menu.Item>
             <Menu.Item key="inwardMaterial">Goods Received Notes</Menu.Item>
-            <Menu.Item key="goodsConsumedNotes">Goods Consumed Notes</Menu.Item>
+            <Menu.Item onClick={() => window.open('https://zenlor.web.app/store?lineNumber=1')} key="goodsConsumedNotes">Goods Consumed Notes</Menu.Item>
             <Menu.Item key="goodsDispatchedNotes">Goods Dispatched Notes</Menu.Item>
           </SubMenu>
           <SubMenu key="jobwork" icon={<MailOutlined />} title="JOB WORK">
