@@ -424,7 +424,8 @@ export const initialState = {
           title: "Accepted Qty",
           dataIndex: "acceptedQty",
           key:"acceptedQty",
-          editable: true
+          editable: true,
+          width:100
         },
       ],
       dataSource:[]
@@ -553,34 +554,39 @@ export const initialState = {
         title: "Status",
         dataIndex: "status",
         key: "status",
+        width:150
       },
       {
         title: "Supplier",
         dataIndex: "supplier",
         key: "supplier",
+        width:150
       },
       {
         title: "Created At",
         dataIndex: "createdAt",
-        key: "createdAt"
+        key: "createdAt",
+        width: 200
       },
       {
         title: "Delivery Date",
         dataIndex: "deliveryDate",
         key: "deliveryDate",
-        editable: true
+        editable: true,
+        width:200
       },
       {
         title: "Amount",
         dataIndex: "amount",
         key: "amount",
+        width:200
       },
       {
         title: "Download",
         dataIndex: "fileUrl",
         key: "fileUrl",
         render : (text) => <a href={text}>Download</a>,
-
+        width:200
       }],
       dataSource: []
     },
