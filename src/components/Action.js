@@ -100,7 +100,7 @@ const EditableCell = ({
       let formattedValue = values;
       if (isDate) {
         formattedValue[dataIndex] = moment(values[dataIndex]).format(
-          "MMM DD YY"
+          "DD MMM YY"
         );
       }
       handleSave({ ...record, ...formattedValue });
