@@ -5,9 +5,8 @@ import { csvToJson } from "../util"
 import {functions} from "../firebase"
 import { useSelector } from "react-redux"
 
-const UploadFileModal = ({type, open}) => {
+const UploadFileModal = ({type, open, onCancel, onCloseModal}) => {
     const company = useSelector(state => state.taskReducer.user.company)
-    const [visible, setVisible] = useState(open)
     const [fileList, setFileList] = useState([])
     const [uploading, setUploading] = useState(false)
 
@@ -18,9 +17,6 @@ const UploadFileModal = ({type, open}) => {
           reader.onload = () => resolve(reader.result);
           reader.onerror = error => reject(error);
         });
-    }
-
-    const hreftemplate = {
     }
 
     const insertData = async (type, json) => {
@@ -61,8 +57,10 @@ const UploadFileModal = ({type, open}) => {
             await insertData(type, json)
             notification["success"]({
                 message: "File Uploaded",
-                description: "U"
+                description: "Enteries are entered into the System"
             })
+            setUploading(false)
+            onCloseModal(false)
         }).catch(e => {
             console.log("There is an error in uploading the file",e)
             notification["error"]({
@@ -93,11 +91,11 @@ const UploadFileModal = ({type, open}) => {
         <Modal
         title={`Upload File`}
         centered
-        visible={visible}
-        onOk={() => setVisible(false)}
-        onCancel={() => setVisible(false)}
+        visible={open}
+        onOk={() => onCloseModal(false)}
+        onCancel={() => onCloseModal()}
         footer={[
-            <Button onClick={() => setVisible(false)}>Cancel</Button>,
+            <Button onClick={() => onCloseModal(false)}>Cancel</Button>,
             <Button type="primary" onClick={handleUpload} disabled={fileList.length === 0} loading={uploading}>Next</Button>
         ]}>
             <Upload {...props}>

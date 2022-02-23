@@ -37,7 +37,7 @@ const AddNewModal = ({type, title, options = ['manual','csv']}) => {
                 </Space>
             </Radio.Group>
            </Modal>
-           { showFileModal?<UploadFileModal type={type} open={showFileModal}></UploadFileModal>:<></>}
+           <UploadFileModal onCloseModal = {()=> setShowFileModal(false)} onCancel = {() => {setShowFileModal(false); setVisible(false)}} type={type} open={showFileModal}></UploadFileModal>
         </>
     )
 }
