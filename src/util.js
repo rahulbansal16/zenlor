@@ -271,5 +271,6 @@ export const csvToJson = (csv) => {
     //     dynamicTyping: false, // convert values to numbers if possible
     //     skipEmptyLines: true
   });
-  return csdv.data;
+  const filtered = csdv.data.filter( (item, idx) => !Object.values(item).every(item => item === "") && idx !== 0)
+  return filtered;
 };
