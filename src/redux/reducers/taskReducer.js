@@ -31,14 +31,12 @@ export const initialState = {
             key: "styleCode",
             filter: "multiSelect",
             showSorterTooltip: false,
-            // width:150,
             fixed: true
           },
             {
               title: "Brand",
               dataIndex: "brand",
               key: "brand",
-              width:100,
               showSorterTooltip: false,
               filter: "multiSelect",
               sortType:"", // date, number, integer, string
@@ -52,7 +50,6 @@ export const initialState = {
             {
               title: "Product",
               dataIndex: "product",
-              width: 100,
               key: "product",
             },
             {
@@ -60,12 +57,10 @@ export const initialState = {
               dataIndex: "orderNo",
               showSorterTooltip: false,
               key: "orderNo",
-              width:150,
               editable: true
             },
             {
               title: "Order Confirmation",
-              width: 200,
               dataIndex: "confirmDate",
               showSorterTooltip: false,
               key: "confirmDate",
@@ -74,7 +69,6 @@ export const initialState = {
             {
               title: "Order Quantity",
               showSorterTooltip: false,
-              width:100,
               dataIndex: "orderQty",
               key: "orderQty",
               editable: true
@@ -82,14 +76,12 @@ export const initialState = {
             {
               title: "To Make Quantity",
               dataIndex: "makeQty",
-              width:100,
               key: "makeQty",
               editable: true
             },
             {
               title: "Delivery Date",
               dataIndex: "deliveryDate",
-              width: 200,
               key: "deliveryDate",
               editable: true
             },
@@ -225,7 +217,6 @@ export const initialState = {
                 dataIndex: "styleCode",
                 filter: "multiSelect",
                 key: "styleCode",
-                width: 150
               },
               {
                 title: "Category",
@@ -425,7 +416,6 @@ export const initialState = {
           dataIndex: "acceptedQty",
           key:"acceptedQty",
           editable: true,
-          width:100
         },
       ],
       dataSource:[]
@@ -554,39 +544,33 @@ export const initialState = {
         title: "Status",
         dataIndex: "status",
         key: "status",
-        width:150
       },
       {
         title: "Supplier",
         dataIndex: "supplier",
         key: "supplier",
-        width:150
       },
       {
         title: "Created At",
         dataIndex: "createdAt",
         key: "createdAt",
-        width: 200
       },
       {
         title: "Delivery Date",
         dataIndex: "deliveryDate",
         key: "deliveryDate",
         editable: true,
-        width:200
       },
       {
         title: "Amount",
         dataIndex: "amount",
         key: "amount",
-        width:200
       },
       {
         title: "Download",
         dataIndex: "fileUrl",
         key: "fileUrl",
         render : (text) => <a href={text}>Download</a>,
-        width:200
       }],
       dataSource: []
     },
