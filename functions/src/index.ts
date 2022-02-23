@@ -853,8 +853,9 @@ const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:Purchas
       mp[key] = {
         ...mp[key],
         ...bom,
-        pendingQty: parseFloat(bom.pendingQty + mp[key].pendingQty).toFixed(2),
+        pendingQty: bom.pendingQty + parseFloat(mp[key].pendingQty),
       };
+      mp[key].pendingQty = parseFloat(mp[key].pendingQty).toFixed(2)
     } else {
       mp[key] = {
         ...bom,
@@ -964,12 +965,35 @@ const upsertPurchaseOrdersInfoSchema = Joi.object<PurchaseOrdersInfo, true>({
   company: Joi.string().required(),
   purchaseOrders: Joi.array().items({
     id: Joi.string().required(),
-    name: Joi.string().required(),
-    category: Joi.string().required(),
-  }),
+    lineItems: Joi.array().items({
+      id: Joi.string().required(),
+      category: Joi.string().required(),
+      unit: Joi.string().required(),
+      type: Joi.string().required(),
+      materialId: Joi.string().required(),
+      materialDescription: Joi.required().required(),
+      purchaseQty: Joi.number().required(),
+      rate: Joi.number().required(),
+      discount: Joi.number().required(),
+      preTaxAmount: Joi.number().required(),
+      tax: Joi.number().required(),
+      taxAmount: Joi.number().required(),
+      totalAmount: Joi.number().required(),
+      supplier: Joi.string().required(),
+      deliveryDate: Joi.string().required(),
+      referenceId: Joi.string().required(),
+      status: Joi.string().required(),
+      sno: Joi.number().required(),
+    }).options({allowUnknown: true}),
+    fileUrl: Joi.string().required(),
+    amount: Joi.number().required(),
+    status: Joi.string().required(),
+    supplier: Joi.string().required(),
+    createdAt: Joi.string().required(),
+    deliveryDate: Joi.string().required()
+  }).options({allowUnknown: true}),
 })
-    .strict(true)
-    .unknown(false);
+    .unknown(true);
 
 // The individual Line Items in the purchaseOrder can not be appended
 // New Line Items will replace the old one
@@ -1104,16 +1128,7 @@ const distributeInventory = (
     };
   }
   collectInventoryFromStyleCodes(allBoms, inventory);
-  for (const activeStyleCode of activeStyleCodes) {
-    // const boms = allBoms.filter((item: BOM) => item.styleCode === activeStyleCode.styleCode)
-    for (let bom of allBoms) {
-      bom = bom as BOM;
-      if (bom.styleCode !== activeStyleCode.styleCode) {
-        continue;
-      }
-      assignInventoryToBOMItem(bom, inventory);
-    }
-  }
+  assignInventoryToBOM(activeStyleCodes, allBoms, inventory);
   return {
     bomsInfo: allBoms,
     inventoryInfo: inventory,
@@ -1124,6 +1139,26 @@ const distributeInventory = (
   // }
   //   ,{ merge: true})
 };
+
+const assignInventoryToBOM = (activeStyleCodes: StyleCodes[], boms: BOM[], inventory: InventoryItems[]) : {
+  boms: BOM[],
+  inventory: InventoryItems[]
+}=> {
+  for (const activeStyleCode of activeStyleCodes) {
+    // const boms = allBoms.filter((item: BOM) => item.styleCode === activeStyleCode.styleCode)
+    for (let bom of boms) {
+      bom = bom as BOM;
+      if (bom.styleCode !== activeStyleCode.styleCode) {
+        continue;
+      }
+      assignInventoryToBOMItem(bom, inventory);
+    }
+  }
+  return {
+    boms,
+    inventory
+  }
+}
 
 const assignInventoryToBOMItem = (bom: BOM, inventory: InventoryItems[]) => {
   const inventoryNeed = Math.max(bom.reqQty - (bom.issueQty??0), 0);
@@ -1239,6 +1274,76 @@ exports.updateStyleCodesInfo = functions
       return obj;
     });
 
+// const purchaseOrdersInfoSchema = Joi.object<PurchaseOrdersInfo, true>({
+//   company: Joi.string().required(),
+//   purchaseOrders: Joi.array().items({
+//     id: Joi.string().required(),
+//     name: Joi.string().required(),
+//     category: Joi.string().required(),
+//   }),
+// })
+
+exports.cancelPO = onCall<PurchaseOrdersInfo>({
+  name:"cancelPO",
+  schema: upsertPurchaseOrdersInfoSchema,
+  handler: async (data, context) => {
+    
+    const {company, purchaseOrders} = data;
+    const doc = await admin.firestore().collection("data").doc(company).get();
+    const docData = doc.data();
+    if (!docData) {
+      throw Error("Document is not prsent for the company");
+    }
+    const purchaseOrdersInfo = docData.purchaseOrdersInfo??[];
+    const bomsInfo = docData.bomsInfo??[];
+    const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
+    const inventory: InventoryItems[] = docData.inventoryInfo??[];
+    const styleCodes: StyleCodes[] = docData.styleCodesInfo??[];
+    const grnInfo: GRNItems[] = docData.GRNInfo??[];
+
+    let deletedPO:any = {}
+    const collectedInventory = collectInventoryFromStyleCodes(bomsInfo, inventory);
+    for (let purchaseOrder of purchaseOrders){
+      for (let lineItem of purchaseOrder.lineItems){
+        const item = collectedInventory.inventory.find(item => item.materialId === lineItem.materialId && item.materialDescription === lineItem.materialDescription)
+        if (!item){
+          throw Error("One of the item in the purchaseOrder does not exist in the Inventory List")
+        }
+        item.activeOrdersQty -= lineItem.purchaseQty;
+      }
+      if (purchaseOrder.status === "CANCELED"){
+        throw Error("Purchase Order is already canceled")
+      }
+      purchaseOrder.status = "CANCELED";
+      deletedPO[purchaseOrder.id] = true;
+    }
+
+    const assignedInventory = assignInventoryToBOM(styleCodes, collectedInventory.boms, collectedInventory.inventory);
+    const updatedPurchaseMaterialsInfo =  populatePurhcaseMaterialsFromBOM(assignedInventory.boms, purchaseMaterialsInfo);
+    let filteredGRN = grnInfo.filter( item => !deletedPO[item.purchaseOrderId])
+    const output = upsertItemsInArray(purchaseOrdersInfo, purchaseOrders, (oldItem, newItem) => oldItem.id === newItem.id);
+
+    let newStyleCodesInfo = addMaterialStatusToStyleCode(styleCodes, collectedInventory.boms);
+    await admin.firestore().collection("data").doc(company).set(
+        {
+          bomsInfo: collectedInventory.boms,
+          inventoryInfo: collectedInventory.inventory,
+          purchaseOrdersInfo: output,
+          purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
+          GRNInfo: filteredGRN
+        }
+        , {
+          merge: true,
+        });
+    return {
+      styleCodesInfo: newStyleCodesInfo,
+      bomsInfo: collectedInventory.boms,
+      purchaseOrdersInfo: output ,
+      purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
+      GRNInfo: filteredGRN
+    };
+  }
+})
 
 const upsertCreatePOSchema = Joi.object<PurchaseMaterialsInfo, true>({
   company: Joi.string().required(),
@@ -1343,6 +1448,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
       purchaseOrder.fileUrl = poUrl;
       urls.push(poUrl)
     }
+    let newStyleCodesInfo = addMaterialStatusToStyleCode(styleCodes, distributedInventory.bomsInfo);
     const grn: GRNItems[] = mapPOToGRN(purchaseOrders);
     await admin.firestore().collection("data").doc(company).set(
         {
@@ -1356,10 +1462,12 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           merge: true,
         });
     return {
+      styleCodesInfo: newStyleCodesInfo,
       bomsInfo,
       purchaseOrderFiles: urls,
-      purchaseOrdersInfo: [...purchaseOrders],
+      purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
       purchaseMaterialsInfo: result,
+      GRNInfo: [...grn, ...grnInfo]
     };
   },
 });
