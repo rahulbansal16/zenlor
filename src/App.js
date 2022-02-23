@@ -16,6 +16,7 @@ import Home from "./forms/Home";
 import ProcessForm from './forms/ProcessForm';
 import { fetchDataAction, udpateRole, updateAuth } from "./redux/actions";
 import SideBar from "./SideBar";
+const { Header, Footer, Sider, Content } = Layout;
 
 const renderPages = () => {
   return (
@@ -30,7 +31,9 @@ const renderPages = () => {
       <Route exact path="/action/:type" render = { (props) => 
         <Layout hasSider={true}>
           <SideBar></SideBar>
-          <Action type={props.match.params.type}/>
+          <Content>
+            <Action type={props.match.params.type}/>
+          </Content>
         </Layout>
       } />
       <Route exact path="/logout" render = { () => <Logout/>} /> 
