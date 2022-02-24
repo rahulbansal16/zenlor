@@ -672,13 +672,13 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
     styleCode: Joi.string().required(),
     brand: Joi.string().required(),
     product: Joi.string().required(),
-    orderNo: Joi.string(),
-    confirmDate: Joi.string(),
+    orderNo: Joi.string().default(""),
+    confirmDate: Joi.string().default(moment().format("DD MMM YY")),
     orderQty: Joi.number().required(),
     makeQty: Joi.number(),
     deliveryDate: Joi.string().default(moment().format("DD MMM YY")),
     styleCodeStatus: Joi.string().default("active"),
-  }).options({allowUnknown: true}),
+  }).options({allowUnknown: true}).strict(false),
 })
     // .strict(true)
     .unknown(true);
