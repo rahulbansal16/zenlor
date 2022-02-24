@@ -29,7 +29,9 @@ const renderPages = () => {
         </Layout>
       } />
       <Route exact path="/action/:type" render = { (props) => 
-        <Layout hasSider={true}>
+        <Layout hasSider={true} style={{
+          fontSize:"13px"
+        }}>
           <SideBar></SideBar>
           <Content>
             <Action type={props.match.params.type}/>

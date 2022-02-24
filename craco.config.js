@@ -13,7 +13,7 @@ module.exports = {
                 '@primary-color': 'green',
                 '@secondary-color': '#F76C8E',
                 '@font-family': "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif",
-                '@font-size-base': '15px',
+                '@font-size-base': '14px',
             },
             javascriptEnabled: true,
           },
