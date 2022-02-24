@@ -244,24 +244,26 @@ export const initialState = {
                     title: "Description",
                     dataIndex: "materialDescription",
                     key: "materialDescription",
-                  },
-                 
-                  {
-                    title:"Wastage",
-                    dataIndex: "wastage",
-                    key: "wastage"
-                  },
+                  },       
                   {
                     title: "Unit",
                     dataIndex: "unit",
                     key: "unit",
                   },
-                  {
-                    title: "Placement",
-                    dataIndex: "placement",
-                    key: "placement",
-                  }
+                
                 ]
+              },
+              {
+                title: "Placement",
+                dataIndex: "placement",
+                key: "placement",
+                editable: true
+              },
+              {
+                title:"Wastage",
+                dataIndex: "wastage",
+                key: "wastage",
+                editable: true
               },
               {
                 title: "Consumption",
