@@ -31,7 +31,6 @@ export const initialState = {
             key: "styleCode",
             filter: "multiSelect",
             showSorterTooltip: false,
-            fixed: true
           },
             {
               title: "Brand",
@@ -219,7 +218,7 @@ export const initialState = {
                 key: "styleCode",
               },
               {
-                title: "Category",
+                title: "Cat.",
                 dataIndex: "category",
                 key: "category",
                 filter: "multiSelect",
