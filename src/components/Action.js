@@ -217,18 +217,24 @@ const Action = ({ type }) => {
   const isFetching = useSelector((state) => state.taskReducer.isFetching);
   const { search } = useLocation();
   const [loading, setLoading] = useState(false);
+  const [filteredInfo, setFilteredInfo] = useState(null)
   const { columns, dataSource } = action;
   const filteredColumns = useFilter(columns, dataSource);
 
   useEffect(() => {
     console.log("Calling for type", type);
-    // setSelectedRowsKeys([])
+    setFilteredInfo(null);
     setSelectedRowsKeys([]);
   }, [type, action]);
 
   if (isFetching) {
     return <Loader />;
   }
+  
+  const handleChange = (pagination, filters, sorter) => {
+    // console.log('Various parameters', pagination, filters, sorter);
+    setFilteredInfo(filters)
+  };
 
   if (!columns)
     return    <Result
@@ -392,7 +398,7 @@ const Action = ({ type }) => {
     },
   };
 
-  const column = filteredColumns.map((col) => {
+  let column = filteredColumns.map((col) => {
     const { company } = user;
     if (!col.editable) {
       return col;
@@ -427,6 +433,13 @@ const Action = ({ type }) => {
       }),
     };
   });
+
+  if (filteredInfo){
+    column = column.map( p => ({
+      ...p,
+      filteredValue: (filteredInfo && filteredInfo[p.key] )|| null
+    }))
+  }
 
   const insertRowHandler = () => {
     console.log("In the insert Row Handler");
@@ -511,6 +524,7 @@ const Action = ({ type }) => {
         sticky={true}
         components={components}
         rowSelection={rowSelection}
+        onChange={handleChange}
         columns={column}
         dataSource={applyFilter(dataSource).map((item) => ({
           ...item,
