@@ -40,6 +40,9 @@ const useFilter = (columns, dataSource) => {
                     console.log("In the onFilter Method", value, record, record);
                     return record[column?.dataIndex] === value }
                 filterColumn['filters'] = fetchAllKeys(dataSource, dataIndex)
+                // console.log("The filterColumn Key is", filterColumn.key)
+                filterColumn.filteredValue = null;
+                // console.log("The filterColumn", filterColumn.filteredValue)
                 break;
             default:
                 break
