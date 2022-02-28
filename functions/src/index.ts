@@ -688,35 +688,44 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
   schema: insertStyleCodeSchema,
   handler: async (data, context) => {
     const {company, styleCodes} = data;
-    const doc = await admin.firestore().collection("data").doc(company).get();
-    const docData = doc.data();
-    if (!docData) {
-      throw Error("The company does not exist" + company);
+    try {
+      const dataRef = admin.firestore().collection("data").doc(company);
+      return await admin.firestore().runTransaction( async db => {
+        const doc = await db.get(dataRef);
+        const docData = doc.data();
+        if (!docData) {
+          throw Error("The company does not exist" + company);
+        }
+        const styleCodesInfo = docData.styleCodesInfo??[];
+        const bomsInfo = docData.bomsInfo??[];
+        const inventoryInfo = docData.inventoryInfo??[];
+        const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
+        const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
+        const result = updateBomsInfoFromStyleCodes(output, bomsInfo, [...bomsInfo], inventoryInfo, purchaseMaterialsInfo);
+        // const result = distributeInventory(output, bomsInfo, inventoryInfo);
+        let newStyleCodesInfo = addMaterialStatusToStyleCode(output, result.bomsInfo);
+        newStyleCodesInfo = newStyleCodesInfo.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
+        await db.set( dataRef,{
+          styleCodesInfo: newStyleCodesInfo,
+          bomsInfo: result.bomsInfo,
+          inventoryInfo: result.inventoryInfo,
+          purchaseMaterialsInfo: result.purchaseMaterialsInfo
+        }, {
+          merge: true,
+        });
+        return {
+          company,
+          styleCodesInfo: newStyleCodesInfo,
+          bomsInfo: result.bomsInfo,
+          inventoryInfo: result.inventoryInfo,
+          purchaseMaterialsInfo: result.purchaseMaterialsInfo
+        };
+      })
     }
-    const styleCodesInfo = docData.styleCodesInfo??[];
-    const bomsInfo = docData.bomsInfo??[];
-    const inventoryInfo = docData.inventoryInfo??[];
-    const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
-    const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
-    const result = updateBomsInfoFromStyleCodes(output, bomsInfo, [...bomsInfo], inventoryInfo, purchaseMaterialsInfo);
-    // const result = distributeInventory(output, bomsInfo, inventoryInfo);
-    let newStyleCodesInfo = addMaterialStatusToStyleCode(output, result.bomsInfo);
-    newStyleCodesInfo = newStyleCodesInfo.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
-    await admin.firestore().collection("data").doc(company).set( {
-      styleCodesInfo: newStyleCodesInfo,
-      bomsInfo: result.bomsInfo,
-      inventoryInfo: result.inventoryInfo,
-      purchaseMaterialsInfo: result.purchaseMaterialsInfo
-    }, {
-      merge: true,
-    });
-    return {
-      company,
-      styleCodesInfo: newStyleCodesInfo,
-      bomsInfo: result.bomsInfo,
-      inventoryInfo: result.inventoryInfo,
-      purchaseMaterialsInfo: result.purchaseMaterialsInfo
-    };
+    catch (e:any){
+      console.log(e);
+      throw Error("Failed To Run Transaction" + e)
+    }
   },
 });
 
