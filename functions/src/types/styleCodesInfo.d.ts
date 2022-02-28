@@ -114,7 +114,7 @@ export interface PurchaseMaterials{
     tax: number,
     taxAmount: number,
     totalAmount: number,
-    supplier: string,
+    supplier?: string,
     deliveryDate: string
 }
 

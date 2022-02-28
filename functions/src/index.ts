@@ -926,9 +926,9 @@ const upsertPurchaseMaterialsSchema = Joi.object<PurchaseMaterialsInfo, true>({
     tax: Joi.number(),
     taxAmount: Joi.number(),
     totalAmount: Joi.number(),
-    supplier: Joi.string(),
+    supplier: Joi.string().optional().allow(''),
     deliveryDate: Joi.string(),
-  }).options({allowUnknown: true}),
+  }).options({stripUnknown: true}).strict(false),
 })
     // .strict(true)
     .unknown(false);
@@ -1392,6 +1392,9 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
 
     for (let item of purchaseMaterials) {
       item = item as PurchaseMaterials;
+      if(!item.supplier){
+        throw Error("Supplier is not present")
+      }
       const supplier = item.supplier.trim().toLowerCase();
       const inventoryItem: InventoryItems|undefined = inventory.find((inventoryItem : InventoryItems) => item.materialId === inventoryItem.materialId && inventoryItem.materialDescription === item.materialDescription);
       if (!inventoryItem) {
