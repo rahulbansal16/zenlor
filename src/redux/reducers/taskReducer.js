@@ -222,7 +222,14 @@ export const initialState = {
                 dataIndex: "category",
                 key: "category",
                 filter: "multiSelect",
-              },{
+              },
+              {
+                title: "Type",
+                dataIndex: "type",
+                key: "type",
+                filter: "multiSelect"
+              },
+              {
                 title: "MATERIAL",
                 children:[
                   // {
@@ -230,11 +237,6 @@ export const initialState = {
                   //   dataIndex: "no",
                   //   key: "no",
                   // },
-                  {
-                    title: "Type",
-                    dataIndex: "type",
-                    key: "type",
-                  },
                   {
                     title: "Id",
                     dataIndex: "materialId",
@@ -297,7 +299,7 @@ export const initialState = {
               ]
               },
               {
-                title: "Pending",
+                title: "Pend",
                 dataIndex: "pendingQty",
                 key: "pendingQty",
                 filter: "multiSelect",
