@@ -810,33 +810,42 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
   schema: upsertBOMSchema,
   handler: async (data, context) => {
     console.log("The data is", data);
-    const {company, boms} = data;
-    const doc = await admin.firestore().collection("data").doc(company).get();
-    const docData = doc.data();
-    if (!docData) {
-      throw Error("The company does not exist" + company);
+    const { company, boms } = data;
+    try {
+      const dataRef = admin.firestore().collection("data").doc(company);
+      return await admin.firestore().runTransaction(async db => {
+        const doc = await db.get(dataRef);
+        const docData = doc.data();
+        if (!docData) {
+          throw Error("The company does not exist" + company);
+        }
+        const styleCodesInfo: StyleCodes[] = docData.styleCodesInfo;
+        if (!styleCodesInfo) {
+          throw Error("StyleCodes Not Present");
+        }
+        const bomsInfo: BOM[] = docData.bomsInfo ?? [];
+        const oldPurchaseMaterials = docData.purchaseMaterialsInfo ?? [];
+        const inventory = docData.inventoryInfo ?? [];
+        // This will use stylecode plus materialId
+        const result = updateBomsInfoFromStyleCodes(styleCodesInfo, bomsInfo, boms, inventory, oldPurchaseMaterials)
+        await db.set(dataRef ,{
+          bomsInfo: result.bomsInfo,
+          purchaseMaterialsInfo: result.purchaseMaterialsInfo,
+          inventoryInfo: result.inventoryInfo,
+        }, {
+          merge: true,
+        });
+        return {
+          company,
+          bomsInfo: result.bomsInfo,
+          purchaseMaterialsInfo: result.bomsInfo,
+        }
+      })
     }
-    const styleCodesInfo:StyleCodes[] = docData.styleCodesInfo;
-    if (!styleCodesInfo) {
-      throw Error("StyleCodes Not Present");
+    catch (e) {
+      console.log(e);
+      throw Error("Failed To Run Transaction" + e)
     }
-    const bomsInfo: BOM[] = docData.bomsInfo??[];
-    const oldPurchaseMaterials = docData.purchaseMaterialsInfo??[];
-    const inventory = docData.inventoryInfo??[];
-    // This will use stylecode plus materialId
-    const result = updateBomsInfoFromStyleCodes(styleCodesInfo, bomsInfo, boms, inventory, oldPurchaseMaterials)
-    await admin.firestore().collection("data").doc(company).set( {
-      bomsInfo: result.bomsInfo,
-      purchaseMaterialsInfo: result.purchaseMaterialsInfo,
-      inventoryInfo: result.inventoryInfo,
-    }, {
-      merge: true,
-    });
-    return {
-      company,
-      bomsInfo: result.bomsInfo,
-      purchaseMaterialsInfo: result.bomsInfo,
-    };
   },
 });
 
@@ -1384,104 +1393,113 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
   schema: upsertCreatePOSchema,
   handler: async (data, context) => {
     const supplierMap: any = {};
-    const total : any= {};
-    const {company, purchaseMaterials, createdAt} = data;
-    const doc = await admin.firestore().collection("data").doc(company).get();
-    const docData = doc.data();
-    if (!docData) {
-      throw Error("Document is not prsent for the company");
-    }
-    const purchaseOrdersInfo = docData.purchaseOrdersInfo??[];
-    const bomsInfo = docData.bomsInfo??[];
-    const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
-    const inventory: InventoryItems[] = docData.inventoryInfo??[];
-    const styleCodes: StyleCodes[] = docData.styleCodesInfo??[];
-    const grnInfo: GRNItems[] = docData.GRNInfo??[];
-    let deliveryDate="";
+    const total: any = {};
+    const { company, purchaseMaterials, createdAt } = data;
+    try {
+      const dataRef = admin.firestore().collection("data").doc(company);
+      return await admin.firestore().runTransaction(async db => {
+        const doc = await db.get(dataRef);
+        const docData = doc.data();
+        if (!docData) {
+          throw Error("Document is not prsent for the company");
+        }
+        const purchaseOrdersInfo = docData.purchaseOrdersInfo ?? [];
+        const bomsInfo = docData.bomsInfo ?? [];
+        const purchaseMaterialsInfo = docData.purchaseMaterialsInfo ?? [];
+        const inventory: InventoryItems[] = docData.inventoryInfo ?? [];
+        const styleCodes: StyleCodes[] = docData.styleCodesInfo ?? [];
+        const grnInfo: GRNItems[] = docData.GRNInfo ?? [];
+        let deliveryDate = "";
 
-    for (let item of purchaseMaterials) {
-      item = item as PurchaseMaterials;
-      if(!item.supplier){
-        throw Error("Supplier is not present")
-      }
-      const supplier = item.supplier.trim().toLowerCase();
-      const inventoryItem: InventoryItems|undefined = inventory.find((inventoryItem : InventoryItems) => item.materialId === inventoryItem.materialId && inventoryItem.materialDescription === item.materialDescription);
-      if (!inventoryItem) {
-        throw Error("The material Entry is not present in the gloabl inventory");
-      }
-      if (item.purchaseQty <= 0) {
-        throw Error("The purchaseQty can not be zero");
-      }
-      deliveryDate = item.deliveryDate;
-      inventoryItem.activeOrdersQty += item.purchaseQty;
-      // console.log("The bom Items are activeOrdersQty pendingQty", bom.activeOrdersQty, bom.pendingQty);
-      const {styleCode, totalAmount} = item;
-      if (!supplierMap[supplier]) {
-        supplierMap[supplier] = [];
-        total[supplier] = 0;
-      }
-      supplierMap[supplier].push({
-        sno: supplierMap[supplier].length + 1,
-        referenceId: styleCode,
-        ...item,
-        // itemId: id,
-        // itemDesc: description,
-        // quantity: poQty * consumption,
-        // unit: unit,
-        // rate: rate,
-        // tax: "",
-        // amount: amount,
-      });
-      total[supplier] += totalAmount;
-    }
-    console.log("The supplier map is", supplierMap);
-    const purchaseOrders : PurchaseOrder[] = [];
-    for (const key in supplierMap) {
-      purchaseOrders.push({
-        id: generateUId("PO-", 10).toUpperCase(),
-        supplier: key,
-        createdAt,
-        purchaseOrderId: "",
-        deliveryDate,
-        amount: total[key],
-        status: POStatus.ACTIVE.toString(),
-        lineItems: supplierMap[key],
-      });
-    }
-    const distributedInventory = distributeInventory(styleCodes, bomsInfo, inventory);
-    let result = populatePurhcaseMaterialsFromBOM(distributedInventory.bomsInfo, purchaseMaterialsInfo);
-    // Update the filter to deleted for those items which are removed because the pendingQty is less than equal to zero
-    result = result.filter( (item:PurchaseMaterials) => item.pendingQty > 0);
-    // const new = purchaseMaterialsInfo.filter(()=>());
-    // const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
-    let urls = []
-    for (let purchaseOrder of purchaseOrders){
-      const poUrl = await createPOFormatFile(company, purchaseOrder);
-      purchaseOrder.fileUrl = poUrl;
-      urls.push(poUrl)
-    }
-    let newStyleCodesInfo = addMaterialStatusToStyleCode(styleCodes, distributedInventory.bomsInfo);
-    const grn: GRNItems[] = mapPOToGRN(purchaseOrders);
-    await admin.firestore().collection("data").doc(company).set(
-        {
-          bomsInfo: distributedInventory.bomsInfo,
-          inventoryInfo: distributedInventory.inventoryInfo,
+        for (let item of purchaseMaterials) {
+          item = item as PurchaseMaterials;
+          if (!item.supplier) {
+            throw Error("Supplier is not present")
+          }
+          const supplier = item.supplier.trim().toLowerCase();
+          const inventoryItem: InventoryItems | undefined = inventory.find((inventoryItem: InventoryItems) => item.materialId === inventoryItem.materialId && inventoryItem.materialDescription === item.materialDescription);
+          if (!inventoryItem) {
+            throw Error("The material Entry is not present in the gloabl inventory");
+          }
+          if (item.purchaseQty <= 0) {
+            throw Error("The purchaseQty can not be zero");
+          }
+          deliveryDate = item.deliveryDate;
+          inventoryItem.activeOrdersQty += item.purchaseQty;
+          // console.log("The bom Items are activeOrdersQty pendingQty", bom.activeOrdersQty, bom.pendingQty);
+          const { styleCode, totalAmount } = item;
+          if (!supplierMap[supplier]) {
+            supplierMap[supplier] = [];
+            total[supplier] = 0;
+          }
+          supplierMap[supplier].push({
+            sno: supplierMap[supplier].length + 1,
+            referenceId: styleCode,
+            ...item,
+            // itemId: id,
+            // itemDesc: description,
+            // quantity: poQty * consumption,
+            // unit: unit,
+            // rate: rate,
+            // tax: "",
+            // amount: amount,
+          });
+          total[supplier] += totalAmount;
+        }
+        console.log("The supplier map is", supplierMap);
+        const purchaseOrders: PurchaseOrder[] = [];
+        for (const key in supplierMap) {
+          purchaseOrders.push({
+            id: generateUId("PO-", 10).toUpperCase(),
+            supplier: key,
+            createdAt,
+            purchaseOrderId: "",
+            deliveryDate,
+            amount: total[key],
+            status: POStatus.ACTIVE.toString(),
+            lineItems: supplierMap[key],
+          });
+        }
+        const distributedInventory = distributeInventory(styleCodes, bomsInfo, inventory);
+        let result = populatePurhcaseMaterialsFromBOM(distributedInventory.bomsInfo, purchaseMaterialsInfo);
+        // Update the filter to deleted for those items which are removed because the pendingQty is less than equal to zero
+        result = result.filter((item: PurchaseMaterials) => item.pendingQty > 0);
+        // const new = purchaseMaterialsInfo.filter(()=>());
+        // const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
+        let urls = []
+        for (let purchaseOrder of purchaseOrders) {
+          const poUrl = await createPOFormatFile(company, purchaseOrder);
+          purchaseOrder.fileUrl = poUrl;
+          urls.push(poUrl)
+        }
+        let newStyleCodesInfo = addMaterialStatusToStyleCode(styleCodes, distributedInventory.bomsInfo);
+        const grn: GRNItems[] = mapPOToGRN(purchaseOrders);
+        await db.set(dataRef,
+          {
+            bomsInfo: distributedInventory.bomsInfo,
+            inventoryInfo: distributedInventory.inventoryInfo,
+            purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
+            purchaseMaterialsInfo: result,
+            GRNInfo: [...grn, ...grnInfo],
+          }
+          , {
+            merge: true,
+          });
+        return {
+          styleCodesInfo: newStyleCodesInfo,
+          bomsInfo,
+          purchaseOrderFiles: urls,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
           purchaseMaterialsInfo: result,
-          GRNInfo: [...grn, ...grnInfo],
-        }
-        , {
-          merge: true,
-        });
-    return {
-      styleCodesInfo: newStyleCodesInfo,
-      bomsInfo,
-      purchaseOrderFiles: urls,
-      purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
-      purchaseMaterialsInfo: result,
-      GRNInfo: [...grn, ...grnInfo]
-    };
-  },
+          GRNInfo: [...grn, ...grnInfo]
+        };
+      })
+    }
+    catch (e: any) {
+      console.log(e);
+      throw Error("Failed To Run Transaction" + e)
+    }
+  }
 });
 
 const upsertCreateGRNSchema = Joi.object<GRN, true>({
@@ -1544,67 +1562,76 @@ exports.upsertGRN = onCall<GRN>({
   handler: async (data, context) => {
     console.log("The data is", data);
     const {company, GRN} = data;
-    const doc = await admin.firestore().collection("data").doc(company).get();
-    const docData = doc.data();
-    if (!docData) {
-      throw Error("The company does not exist" + company);
+    try {
+      const dataRef = admin.firestore().collection("data").doc(company);
+      return await admin.firestore().runTransaction(async db => {
+        const doc = await db.get(dataRef);
+        const docData = doc.data();
+        if (!docData) {
+          throw Error("The company does not exist" + company);
+        }
+        const grnInfo = docData.GRNInfo ?? [];
+        // const activeGRNInfo = grnInfo.filter((item: GRNItems) => item.status === "active");
+        // let grnInfoOutput = upsertItemsInArray(activeGRNInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
+        // oldItem.materialId === newItem.materialId &&
+        // oldItem.materialDescription === newItem.materialDescription);
+
+        const inventory = GRN.map((output: GRNItems) => ({
+          materialId: output.materialId,
+          materialDescription: output.materialDescription,
+          inventory: output.acceptedQty,
+          purchaseQty: output.purchaseQty,
+        }));
+        const inventoryInfo = docData.inventoryInfo ?? [];
+        const bomsInfo = docData.bomsInfo ?? [];
+        const styleCodesInfo = docData.styleCodesInfo ?? [];
+        const purchaseMaterialsInfo = docData.purchaseMaterialsInfo ?? [];
+        const result = collectInventoryFromStyleCodes(bomsInfo, inventoryInfo);
+        const collectedInventory = result?.inventory;
+        if (!collectedInventory) {
+          throw Error("Inventory Collection Failed");
+        }
+        const output = upsertItemsInArray(collectedInventory, inventory as any, (oldItem: InventoryItems, newItem: InventoryItems) => oldItem.materialId === newItem.materialId &&
+          oldItem.materialDescription === newItem.materialDescription,
+          undefined,
+          (oldItem: InventoryItems, newItem: any) => ({
+            ...oldItem,
+            inventory: oldItem.inventory + newItem.inventory,
+            activeOrdersQty: oldItem.activeOrdersQty - newItem.purchaseQty,
+          }));
+
+        const p = distributeInventory(styleCodesInfo, result.boms, output);
+        // let grnAfterRemovingItem = grnInfoOutput.filter( item => )
+        const GRNDone = GRN.map((item: GRNItems) => ({
+          ...item,
+          status: "done",
+        }));
+        const grnInfoOutput = upsertItemsInArray(grnInfo, GRNDone, (oldItem: GRNItems, newItem: GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
+          oldItem.materialId === newItem.materialId &&
+          oldItem.materialDescription === newItem.materialDescription);
+        const newPurchaseMaterialInfo = populatePurhcaseMaterialsFromBOM(p.bomsInfo, purchaseMaterialsInfo);
+
+        await admin.firestore().collection("data").doc(company).set({
+          GRNInfo: grnInfoOutput,
+          inventoryInfo: p.inventoryInfo,
+          bomsInfo: p.bomsInfo,
+          purchaseMaterialsInfo: newPurchaseMaterialInfo
+        }, {
+          merge: true,
+        });
+        return {
+          company,
+          GRNInfo: grnInfoOutput.filter((item) => item.status === "active"),
+          inventoryInfo: p.inventoryInfo,
+          bomsInfo: p.bomsInfo,
+          purchaseMaterialsInfo: newPurchaseMaterialInfo
+        };
+      })
     }
-    const grnInfo = docData.GRNInfo??[];
-    // const activeGRNInfo = grnInfo.filter((item: GRNItems) => item.status === "active");
-    // let grnInfoOutput = upsertItemsInArray(activeGRNInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
-    // oldItem.materialId === newItem.materialId &&
-    // oldItem.materialDescription === newItem.materialDescription);
-
-    const inventory = GRN.map( (output: GRNItems) => ({
-      materialId: output.materialId,
-      materialDescription: output.materialDescription,
-      inventory: output.acceptedQty,
-      purchaseQty: output.purchaseQty,
-    }));
-    const inventoryInfo = docData.inventoryInfo??[];
-    const bomsInfo = docData.bomsInfo??[];
-    const styleCodesInfo = docData.styleCodesInfo??[];
-    const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
-    const result = collectInventoryFromStyleCodes(bomsInfo, inventoryInfo);
-    const collectedInventory = result?.inventory;
-    if (!collectedInventory) {
-      throw Error("Inventory Collection Failed");
+    catch (e: any) {
+      console.log(e);
+      throw Error("Failed To Run Transaction" + e)
     }
-    const output = upsertItemsInArray(collectedInventory, inventory as any, (oldItem: InventoryItems, newItem: InventoryItems) => oldItem.materialId === newItem.materialId &&
-    oldItem.materialDescription === newItem.materialDescription,
-    undefined,
-    (oldItem: InventoryItems, newItem: any)=> ({
-      ...oldItem,
-      inventory: oldItem.inventory + newItem.inventory,
-      activeOrdersQty: oldItem.activeOrdersQty - newItem.purchaseQty,
-    }));
-
-    const p = distributeInventory(styleCodesInfo, result.boms, output);
-    // let grnAfterRemovingItem = grnInfoOutput.filter( item => )
-    const GRNDone = GRN.map( (item: GRNItems)=> ({
-      ...item,
-      status: "done",
-    }));
-    const grnInfoOutput = upsertItemsInArray(grnInfo, GRNDone, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
-    oldItem.materialId === newItem.materialId &&
-    oldItem.materialDescription === newItem.materialDescription);
-    const newPurchaseMaterialInfo = populatePurhcaseMaterialsFromBOM(p.bomsInfo, purchaseMaterialsInfo);
-
-    await admin.firestore().collection("data").doc(company).set( {
-      GRNInfo: grnInfoOutput,
-      inventoryInfo: p.inventoryInfo,
-      bomsInfo: p.bomsInfo,
-      purchaseMaterialsInfo: newPurchaseMaterialInfo
-    }, {
-      merge: true,
-    });
-    return {
-      company,
-      GRNInfo: grnInfoOutput.filter( (item) => item.status === "active"),
-      inventoryInfo: p.inventoryInfo,
-      bomsInfo: p.bomsInfo,
-      purchaseMaterialsInfo: newPurchaseMaterialInfo
-    };
   },
 });
 
