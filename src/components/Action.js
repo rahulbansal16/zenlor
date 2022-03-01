@@ -333,6 +333,7 @@ const Action = ({ type }) => {
           description: "PO is created successfully"
         }) 
         dispatch(fetchDataAction({...result.data}))
+        setSelectedRows([])
       } catch(e){
        notification["error"] ({
          message:"Error Creating PO",
