@@ -1564,6 +1564,7 @@ exports.upsertGRN = onCall<GRN>({
     const inventoryInfo = docData.inventoryInfo??[];
     const bomsInfo = docData.bomsInfo??[];
     const styleCodesInfo = docData.styleCodesInfo??[];
+    const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
     const result = collectInventoryFromStyleCodes(bomsInfo, inventoryInfo);
     const collectedInventory = result?.inventory;
     if (!collectedInventory) {
@@ -1587,11 +1588,13 @@ exports.upsertGRN = onCall<GRN>({
     const grnInfoOutput = upsertItemsInArray(grnInfo, GRNDone, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
     oldItem.materialId === newItem.materialId &&
     oldItem.materialDescription === newItem.materialDescription);
+    const newPurchaseMaterialInfo = populatePurhcaseMaterialsFromBOM(p.bomsInfo, purchaseMaterialsInfo);
 
     await admin.firestore().collection("data").doc(company).set( {
       GRNInfo: grnInfoOutput,
       inventoryInfo: p.inventoryInfo,
       bomsInfo: p.bomsInfo,
+      purchaseMaterialsInfo: newPurchaseMaterialInfo
     }, {
       merge: true,
     });
@@ -1600,6 +1603,7 @@ exports.upsertGRN = onCall<GRN>({
       GRNInfo: grnInfoOutput.filter( (item) => item.status === "active"),
       inventoryInfo: p.inventoryInfo,
       bomsInfo: p.bomsInfo,
+      purchaseMaterialsInfo: newPurchaseMaterialInfo
     };
   },
 });
