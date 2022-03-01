@@ -332,7 +332,7 @@ const Action = ({ type }) => {
           message: "PO Created Successfully",
           description: "PO is created successfully"
         }) 
-        dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo));
+        dispatch(fetchDataAction({...result.data}))
       } catch(e){
        notification["error"] ({
          message:"Error Creating PO",
