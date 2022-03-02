@@ -309,36 +309,7 @@ export const initialState = {
             actions:[
 
             ],
-            dataSource: [{
-                id: "WASH23-50",
-                styleCode: "WSH23",
-                toMakeQty: 50,
-                category: 'shirts',
-                type: 'casual',
-                materialId: 'SFSDFLSD2323',
-                description: 'Soft Fabric',
-                unit: 12,
-                rate: 232,
-                consumption: 1.23,
-                reqQty: 40,
-                remQty: 10,
-                supplier: "ABC Company",
-                poQty: 20
-            }, {
-                id: "WNG989-40",
-                styleCode: "WNG989",
-                toMakeQty: 50,
-                category: 'shirts',
-                type: 'casual',
-                materialId: 'SFSDFLSD2323',
-                description: 'Soft Fabric',
-                unit: 12,
-                consumption: 1.23,
-                reqQty: 40,
-                remQty: 10,
-                supplier: "Anusha",
-                poQty: 20
-            }]
+            dataSource: []
     },
     inwardMaterial: {
       columns: [
