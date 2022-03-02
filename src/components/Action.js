@@ -1,28 +1,24 @@
 import {
-  Table,
-  Select,
-  Button,
   Form,
   Input,
-  Space,
-  Affix,
   Tooltip,
   DatePicker,
   notification,
   Result,
+  Button,
+  Empty,
 } from "antd";
 import { Table as ExportTable } from "ant-table-extensions";
 import moment from "moment";
 
 import { useDispatch, useSelector } from "react-redux";
-import { LeftOutlined, PlusOutlined, RightOutlined, SmileOutlined } from "@ant-design/icons";
+import { SmileOutlined } from "@ant-design/icons";
 // https://codesandbox.io/s/editable-cells-antd-4-17-4-forked-w3q20?file=/index.js:1809-1869
 import Loader from "./Loader";
 import { useLocation } from "react-router";
 import React, { useEffect, useContext, useState, useRef } from "react";
 import { functions } from "../firebase";
 import {
-  downloadCsv,
   generateUId,
   getCurrentTime,
   performCalculation,
@@ -30,17 +26,14 @@ import {
 } from "../util";
 import {
   fetchDataAction,
-  fetchPOs,
-  fetchPurchaseMaterialsInfo,
   insertRow,
   updateCell,
-  updateData,
 } from "../redux/actions";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ActionBar from "./ActionBar";
 import useFilter from "../hooks/useFilter";
 import { Typography } from "antd";
-import { Row, Col, Divider } from 'antd';
+import { Row, Col } from 'antd';
 import AddNewModal from "./AddModal";
 
 const { Title } = Typography;
@@ -412,7 +405,6 @@ const Action = ({ type }) => {
       cell: EditableCell,
     },
   };
-
   let column = filteredColumns.map((col) => {
     const { company } = user;
     if (!col.editable) {
@@ -499,6 +491,17 @@ const Action = ({ type }) => {
       <div style={{  overflowY: 'auto', maxHeight:'88vh'}}>
       <ExportTable
         exportable
+        locale={ {
+          emptyText: () => <Empty
+          description={
+            <span>
+            No Data
+            </span>
+          }
+        >
+          <Button onClick={() => window.location.reload()}>Click To Reload</Button>
+        </Empty>
+        }}
         // summary={() => (
         //   <Table.Summary fixed>
         //     <Table.Summary.Row>
