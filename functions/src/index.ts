@@ -343,6 +343,30 @@ exports.updateData = functions
         throw new Error("Data Not Present For the company" + company);
       }
       let departmentData = companyData[department] || [];
+
+      const obj: any = {};
+      let amountDiff = 0;
+      // For deleting the Json Values Need to change the code to allow reading the value
+      if (data && data.json && data.json.values){
+        const keys = Object.keys(data.json.values);
+        if (keys[0].startsWith(".")){
+          let [materialId, materialDescription] = keys[0].split(":");
+          materialId = materialId.substring(1)
+          const oldItem = departmentData.find( (i:any) => i.id === data.id)
+          let k = `.${materialId}:${materialDescription}`
+          amountDiff = (data.json.status === "deleted" ? 0 : data.json.values[k][0]) - oldItem.values[k]
+          const boms = companyData.bomsInfo;
+          obj["bomsInfo"] = issueInventory({
+            styleCode: data.json.styleCode,
+            materialIssue: [{
+              materialId,
+              materialDescription,
+              issueAmount: amountDiff
+            }]
+          }, boms);
+        }
+      }
+
       departmentData = departmentData.map((item: { id: any; }) => {
         if (item.id !== id) {
           return item;
@@ -352,7 +376,6 @@ exports.updateData = functions
           ...entry,
         };
       });
-      const obj: any = {};
       obj[department] = departmentData;
       await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).set(obj, {merge: true});
       return departmentData;
@@ -1518,7 +1541,7 @@ const upsertCreateGRNSchema = Joi.object<GRN, true>({
     receivedQty: Joi.number().required(),
     receivedDate: Joi.string().required(),
     rejectedQty: Joi.number().required(),
-    rejectedReason: Joi.string().required(),
+    rejectedReason: Joi.string().allow(""),
     acceptedQty: Joi.number().required(),
   }).options({allowUnknown: true}),
 })
@@ -1611,7 +1634,7 @@ exports.upsertGRN = onCall<GRN>({
           oldItem.materialDescription === newItem.materialDescription);
         const newPurchaseMaterialInfo = populatePurhcaseMaterialsFromBOM(p.bomsInfo, purchaseMaterialsInfo);
 
-        await admin.firestore().collection("data").doc(company).set({
+        await db.set(dataRef ,{
           GRNInfo: grnInfoOutput,
           inventoryInfo: p.inventoryInfo,
           bomsInfo: p.bomsInfo,
