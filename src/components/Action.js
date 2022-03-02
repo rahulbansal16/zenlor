@@ -361,13 +361,27 @@ const Action = ({ type }) => {
     } else if (action === "inwardItem") {
       // This will do actualGRN as in updating the values in the db etc for the inventory
       const upsertGRN = functions.httpsCallable("upsertGRN");
-      const result = await upsertGRN({
-        company,
-        createdAt: getCurrentTime(),
-        GRN: selectedRows,
-      });
-      console.log("The result is ", result);
-      dispatch(updateData(result.data));
+      try {
+        setLoading(true)
+        const result = await upsertGRN({
+          company,
+          createdAt: getCurrentTime(),
+          GRN: selectedRows,
+        });
+        console.log("The result is ", result);
+        setSelectedRows([])
+        dispatch(fetchDataAction(result.data));
+        notification["success"]({
+          message:"GRN Done",
+          description: "The GRN of Item is done successfully" 
+        })
+      } catch(e){
+        notification["error"]({
+          message:"Error Doing GRN",
+          description: e.message
+        })
+      }
+      setLoading(false)
     } else if (action === "cancelPO"){
       // write some logic of canceling the PO
       const cancelPO = functions.httpsCallable("cancelPO");
@@ -470,7 +484,7 @@ const Action = ({ type }) => {
       {/* <Button onClick={()=>{
         history.push('/action/purchaseOrder')        
       }}>GRN</Button> */}
-      {loading?<Loader/>:<></>}
+      {/* {loading?<Loader/>:<></>} */}
       <Row style = {{
         marginTop:'10px'
         }}>
@@ -542,7 +556,7 @@ const Action = ({ type }) => {
         // height:'90px',
         width: '100%'
       }}>
-        <ActionBar type={type} onFinish={onFinish} />
+        <ActionBar type={type} onFinish={onFinish} loading={loading} />
       </div>
       {/* <ActionBar type={type} onFinish={onFinish}/> */}
     </div>

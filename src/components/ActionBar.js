@@ -86,7 +86,7 @@ const actions = {
   }]
 };
 
-const ActionBar = ({type, onFinish}) => {
+const ActionBar = ({type, onFinish, loading}) => {
     const history = useHistory();
     const [form] = Form.useForm();
 
@@ -132,7 +132,7 @@ const ActionBar = ({type, onFinish}) => {
             <Button onClick = { () => {
               history.goBack()
             }}><LeftOutlined/> Back</Button>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={loading}>
               Next <RightOutlined />
             </Button>
           </Space>
