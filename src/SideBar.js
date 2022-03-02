@@ -18,7 +18,7 @@ import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 const { SubMenu } = Menu;
 const { Header, Footer, Sider, Content } = Layout;
 
-const SideBar = () => {
+const SideBar = ({type}) => {
 
     const [collapsed, setCollapsed] = useState(false);
     const history = useHistory()
@@ -41,8 +41,9 @@ const SideBar = () => {
                 {/* {collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>} */}
             </Button>
         <Menu
-          defaultSelectedKeys={['styleDashboard']}
-          defaultOpenKeys={['sub1']}
+          defaultSelectedKeys={['dashboard']}
+          defaultOpenKeys={['style','procure','inventory']}
+          selectedKeys={type}
           mode="inline"
           theme="dark"
           onClick={(e)=>clickHandler(e)}

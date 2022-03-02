@@ -32,7 +32,7 @@ const renderPages = () => {
         <Layout hasSider={true} style={{
           fontSize:"13px"
         }}>
-          <SideBar></SideBar>
+          <SideBar type={props.match.params.type}></SideBar>
           <Content>
             <Action type={props.match.params.type}/>
           </Content>
