@@ -347,17 +347,17 @@ exports.updateData = functions
       const obj: any = {};
       let amountDiff = 0;
       // For deleting the Json Values Need to change the code to allow reading the value
-      if (data && data.json && data.json.values){
-        const keys = Object.keys(data.json.values);
+      if (data && data.json){
+        const oldItem = departmentData.find( (i:any) => i.id === data.id)
+        const keys = Object.keys(oldItem.values);
         if (keys[0].startsWith(".")){
           let [materialId, materialDescription] = keys[0].split(":");
           materialId = materialId.substring(1)
-          const oldItem = departmentData.find( (i:any) => i.id === data.id)
           let k = `.${materialId}:${materialDescription}`
-          amountDiff = (data.json.status === "deleted" ? 0 : data.json.values[k][0]) - oldItem.values[k]
+          amountDiff = (data.status === "deleted" ? 0 : data.json.values[k][0]) - oldItem.values[k]
           const boms = companyData.bomsInfo;
           obj["bomsInfo"] = issueInventory({
-            styleCode: data.json.styleCode,
+            styleCode: oldItem.styleCode,
             materialIssue: [{
               materialId,
               materialDescription,
