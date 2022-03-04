@@ -56,7 +56,8 @@ export enum MaterialStatus {
   PART_ORDERED="PARTIAL_ORDERED",
   FULLY_ORDERED="FULLY_ORDERED",
   UNKNOWN="UNKNOWN",
-  ORDERING_REQUIRED = "ORDERING_REQUIRED"
+  ORDERING_REQUIRED = "ORDERING_REQUIRED",
+  NO_BOM = "NO_BOM"
 }
 
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -354,7 +355,7 @@ exports.updateData = functions
           let [materialId, materialDescription] = keys[0].split(":");
           materialId = materialId.substring(1)
           let k = `.${materialId}:${materialDescription}`
-          amountDiff = (data.status === "deleted" ? 0 : data.json.values[k][0]) - oldItem.values[k]
+          amountDiff = (data.status === "deleted" ? 0 : data.json.values[k]) - oldItem.values[k]
           const boms = companyData.bomsInfo;
           obj["bomsInfo"] = issueInventory({
             styleCode: oldItem.styleCode,
@@ -569,6 +570,9 @@ const getMaterialStatus = (styleCode: string, boms: BOM[], category?: Category) 
   let materials = boms.filter( (bom) => bom.styleCode === styleCode );
   if (category) {
     materials = materials.filter((bom) => bom.category === category);
+  }
+  if (materials.length === 0) {
+    return MaterialStatus.NO_BOM
   }
   const allIn = materials.every( (item) => ((item.inventory??0) + (item.issueQty??0)) >= item.reqQty );
   if (allIn) {
