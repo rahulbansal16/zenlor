@@ -150,7 +150,7 @@ const EditableCell = ({
       )
     ) : (
       <Tooltip title={children}>
-        <div className="editable-cell-value-wrap" onClick={toggleEdit}>
+        <div className="editable-cell-value-wrap" tabIndex={0} onFocus={toggleEdit} onClick={toggleEdit}>
           {children}
         </div>
       </Tooltip>
