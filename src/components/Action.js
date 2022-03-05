@@ -377,6 +377,7 @@ const Action = ({ type }) => {
       //   downloadCsv(element);
       // });
       setLoading(false)
+      window.location.reload()
    
       // history.push({
       //   pathname: `/action/purchaseOrder`,
