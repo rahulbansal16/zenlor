@@ -715,7 +715,7 @@ const taskReducer = (state = initialState, action) => {
                 // packing: [...packing],
                 // isFetching,
                 // name,
-                suppliers: action.payload?.suppliersInfo || [],
+                suppliers: action.payload?.suppliersInfo || state.suppliers || [],
                 createPO: {
                     ...state.createPO, 
                     dataSource: (action.payload.purchaseMaterialsInfo || createPO?.dataSource || []).map( item => ({
