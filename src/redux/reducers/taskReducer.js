@@ -507,7 +507,7 @@ export const initialState = {
                 title: "Tax Amount",
                 dataIndex: "taxAmount",
                 key: "taxAmount",
-                editable: true,
+                // editable: true,
               }, 
               {
                 title: "Total Amount",
