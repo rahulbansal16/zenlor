@@ -388,7 +388,6 @@ const Action = ({ type }) => {
         pathname: `/action/${data.action}`,
         search: `poId=${poId}`,
       });
-    } else if (action === "viewLineItems") {
     } else if (action === "inwardItem") {
       // This will do actualGRN as in updating the values in the db etc for the inventory
       const upsertGRN = functions.httpsCallable("upsertGRN");
@@ -435,6 +434,12 @@ const Action = ({ type }) => {
       })
     }
       setLoading(false)
+    }
+    else {
+      notification["warning"]({
+        message: "Option Coming Soon",
+        description: "The option you selected is being implemented"
+      })
     }
   };
   const components = {
