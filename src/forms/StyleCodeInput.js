@@ -8,6 +8,12 @@ import AutoCompleteSelector from "./AutoCompleteSelector";
 const StyleCodeInput = ({onSelectCb}) => {
 
     const styleCodes = useSelector( state => state.taskReducer.styleCodes)
+    // const styleCodesInfo = useSelector( state => state.taskReducer.styleCodesInfo)
+    // const mapedStyleCodesInfo = styleCodesInfo.map( styleCode => ({
+    //     id: styleCode.styleCode,
+    //     name: styleCode.styleCode
+    // }));
+    // const filteredStyleCodes = [...styleCodes, ...mapedStyleCodesInfo]
     return <AutoCompleteSelector label={"Enter code"} onSelectCb={onSelectCb} data={styleCodes}/>
 
     const [options, setOptions] = useState([]);

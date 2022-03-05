@@ -15,7 +15,7 @@ import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
   BOMInfoDto,
   MaterialIssue,
-  PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo, Category} from "./types/styleCodesInfo";
+  PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo, Category, SupplierInfo} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -1905,6 +1905,60 @@ const uploadFileToStorage = async (filePath: any, path: string) => {
   });
   return downloadUrl
 }
+
+const SupplierSchema =  Joi.object<SupplierInfo, true>({
+  company: Joi.string().required(),
+  createdAt: Joi.string(),
+  suppliers: Joi.array().items({
+    name: Joi.string().required(),
+    address1: Joi.string().required(),
+    address2: Joi.string().allow(""),
+    city: Joi.string().required(),
+    state: Joi.string().required(),
+    pin: Joi.number().required(),
+    gst: Joi.string().required(),
+    pan: Joi.string().required(),
+    person: Joi.string().required(),
+    phoneNumber: Joi.number().required(),
+    email: Joi.string().email(),
+  }).options({allowUnknown: true}).strict(false),
+})
+    // .strict(true)
+    .unknown(true); 
+
+exports.upsertSuppliersInfo = onCall<SupplierInfo>({
+  name: "upsertSuppliers",
+  schema: SupplierSchema,
+  handler: async (data, context) => {
+    const {company, suppliers} = data;
+    try {
+      const dataRef = admin.firestore().collection("data").doc(company);
+      return await admin.firestore().runTransaction( async db => {
+        const doc = await db.get(dataRef);
+        const docData = doc.data();
+        if (!docData) {
+          throw Error("The company does not exist" + company);
+        }
+        const suppliersInfo= docData.suppliersInfo??[];
+        const output = upsertItemsInArray(suppliersInfo, suppliers, (oldItem, newItem) => oldItem.gst === newItem.gst && oldItem.name === newItem.name);
+        await db.set( dataRef,{
+          suppliersInfo: output
+        }, {
+          merge: true,
+        });
+        return {
+          company,
+          suppliersInfo: output
+        };
+      }) 
+    }
+    catch(e){
+      console.log(e);
+      throw Error("Failed To Run Transaction" + e) 
+    }
+  }
+})
+
 // Will pick it up when making the RestFul APIs
 // const router = express.Router();
 // const defaultRoutes = [

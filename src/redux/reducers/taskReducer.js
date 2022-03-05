@@ -19,6 +19,7 @@ export const initialState = {
     kajjaandbuttoning: [],
     washing: [],
     styleCodes: [],
+    suppliers: [],
     
     // I can store the data across a certain id which can be stored as
     // some global Id
@@ -210,6 +211,36 @@ export const initialState = {
           ],
         dataSource: []
     },
+    inventory: {
+      columns: [{
+        title: "Material Id",
+        dataIndex: "materialId",
+        key: "materialId"
+      },
+      {
+        title: "Material Description",
+        dataIndex: "materialDescription",
+        key: "materialDescription"
+      }, 
+      {
+        title: "Inventory",
+        dataIndex: "inventory",
+        key: "inventory"
+      }, 
+      {
+        title: "Issue",
+        dataIndex: "issue",
+        key: "issue"
+      }, 
+      {
+        title: "Active Orders",
+        dataIndex: "activeOrdersQty",
+        key: "activeOrdersQty"
+      }, 
+    ],
+      dataSource:[]
+    },
+
     orderMaterials: {
             columns: [{
                 title: "Style Code",
@@ -684,6 +715,7 @@ const taskReducer = (state = initialState, action) => {
                 // packing: [...packing],
                 // isFetching,
                 // name,
+                suppliers: action.payload?.suppliersInfo || [],
                 createPO: {
                     ...state.createPO, 
                     dataSource: (action.payload.purchaseMaterialsInfo || createPO?.dataSource || []).map( item => ({

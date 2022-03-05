@@ -205,3 +205,22 @@ export interface GRNItems {
     rejectedReason: string,
     acceptedQty: number
 }
+
+export interface SupplierInfo {
+    company: string,
+    createdAt: string,
+    suppliers: Supplier[]
+}
+export interface Supplier {
+    name: string,
+    address1: string,
+    address2: string,
+    city: string,
+    state: string,
+    pin: number,
+    gst: string,
+    pan: string,
+    person: string,
+    phoneNumber: number,
+    email: string
+}
