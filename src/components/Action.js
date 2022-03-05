@@ -96,11 +96,20 @@ const EditableCell = ({
           "DD MMM YY"
         );
       }
-      handleSave({ ...record, ...formattedValue });
+      if (areValueChange(record, formattedValue)){
+        handleSave({ ...record, ...formattedValue });
+      }
     } catch (errInfo) {
       console.log("Save failed:", errInfo);
     }
   };
+
+  const areValueChange = (oldValue, newValue) => {
+    for (let key in newValue){
+      if ( oldValue[key] != newValue[key]) return true
+    }
+    return false
+  }
 
   let childNode = children;
 
