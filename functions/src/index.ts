@@ -15,7 +15,7 @@ import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
   BOMInfoDto,
   MaterialIssue,
-  PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo, Category, SupplierInfo} from "./types/styleCodesInfo";
+  PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -1436,6 +1436,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         const inventory: InventoryItems[] = docData.inventoryInfo ?? [];
         const styleCodes: StyleCodes[] = docData.styleCodesInfo ?? [];
         const grnInfo: GRNItems[] = docData.GRNInfo ?? [];
+        const suppliersInfo: Supplier[] = docData.suppliersInfo ?? [];
         let deliveryDate = "";
 
         for (let item of purchaseMaterials) {
@@ -1495,7 +1496,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         // const result = purchaseMaterialsInfo.filter((x :PurchaseMaterials) => purchaseMaterials.every((x2) => (x2.styleCode+x2.materialId+x2.materialDescription) !== (x.styleCode+x.materialId+x.materialDescription)));
         let urls = []
         for (let purchaseOrder of purchaseOrders) {
-          const poUrl = await createPOFormatFile(company, purchaseOrder);
+          const poUrl = await createPOFormatFile(company, purchaseOrder, suppliersInfo);
           purchaseOrder.fileUrl = poUrl;
           urls.push(poUrl)
         }
@@ -1846,10 +1847,10 @@ exports.formatPO = functions
           materialDescription: "mota-12",
           purchaseQty: 2212
         }]
-      } as unknown as PurchaseOrder)
+      } as unknown as PurchaseOrder, [])
     })
 
-const createPOFormatFile = async (company: string, purchaseOrder : PurchaseOrder) => {
+const createPOFormatFile = async (company: string, purchaseOrder : PurchaseOrder, suppliers: Supplier[]) => {
 
   const workbook = new excelJS.Workbook();
 
@@ -1857,7 +1858,12 @@ const createPOFormatFile = async (company: string, purchaseOrder : PurchaseOrder
   await workbook.xlsx.read(formateTemplateStream);
   const worksheet = workbook.getWorksheet('Sheet1');
   // const data = transformPOToKeyValue(purchaseOrder);
-  fillWorksheet(worksheet, purchaseOrder);
+  const supplier = suppliers.find( item => item.name.toLowerCase() === purchaseOrder.supplier.toLowerCase());
+
+  if (!supplier)
+    throw Error("Supplier does not exist in DB");
+
+  fillWorksheet(worksheet, purchaseOrder, supplier);
   const outputFile = path.join(os.tmpdir(), "output.xlsx");
   await workbook.xlsx.writeFile(outputFile)
   const fileUrl = await uploadFileToStorage(outputFile, `purchaseOrders/${company}/${purchaseOrder.id}.xlsx`)
@@ -1869,8 +1875,14 @@ const readExcelTemplate = (fileName: string = "format/PurchaseOrder.xlsx") => {
   return file.createReadStream()
 }
 
-const fillWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrder) => {
+const fillWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrder, supplier: Supplier) => {
   worksheet.getCell("B15").value = "C/O " + purchaseOrder.supplier
+  worksheet.getCell("B16").value = supplier.address1;
+  worksheet.getCell("B17").value = supplier.address2;
+  worksheet.getCell("B20").value = "GSTIN " + supplier.gst??"";
+  worksheet.getCell("B21").value = "Contact No " + supplier.phoneNumber??"";
+  worksheet.getCell("B22").value = "Email Id " + supplier.email??"";
+
   worksheet.getCell("G15").value = "Order No. " + purchaseOrder.id
   worksheet.getCell("G19").value = "Order Date " + moment(purchaseOrder.createdAt).format("DD MMM YY")
   worksheet.getCell("G22").value = purchaseOrder.deliveryDate
