@@ -7,8 +7,11 @@ import {
   Result,
   Button,
   Empty,
+  InputNumber,
 } from "antd";
 import { Table as ExportTable } from "ant-table-extensions";
+import { Select } from 'antd';
+
 import moment from "moment";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -36,6 +39,7 @@ import { Typography } from "antd";
 import { Row, Col } from 'antd';
 import AddNewModal from "./AddModal";
 
+const { Option } = Select;
 const { Title } = Typography;
 
 const header = {
@@ -70,6 +74,8 @@ const EditableCell = ({
   const inputRef = useRef(null);
   const form = useContext(EditableContext);
   const isDate = dataIndex?.includes("Date");
+  const isSupplier = dataIndex?.includes("supplier")
+  const suppliers = useSelector( state => state.taskReducer.suppliers)
   useEffect(() => {
     if (editing) {
       inputRef.current.focus();
@@ -151,11 +157,34 @@ const EditableCell = ({
         </Form.Item>
       );
     };
+
+    const loadSupplier = (suppliers) => {
+      return (
+        <Form.Item
+          style={{
+            margin: 0,
+          }}
+          name={dataIndex}
+          rules={[
+            {
+              required: true,
+              message: `${title} is required.`,
+            },
+          ]}
+        >
+          <Select ref={inputRef} onPressEnter={save} onBlur={save}>
+            {suppliers.map(item => (<Option value={item.name}>{item.name}</Option>))}
+          </Select>
+        </Form.Item>
+      );
+
+    }
+
     childNode = editing ? (
       isDate ? (
         loadFormWithDate()
       ) : (
-        loadForm()
+        isSupplier? loadSupplier(suppliers): loadForm()
       )
     ) : (
       <Tooltip title={children}>
