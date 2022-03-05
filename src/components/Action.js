@@ -65,6 +65,7 @@ const EditableCell = ({
   title,
   editable,
   children,
+  suppliers,
   dataIndex,
   record,
   handleSave,
@@ -75,7 +76,7 @@ const EditableCell = ({
   const form = useContext(EditableContext);
   const isDate = dataIndex?.includes("Date");
   const isSupplier = dataIndex?.includes("supplier")
-  const suppliers = useSelector( state => state.taskReducer.suppliers)
+  // const suppliers = useSelector( state => state.taskReducer.suppliers)
   useEffect(() => {
     if (editing) {
       inputRef.current.focus();
@@ -89,6 +90,10 @@ const EditableCell = ({
     };
     if (isDate) {
       fieldValue[dataIndex] = moment(record[dataIndex]);
+    }
+    if (isSupplier){
+      // fieldValue[dataIndex] = undefined
+      // form.resetFields(["supplier"])
     }
     form.setFieldsValue(fieldValue);
   };
@@ -158,7 +163,7 @@ const EditableCell = ({
       );
     };
 
-    const loadSupplier = (suppliers) => {
+    const loadSupplier = () => {
       return (
         <Form.Item
           style={{
@@ -184,7 +189,7 @@ const EditableCell = ({
       isDate ? (
         loadFormWithDate()
       ) : (
-        isSupplier? loadSupplier(suppliers): loadForm()
+        isSupplier? loadSupplier(): loadForm()
       )
     ) : (
       <Tooltip title={children}>
@@ -243,6 +248,7 @@ const Action = ({ type }) => {
   const [selectedRowKeys, setSelectedRowsKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   // const [selectedRowsKeys, setSelectedRowsKeys] = useState([])
+  const suppliers = useSelector( state => state.taskReducer.suppliers)
   const user = useSelector((state) => state.taskReducer.user);
   const action = useSelector((state) => state.taskReducer[type] || {columns:undefined,dataSource:undefined});
   const isFetching = useSelector((state) => state.taskReducer.isFetching);
@@ -446,7 +452,7 @@ const Action = ({ type }) => {
   const components = {
     body: {
       row: EditableRow,
-      cell: EditableCell,
+      cell: (props) => <EditableCell {...props} suppliers={suppliers}/>,
     },
   };
   let column = filteredColumns.map((col) => {
