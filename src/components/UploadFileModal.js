@@ -62,6 +62,7 @@ const UploadFileModal = ({type, open, onCancel, onCloseModal}) => {
             setUploading(false)
             onCloseModal(false)
             onCancel()
+            window.location.reload()
         }).catch(e => {
             console.log("There is an error in uploading the file",e)
             notification["error"]({
