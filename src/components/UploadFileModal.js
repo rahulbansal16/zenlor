@@ -61,6 +61,7 @@ const UploadFileModal = ({type, open, onCancel, onCloseModal}) => {
             })
             setUploading(false)
             onCloseModal(false)
+            onCancel()
         }).catch(e => {
             console.log("There is an error in uploading the file",e)
             notification["error"]({
@@ -69,6 +70,7 @@ const UploadFileModal = ({type, open, onCancel, onCloseModal}) => {
             })
             setUploading(false)
         })
+        setFileList([])
     }
 
     const props = {
