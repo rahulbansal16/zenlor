@@ -792,7 +792,10 @@ const updateBomsInfoFromStyleCodes = (styleCodes: StyleCodes[],
      inventoryInfo: InventoryItems[]
    } => {
   const bomJoinedStyleCode = join(newboms, styleCodes, (a, b)=>a.styleCode === b.styleCode);
-  const mappedBOMDTO: any = bomJoinedStyleCode.map( (bom) => ({
+  const mappedBOMDTO: any = bomJoinedStyleCode.map( (bom) => {
+    if (!bom.makeQty)
+     throw Error(`The StyleCode ${bom.styleCode} does not exist`)
+    return {
     styleCode: bom.styleCode,
     category: bom.category,
     type: bom.type,
@@ -809,7 +812,7 @@ const updateBomsInfoFromStyleCodes = (styleCodes: StyleCodes[],
     // inventory: 0,
     // activeOrdersQty: 0,
     // pendingQty: 0,
-  }));
+  }});
 
   const output = upsertItemsInArray(oldboms,
       mappedBOMDTO,
@@ -854,6 +857,11 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
         const oldPurchaseMaterials = docData.purchaseMaterialsInfo ?? [];
         const inventory = docData.inventoryInfo ?? [];
         // This will use stylecode plus materialId
+        for (let bom of boms){
+          if (!styleCodesInfo.find(item => item.styleCode === bom.styleCode)){
+            throw Error(`The StyleCode ${bom.styleCode} does not exist`)
+          }
+        }
         const result = updateBomsInfoFromStyleCodes(styleCodesInfo, bomsInfo, boms, inventory, oldPurchaseMaterials)
         await db.set(dataRef ,{
           bomsInfo: result.bomsInfo,
