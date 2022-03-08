@@ -1862,7 +1862,7 @@ const createPOFormatFile = async (company: string, purchaseOrder : PurchaseOrder
 
   const workbook = new excelJS.Workbook();
 
-  const formateTemplateStream = readExcelTemplate();
+  const formateTemplateStream = readExcelTemplate(company);
   await workbook.xlsx.read(formateTemplateStream);
   const worksheet = workbook.getWorksheet('Sheet1');
   // const data = transformPOToKeyValue(purchaseOrder);
@@ -1878,9 +1878,15 @@ const createPOFormatFile = async (company: string, purchaseOrder : PurchaseOrder
   return fileUrl
 }
 
-const readExcelTemplate = (fileName: string = "format/PurchaseOrder.xlsx") => {
-  const file = admin.storage().bucket("gs://zenlor.appspot.com").file(fileName)
-  return file.createReadStream()
+const readExcelTemplate = (company: string) => {
+  const filePath = `format/${company}/PurchaseOrder.xlsx`;
+  try {
+    const file = admin.storage().bucket("gs://zenlor.appspot.com").file(filePath)
+    return file.createReadStream()
+  }
+  catch (e:any){
+    throw Error("Unable to read PurchaseOrder Format" + e)
+  }
 }
 
 const fillWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrder, supplier: Supplier) => {
