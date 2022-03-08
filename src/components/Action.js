@@ -76,7 +76,6 @@ const EditableCell = ({
   const form = useContext(EditableContext);
   const isDate = dataIndex?.includes("Date");
   const isSupplier = dataIndex?.includes("supplier")
-  // const suppliers = useSelector( state => state.taskReducer.suppliers)
   useEffect(() => {
     if (editing) {
       inputRef.current.focus();
@@ -371,6 +370,7 @@ const Action = ({ type }) => {
         }) 
         dispatch(fetchDataAction({...result.data}))
         setSelectedRows([])
+        window.location.reload()
       } catch(e){
        notification["error"] ({
          message:"Error Creating PO",
@@ -383,7 +383,6 @@ const Action = ({ type }) => {
       //   downloadCsv(element);
       // });
       setLoading(false)
-      window.location.reload()
    
       // history.push({
       //   pathname: `/action/purchaseOrder`,
