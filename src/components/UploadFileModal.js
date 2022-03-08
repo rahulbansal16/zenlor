@@ -67,7 +67,7 @@ const UploadFileModal = ({type, open, onCancel, onCloseModal}) => {
             console.log("There is an error in uploading the file",e)
             notification["error"]({
                 message: "File upload Failed",
-                description: "Unable to Upload the file. Please try again"
+                description: "Error" + e
             })
             setUploading(false)
         })
