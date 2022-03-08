@@ -120,6 +120,8 @@ const ActionBar = ({type, onFinish, loading}) => {
             autoFocus
             onChange={() => {}}
             allowClear
+            getPopupContainer={() => document.getElementById("table")}
+            // dropdownStyle={{marginBottom:'30px'}}
           >
             {(actions[type]??[]).map((action) => (
               <Option size="large" value={action.value} key = {action.key}>

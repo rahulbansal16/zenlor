@@ -600,7 +600,7 @@ const Action = ({ type }) => {
       />
       </div>
 
-      <div style={{
+      <div id ="table" style={{
         position: 'fixed',
         paddingTop:'20px',
         paddingLeft:'20px',
