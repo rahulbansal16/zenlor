@@ -1,5 +1,8 @@
 // Filter could be sorting , string or number 
 // Multiselect
+
+import { useEffect, useState } from "react";
+
 // 
 const fetchAllKeys = (dataSource, column) => {
     const filters = dataSource.map( item => {
@@ -24,31 +27,36 @@ const fetchAllKeys = (dataSource, column) => {
 }
 
 const useFilter = (columns, dataSource) => {
-    if (!columns || !dataSource) 
-     return []
-    const columnsWithFilter = columns.map( column => {
-        if (!column.filter)
-            return column;
-        let filterColumn = {
-            ...column,
-            sorter: (a,b) => a[column?.dataIndex] - b[column?.dataIndex]
-        }
-        const {filter, dataIndex} = column
-        switch(filter){
-            case "multiSelect":
-                filterColumn["onFilter"] = (value, record) => {
-                    console.log("In the onFilter Method", value, record, record);
-                    return record[column?.dataIndex] === value }
-                filterColumn['filters'] = fetchAllKeys(dataSource, dataIndex)
-                // console.log("The filterColumn Key is", filterColumn.key)
-                filterColumn.filteredValue = null;
-                // console.log("The filterColumn", filterColumn.filteredValue)
-                break;
-            default:
-                break
-        }
-        return filterColumn
-    })
+    const [columnsWithFilter, setColumnsWithFilter] = useState()
+    useEffect(() => {
+        if (!columns || !dataSource) 
+        return []
+       const columnsWithFilterResult = columns.map( column => {
+           if (!column.filter)
+               return column;
+           let filterColumn = {
+               ...column,
+               sorter: (a,b) => a[column?.dataIndex] - b[column?.dataIndex]
+           }
+           const {filter, dataIndex} = column
+           switch(filter){
+               case "multiSelect":
+                   filterColumn["onFilter"] = (value, record) => {
+                       console.log("In the onFilter Method", value, record, record);
+                       return record[column?.dataIndex] === value }
+                   filterColumn['filters'] = fetchAllKeys(dataSource, dataIndex)
+                   // console.log("The filterColumn Key is", filterColumn.key)
+                   filterColumn.filteredValue = null;
+                   // console.log("The filterColumn", filterColumn.filteredValue)
+                   break;
+               default:
+                   break
+           }
+           return filterColumn
+       })
+       setColumnsWithFilter(columnsWithFilterResult)
+    //    return columnsWithFilter
+    }, [columns, dataSource])
     return columnsWithFilter
 }
 export default useFilter;
