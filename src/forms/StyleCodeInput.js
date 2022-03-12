@@ -14,7 +14,7 @@ const StyleCodeInput = ({onSelectCb}) => {
     //     name: styleCode.styleCode
     // }));
     // const filteredStyleCodes = [...styleCodes, ...mapedStyleCodesInfo]
-    return <AutoCompleteSelector label={"Enter code"} onSelectCb={onSelectCb} data={styleCodes}/>
+    return <AutoCompleteSelector style={{ width: 300 }} label={"Enter code"} onSelectCb={onSelectCb} data={styleCodes}/>
 
     const [options, setOptions] = useState([]);
 
