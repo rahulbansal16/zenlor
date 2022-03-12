@@ -77,7 +77,6 @@ const AutoCompleteSelector = ({onSelectCb, data, label, reference, defalutValue,
                 defaultValue={defalutValue}
                 label={label}
                 dropdownMatchSelectWidth={252}
-                // style={{ width: 100 }}
                 options={options}
                 placeholder="Start Typing"
                 onSelect={onSelect}
