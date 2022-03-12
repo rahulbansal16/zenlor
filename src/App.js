@@ -30,7 +30,9 @@ const renderPages = () => {
       } />
       <Route exact path="/action/:type" render = { (props) => 
         <Layout hasSider={true} style={{
-          fontSize:"13px"
+          fontSize:"13px",
+          overflowX: 'scroll',
+          overflowY: "clip"
         }}>
           <SideBar type={props.match.params.type}></SideBar>
           <Content>
@@ -44,7 +46,7 @@ const renderPages = () => {
          { (props) => <Authorization allowedRoles={["admin", "manager"]} department = {props.match.params.department}> 
             <Home department={props.match.params.department}/>
           </Authorization>
-        } 
+          } 
       </Route>
       <Route exact path="/:department/form/edit">
         { (props) => <Authorization allowedRoles={["admin", "manager"]} department = {props.match.params.department}> 
@@ -96,7 +98,9 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App" 
+    // style={{overflowY:'hidden'}}
+    >
       <Router>
         {renderPages()}
       </Router>

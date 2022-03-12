@@ -9,8 +9,9 @@ import {
   Empty,
   InputNumber,
 } from "antd";
-import { Table as ExportTable } from "ant-table-extensions";
+// import { Table as ExportTable } from "ant-table-extensions";
 import { Select } from 'antd';
+import {Table as ExportTable} from "antd";
 
 import moment from "moment";
 
@@ -19,7 +20,7 @@ import { SmileOutlined } from "@ant-design/icons";
 // https://codesandbox.io/s/editable-cells-antd-4-17-4-forked-w3q20?file=/index.js:1809-1869
 import Loader from "./Loader";
 import { useLocation } from "react-router";
-import React, { useEffect, useContext, useState, useRef } from "react";
+import React, { useEffect, useContext, useState, useRef, useMemo } from "react";
 import { functions } from "../firebase";
 import {
   generateUId,
@@ -38,6 +39,7 @@ import useFilter from "../hooks/useFilter";
 import { Typography } from "antd";
 import { Row, Col } from 'antd';
 import AddNewModal from "./AddModal";
+import { useCallback } from "react";
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -192,7 +194,7 @@ const EditableCell = ({
       )
     ) : (
       <Tooltip title={children}>
-        <div className="editable-cell-value-wrap" tabIndex={0} onFocus={toggleEdit} onClick={toggleEdit}>
+        <div className="editable-cell-value-wrap" tabIndex={0} style={{whiteSpace:'nowrap !important'}} onFocus={toggleEdit} onClick={toggleEdit}>
           {children}
         </div>
       </Tooltip>
@@ -256,29 +258,7 @@ const Action = ({ type }) => {
   const [filteredInfo, setFilteredInfo] = useState(null)
   const { columns, dataSource } = action;
   const filteredColumns = useFilter(columns, dataSource);
-
-  useEffect(() => {
-    console.log("Calling for type", type);
-    setFilteredInfo(null);
-    setSelectedRowsKeys([]);
-  }, [type, action]);
-
-  if (isFetching) {
-    return <Loader />;
-  }
-  
-  const handleChange = (pagination, filters, sorter) => {
-    // console.log('Various parameters', pagination, filters, sorter);
-    setFilteredInfo(filters)
-  };
-
-  if (!columns)
-    return    <Result
-          icon={<SmileOutlined/>}
-          title="We are working on it"
-          subTitle="We are actively building the functionality. Stay Tuned."
-      />
-  const applyFilter = (dataSource) => {
+  const applyFilter = useCallback( (dataSource) => {
     if (!dataSource)
      return dataSource
 
@@ -316,7 +296,31 @@ const Action = ({ type }) => {
         );
     }
     return dataSource;
+  }, [dataSource])
+  const filteredResult = useMemo(() => applyFilter(dataSource).map(item => ({...item,key: item.id})), [dataSource])
+
+  useEffect(() => {
+    console.log("Calling for type", type);
+    setFilteredInfo(null);
+    setSelectedRowsKeys([]);
+  }, [type, action]);
+
+  if (isFetching) {
+    return <Loader />;
+  }
+  
+  const handleChange = (pagination, filters, sorter) => {
+    // console.log('Various parameters', pagination, filters, sorter);
+    setFilteredInfo(filters)
   };
+
+  if (!columns)
+    return    <Result
+          icon={<SmileOutlined/>}
+          title="We are working on it"
+          subTitle="We are actively building the functionality. Stay Tuned."
+      />
+ 
 
   //
   const onFinish = async (data) => {
@@ -539,6 +543,7 @@ const Action = ({ type }) => {
       </Row>
       <div style={{  overflowY: 'auto', maxHeight:'88vh'}}>
       <ExportTable
+        scroll={{x:true}}
         exportable
         locale={ {
           emptyText: () => <Empty
@@ -593,10 +598,9 @@ const Action = ({ type }) => {
         rowSelection={rowSelection}
         onChange={handleChange}
         columns={column}
-        dataSource={applyFilter(dataSource).map((item) => ({
-          ...item,
-          key: item.id,
-        }))}
+        dataSource={
+          filteredResult
+        }
       />
       </div>
 

@@ -46,6 +46,7 @@ export const initialState = {
                 value:"WROGN"
               }],
               render: (text) => <a>{text}</a>,
+              width: 150
             },
             {
               title: "Product",
@@ -57,33 +58,38 @@ export const initialState = {
               dataIndex: "orderNo",
               showSorterTooltip: false,
               key: "orderNo",
-              editable: true
+              editable: true,
+              width: 150
             },
             {
               title: "Order Confirmation",
               dataIndex: "confirmDate",
               showSorterTooltip: false,
               key: "confirmDate",
-              editable: true
+              editable: true,
+              width: 150
             },
             {
               title: "Order Quantity",
               showSorterTooltip: false,
               dataIndex: "orderQty",
               key: "orderQty",
-              editable: true
+              editable: true,
+              width: 150
             },
             {
               title: "To Make Quantity",
               dataIndex: "makeQty",
               key: "makeQty",
-              editable: true
+              editable: true,
+              width: 150
             },
             {
               title: "Delivery Date",
               dataIndex: "deliveryDate",
               key: "deliveryDate",
-              editable: true
+              editable: true,
+              width: 150
             },
             {
               title: "Status",
@@ -247,6 +253,7 @@ export const initialState = {
                 dataIndex: "styleCode",
                 filter: "multiSelect",
                 key: "styleCode",
+                width: 100
               },
               {
                 title: "Cat.",
@@ -277,6 +284,7 @@ export const initialState = {
                     title: "Description",
                     dataIndex: "materialDescription",
                     key: "materialDescription",
+                    width: 100
                   },       
                   {
                     title: "Unit",
@@ -290,19 +298,22 @@ export const initialState = {
                 title: "Placement",
                 dataIndex: "placement",
                 key: "placement",
-                editable: true
+                editable: true,
+                width: 100
               },
               {
                 title:"Wastage",
                 dataIndex: "wastage",
                 key: "wastage",
-                editable: true
+                editable: true,
+                width: 100
               },
               {
                 title: "Consumption",
                 dataIndex: "consumption",
                 key: "consumption",
-                editable: true
+                editable: true,
+                width: 100
               }, 
               {
                 title: "Quantity",
@@ -316,16 +327,19 @@ export const initialState = {
                   title: "Inventory",
                   dataIndex: "inventory",
                   key: "inventory",
+                  width: 100
                 },
                 {
                   title: "Active Ordered",
                   dataIndex: "activeOrdersQty",
                   key: "activeOrdersQty",
+                  width: 100
                 },             
                 {
                   title:"Issued",
                   dataIndex:"issueQty",
-                  key: "issueQty"
+                  key: "issueQty",
+                  width: 100
                 },
               ]
               },
@@ -334,6 +348,7 @@ export const initialState = {
                 dataIndex: "pendingQty",
                 key: "pendingQty",
                 filter: "multiSelect",
+                width: 100
               },  
               // Table.SELECTION_COLUMN,
             ],
@@ -357,8 +372,8 @@ export const initialState = {
         {
           title: "Category",
           dataIndex: "category",
-          key:"category"
-
+          key:"category",
+          filter: "multiSelect"
         },
         {
           title:"Type",
@@ -379,8 +394,8 @@ export const initialState = {
         {
           title: "Material Description",
           dataIndex: "materialDescription",
-          key:"materialDescription"
-  
+          key:"materialDescription",
+          width: 100
         },
         {
           title:"unit",
@@ -396,31 +411,36 @@ export const initialState = {
           title:"Received Qty",
           dataIndex:"receivedQty",
           key:"receivedQty",
-          editable: true
+          editable: true,
+          width: 150
         },
         {
           title: "Received Date",
           dataIndex: "receivedDate",
           key:"receivedDate",
-          editable: true
+          editable: true,
+          width: 150
         },        
         {
           title:"Rejected Qty",
           dataIndex:"rejectedQty",
           key:"rejectedQty",
-          editable: true
+          editable: true,
+          width: 150
         },
         {
           title: "Rejected Reason",
           dataIndex: "rejectedReason",
           key:"rejectedReason",
-          editable: true
+          editable: true,
+          width: 200
         },
         {
           title: "Accepted Qty",
           dataIndex: "acceptedQty",
           key:"acceptedQty",
           editable: true,
+          width: 150
         },
       ],
       dataSource:[]
@@ -470,13 +490,15 @@ export const initialState = {
                   title:"pending",
                   dataIndex:"pendingQty",
                   key:"pendingQty",
+                  width: 100
                   // editable: true
                 },
                 {
                   title:"purchase",
                   dataIndex:"purchaseQty",
                   key:"purchaseQty",
-                  editable: true
+                  editable: true,
+                  width: 100
                 },
               // ]
             // },
@@ -484,47 +506,55 @@ export const initialState = {
                 title: "Rate",
                 dataIndex: "rate",
                 key: "rate",
-                editable: true
+                editable: true,
+                width: 100
               },
               {
                 title: "Disc %",
                 dataIndex: "discount",
                 key: "discount",
                 editable: true,
+                width: 100
               },
               {
                 title: "Pre Tax",
                 dataIndex: "preTaxAmount",
                 key: "preTaxAmount",
+                width: 100
               }, 
               {
                 title: "Tax %",
                 dataIndex: "tax",
                 key: "tax",
                 editable: true,
+                width: 100
               },
               {
                 title: "Tax Amount",
                 dataIndex: "taxAmount",
                 key: "taxAmount",
+                width: 100
                 // editable: true,
               }, 
               {
                 title: "Total Amount",
                 dataIndex: "totalAmount",
                 key: "totalAmount",
+                width: 100
               }, 
               {
                 title: "Supplier",
                 dataIndex: "supplier",
                 key: "supplier",
                 editable: true,
+                width: 200
               },
               {
                 title: "Delivery Date",
                 dataIndex: "deliveryDate",
                 key: "deliveryDate",
                 editable: true,
+                width: 150
               },
               // Table.SELECTION_COLUMN 
             ],
@@ -549,6 +579,7 @@ export const initialState = {
         title: "Status",
         dataIndex: "status",
         key: "status",
+        filter: "multiSelect"
       },
       {
         title: "Supplier",
@@ -565,6 +596,7 @@ export const initialState = {
         dataIndex: "deliveryDate",
         key: "deliveryDate",
         editable: true,
+        width: 150
       },
       {
         title: "Amount",
