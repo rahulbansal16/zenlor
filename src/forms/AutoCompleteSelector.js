@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 // StyleCode Name on the Top
 
-const AutoCompleteSelector = ({onSelectCb, data, label}) => {
+const AutoCompleteSelector = ({onSelectCb, data, label, reference, defalutValue, validateStatus}) => {
 
     // const styleCodes = useSelector(state => state.taskReducer.styleCodes)
 
@@ -72,7 +72,9 @@ const AutoCompleteSelector = ({onSelectCb, data, label}) => {
         onSelectCb(value)
     };
     return <Select
+                ref={reference}
                 showSearch
+                defaultValue={defalutValue}
                 label={label}
                 dropdownMatchSelectWidth={252}
                 style={{ width: 300 }}

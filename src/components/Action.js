@@ -40,6 +40,7 @@ import { Typography } from "antd";
 import { Row, Col } from 'antd';
 import AddNewModal from "./AddModal";
 import { useCallback } from "react";
+import AutoCompleteSelector from "../forms/AutoCompleteSelector";
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -84,7 +85,7 @@ const EditableCell = ({
     }
   }, [editing]);
 
-  const toggleEdit = () => {
+  const toggleEdit = (value) => {
     setEditing(!editing);
     let fieldValue = {
       [dataIndex]: record[dataIndex],
@@ -93,20 +94,22 @@ const EditableCell = ({
       fieldValue[dataIndex] = moment(record[dataIndex]);
     }
     if (isSupplier){
-      // fieldValue[dataIndex] = undefined
-      // form.resetFields(["supplier"])
+      fieldValue[dataIndex] = value
     }
     form.setFieldsValue(fieldValue);
   };
-  const save = async () => {
+  const save = async (value) => {
     try {
       const values = await form.validateFields();
-      toggleEdit();
+      toggleEdit(value);
       let formattedValue = values;
       if (isDate) {
         formattedValue[dataIndex] = moment(values[dataIndex]).format(
           "DD MMM YY"
         );
+      }
+      if (dataIndex === "supplier"){
+        formattedValue[dataIndex] = value;
       }
       if (areValueChange(record, formattedValue)){
         handleSave({ ...record, ...formattedValue });
@@ -178,9 +181,14 @@ const EditableCell = ({
             },
           ]}
         >
-          <Select ref={inputRef} onPressEnter={save} onBlur={save}>
-            {suppliers.map(item => (<Option value={item.name}>{item.name}</Option>))}
-          </Select>
+          <AutoCompleteSelector defalutValue={
+            form.getFieldsValue("supplier")
+          } reference={inputRef} onSelectCb={
+            (value) => {
+              save(value)
+            }
+            } 
+            label={"Type Supplier"} data={suppliers.map(item => ({id:item.name+"id", name:item.name}))}/>
         </Form.Item>
       );
 
