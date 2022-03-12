@@ -253,19 +253,21 @@ export const initialState = {
                 dataIndex: "styleCode",
                 filter: "multiSelect",
                 key: "styleCode",
-                width: 100
+                width: 150
               },
               {
                 title: "Cat.",
                 dataIndex: "category",
                 key: "category",
                 filter: "multiSelect",
+                width: 100
               },
               {
                 title: "Type",
                 dataIndex: "type",
                 key: "type",
-                filter: "multiSelect"
+                filter: "multiSelect",
+                widht: 100
               },
               {
                 title: "MATERIAL",
@@ -284,7 +286,6 @@ export const initialState = {
                     title: "Description",
                     dataIndex: "materialDescription",
                     key: "materialDescription",
-                    width: 100
                   },       
                   {
                     title: "Unit",
