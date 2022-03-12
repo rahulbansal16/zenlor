@@ -553,6 +553,7 @@ const Action = ({ type }) => {
       <ExportTable
         scroll={{x:true}}
         exportable
+        size="small"
         locale={ {
           emptyText: () => <Empty
           description={
