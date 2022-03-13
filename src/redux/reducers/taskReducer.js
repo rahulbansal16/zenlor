@@ -303,7 +303,7 @@ export const initialState = {
                 width: 100
               },
               {
-                title:"Wastage",
+                title:"W%",
                 dataIndex: "wastage",
                 key: "wastage",
                 editable: true,
@@ -331,7 +331,7 @@ export const initialState = {
                   width: 100
                 },
                 {
-                  title: "Active Ordered",
+                  title: "Ordered",
                   dataIndex: "activeOrdersQty",
                   key: "activeOrdersQty",
                   width: 100
