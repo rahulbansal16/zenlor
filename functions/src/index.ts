@@ -1891,10 +1891,10 @@ const readExcelTemplate = (company: string) => {
 
 const fillWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrder, supplier: Supplier) => {
   worksheet.getCell("B15").value = "C/O " + supplier.person;
-  worksheet.getCell("B16").value = purchaseOrder.supplier;
+  worksheet.getCell("B16").value = (purchaseOrder.supplier || "").toUpperCase();
   worksheet.getCell("B17").value = supplier.address1;
-  worksheet.getCell("B17").value = supplier.address2;
-  worksheet.getCell("B19").value = supplier.city + " - " + supplier.pin + ",India"
+  worksheet.getCell("B18").value = supplier.address2;
+  worksheet.getCell("B19").value = supplier.city + " - " + supplier.pin + ", INDIA"
   worksheet.getCell("B20").value = "GSTIN " + (supplier.gst??"")+ ", PAN " + (supplier.pan??"");
   worksheet.getCell("B21").value = "Contact No " + supplier.phoneNumber??"";
   worksheet.getCell("B22").value = "Email Id " + supplier.email??"";
