@@ -36,7 +36,7 @@ const useFilter = (columns, dataSource) => {
                return column;
            let filterColumn = {
                ...column,
-               sorter: (a,b) => a[column?.dataIndex] - b[column?.dataIndex]
+            //    sorter: (a,b) => a[column?.dataIndex] - b[column?.dataIndex]
            }
            const {filter, dataIndex} = column
            switch(filter){
