@@ -30,7 +30,7 @@ const renderPages = () => {
       } />
       <Route exact path="/action/:type" render = { (props) => 
         <Layout hasSider={true} style={{
-          fontSize:"13px",
+          // fontSize:"13px",
           overflowX: 'scroll',
           overflowY: "clip"
         }}>
