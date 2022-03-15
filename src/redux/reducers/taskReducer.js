@@ -100,7 +100,7 @@ export const initialState = {
             // {
               // children : [
                {
-                title:"Material Status",
+                title:"Mat. Status",
                 dataIndex: "materialStatus",
                 key: "materialStatus",
                 filterMode: 'tree',
@@ -253,7 +253,7 @@ export const initialState = {
                 dataIndex: "styleCode",
                 filter: "multiSelect",
                 key: "styleCode",
-                width: 150
+                width: 200
               },
               {
                 title: "Cat.",
