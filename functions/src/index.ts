@@ -626,7 +626,9 @@ exports.getData = functions
       const {company} = await getCompany(data, context);
       console.log("The company is", company);
       const companyDoc = await admin.firestore().collection("data").doc(company).get();
+      const suppliersDoc = await admin.firestore().collection("suppliers").doc(company).get();
       const companyData = companyDoc.data();
+      const suppliersData = suppliersDoc.data();
       // companyData["aggregate"] = {...await getAggregate(company)}
       console.log("The getData result is", companyData);
       if (!companyData) {
@@ -639,6 +641,7 @@ exports.getData = functions
       styleCodesInfo = addMaterialStatusToStyleCode(styleCodesInfo, bomsInfo);
       return {
         ...companyData,
+        ...suppliersData,
         styleCodesInfo: styleCodesInfo,
         GRNInfo: GRNInfo.filter((item:GRNItems) => item.status === "active"),
       };
@@ -1432,6 +1435,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     const { company, purchaseMaterials, createdAt } = data;
     try {
       const dataRef = admin.firestore().collection("data").doc(company);
+      const suppliersRef = admin.firestore().collection("suppliers").doc(company);
       return await admin.firestore().runTransaction(async db => {
         const doc = await db.get(dataRef);
         const docData = doc.data();
@@ -1444,7 +1448,12 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         const inventory: InventoryItems[] = docData.inventoryInfo ?? [];
         const styleCodes: StyleCodes[] = docData.styleCodesInfo ?? [];
         const grnInfo: GRNItems[] = docData.GRNInfo ?? [];
-        const suppliersInfo: Supplier[] = docData.suppliersInfo ?? [];
+        const suppliersDoc = await db.get(suppliersRef);
+        const suppliersDocData = suppliersDoc.data();
+        if (!suppliersDocData){
+          throw Error("Suppliers are not present in the doc");
+        }
+        const suppliersInfo: Supplier[] = suppliersDocData.suppliersInfo ?? [];
         let deliveryDate = "";
 
         for (let item of purchaseMaterials) {
@@ -1960,14 +1969,14 @@ exports.upsertSuppliersInfo = onCall<SupplierInfo>({
   handler: async (data, context) => {
     const {company, suppliers} = data;
     try {
-      const dataRef = admin.firestore().collection("data").doc(company);
+      const dataRef = admin.firestore().collection("suppliers").doc(company);
       return await admin.firestore().runTransaction( async db => {
         const doc = await db.get(dataRef);
         const docData = doc.data();
         if (!docData) {
           throw Error("The company does not exist" + company);
         }
-        const suppliersInfo= docData.suppliersInfo??[];
+        const suppliersInfo= docData?.suppliersInfo??[];
         const output = upsertItemsInArray(suppliersInfo, suppliers, (oldItem, newItem) => oldItem.gst === newItem.gst && oldItem.name === newItem.name);
         await db.set( dataRef,{
           suppliersInfo: output
