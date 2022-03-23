@@ -637,11 +637,19 @@ exports.getData = functions
       let styleCodesInfo = (companyData.styleCodesInfo??[]).sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
       const GRNInfo = companyData.GRNInfo??[];
       styleCodesInfo = styleCodesInfo as StyleCodes[];
-      const bomsInfo = companyData.bomsInfo??[];
+
+      const bomsDoc = await admin.firestore().collection("boms").doc(company).get();
+      const bomsData = bomsDoc.data();
+      if (!bomsData){
+        throw Error("Boms Data not Present");
+      }
+      const bomsInfo = bomsData.bomsInfo??[];
+
       styleCodesInfo = addMaterialStatusToStyleCode(styleCodesInfo, bomsInfo);
       return {
         ...companyData,
         ...suppliersData,
+        bomsInfo,
         styleCodesInfo: styleCodesInfo,
         GRNInfo: GRNInfo.filter((item:GRNItems) => item.status === "active"),
       };
@@ -720,6 +728,7 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
     const {company, styleCodes} = data;
     try {
       const dataRef = admin.firestore().collection("data").doc(company);
+      const bomsRef = admin.firestore().collection("boms").doc(company);
       return await admin.firestore().runTransaction( async db => {
         const doc = await db.get(dataRef);
         const docData = doc.data();
@@ -727,7 +736,12 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
           throw Error("The company does not exist" + company);
         }
         const styleCodesInfo = docData.styleCodesInfo??[];
-        const bomsInfo = docData.bomsInfo??[];
+        const bomsDoc = await db.get(bomsRef);
+        const bomData = bomsDoc.data();
+        if(!bomData){
+          throw Error("The Boms Data does not exist");
+        }
+        const bomsInfo = bomData.bomsInfo??[];
         const inventoryInfo = docData.inventoryInfo??[];
         const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
         const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
@@ -735,14 +749,21 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
         // const result = distributeInventory(output, bomsInfo, inventoryInfo);
         let newStyleCodesInfo = addMaterialStatusToStyleCode(output, result.bomsInfo);
         newStyleCodesInfo = newStyleCodesInfo.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
-        await db.set( dataRef,{
+        const batch = admin.firestore().batch()
+        // writeBatch(db);
+        batch.set( dataRef,{
           styleCodesInfo: newStyleCodesInfo,
-          bomsInfo: result.bomsInfo,
           inventoryInfo: result.inventoryInfo,
           purchaseMaterialsInfo: result.purchaseMaterialsInfo
         }, {
           merge: true,
         });
+        batch.set( bomsRef, {
+          bomsInfo: result.bomsInfo
+        },{
+          merge: true
+        })
+        await batch.commit();
         return {
           company,
           styleCodesInfo: newStyleCodesInfo,
@@ -1345,59 +1366,80 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
   handler: async (data, context) => {
     
     const {company, purchaseOrders} = data;
-    const doc = await admin.firestore().collection("data").doc(company).get();
-    const docData = doc.data();
-    if (!docData) {
-      throw Error("Document is not prsent for the company");
-    }
-    const purchaseOrdersInfo = docData.purchaseOrdersInfo??[];
-    const bomsInfo = docData.bomsInfo??[];
-    const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
-    const inventory: InventoryItems[] = docData.inventoryInfo??[];
-    const styleCodes: StyleCodes[] = docData.styleCodesInfo??[];
-    const grnInfo: GRNItems[] = docData.GRNInfo??[];
 
-    let deletedPO:any = {}
-    const collectedInventory = collectInventoryFromStyleCodes(bomsInfo, inventory);
-    for (let purchaseOrder of purchaseOrders){
-      for (let lineItem of purchaseOrder.lineItems){
-        const item = collectedInventory.inventory.find(item => item.materialId === lineItem.materialId && item.materialDescription === lineItem.materialDescription)
-        if (!item){
-          throw Error("One of the item in the purchaseOrder does not exist in the Inventory List")
-        }
-        item.activeOrdersQty -= lineItem.purchaseQty;
+    const dataRef = admin.firestore().collection("data").doc(company);
+    const bomsRef = admin.firestore().collection("boms").doc(company);
+    return await admin.firestore().runTransaction(async db => {
+
+      const doc = await db.get(dataRef);
+      const docData = doc.data();
+      if (!docData) {
+        throw Error("Document is not prsent for the company");
       }
-      if (purchaseOrder.status === "CANCELED"){
-        throw Error("Purchase Order is already canceled")
+
+      const purchaseOrdersInfo = docData.purchaseOrdersInfo??[];
+  
+      const bomsDoc = await db.get(bomsRef);
+      const bomData = bomsDoc.data();
+      if(!bomData){
+        throw Error("The Boms Data does not exist");
       }
-      purchaseOrder.status = "CANCELED";
-      deletedPO[purchaseOrder.id] = true;
-    }
-
-    const assignedInventory = assignInventoryToBOM(styleCodes, collectedInventory.boms, collectedInventory.inventory);
-    const updatedPurchaseMaterialsInfo =  populatePurhcaseMaterialsFromBOM(assignedInventory.boms, purchaseMaterialsInfo);
-    let filteredGRN = grnInfo.filter( item => !deletedPO[item.purchaseOrderId])
-    const output = upsertItemsInArray(purchaseOrdersInfo, purchaseOrders, (oldItem, newItem) => oldItem.id === newItem.id);
-
-    let newStyleCodesInfo = addMaterialStatusToStyleCode(styleCodes, collectedInventory.boms);
-    await admin.firestore().collection("data").doc(company).set(
-        {
-          bomsInfo: collectedInventory.boms,
-          inventoryInfo: collectedInventory.inventory,
-          purchaseOrdersInfo: output,
-          purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
-          GRNInfo: filteredGRN
+      const bomsInfo = bomData.bomsInfo??[];
+  
+      const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
+      const inventory: InventoryItems[] = docData.inventoryInfo??[];
+      const styleCodes: StyleCodes[] = docData.styleCodesInfo??[];
+      const grnInfo: GRNItems[] = docData.GRNInfo??[];
+  
+      let deletedPO:any = {}
+      const collectedInventory = collectInventoryFromStyleCodes(bomsInfo, inventory);
+      for (let purchaseOrder of purchaseOrders){
+        for (let lineItem of purchaseOrder.lineItems){
+          const item = collectedInventory.inventory.find(item => item.materialId === lineItem.materialId && item.materialDescription === lineItem.materialDescription)
+          if (!item){
+            throw Error("One of the item in the purchaseOrder does not exist in the Inventory List")
+          }
+          item.activeOrdersQty -= lineItem.purchaseQty;
         }
-        , {
-          merge: true,
-        });
-    return {
-      styleCodesInfo: newStyleCodesInfo,
-      bomsInfo: collectedInventory.boms,
-      purchaseOrdersInfo: output ,
-      purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
-      GRNInfo: filteredGRN
-    };
+        if (purchaseOrder.status === "CANCELED"){
+          throw Error("Purchase Order is already canceled")
+        }
+        purchaseOrder.status = "CANCELED";
+        deletedPO[purchaseOrder.id] = true;
+      }
+  
+      const assignedInventory = assignInventoryToBOM(styleCodes, collectedInventory.boms, collectedInventory.inventory);
+      const updatedPurchaseMaterialsInfo =  populatePurhcaseMaterialsFromBOM(assignedInventory.boms, purchaseMaterialsInfo);
+      let filteredGRN = grnInfo.filter( item => !deletedPO[item.purchaseOrderId])
+      const output = upsertItemsInArray(purchaseOrdersInfo, purchaseOrders, (oldItem, newItem) => oldItem.id === newItem.id);
+  
+      let newStyleCodesInfo = addMaterialStatusToStyleCode(styleCodes, collectedInventory.boms);
+
+      const batch = admin.firestore().batch()
+      // writeBatch(db);
+      batch.set( dataRef,  {
+        inventoryInfo: collectedInventory.inventory,
+        purchaseOrdersInfo: output,
+        purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
+        GRNInfo: filteredGRN
+      }, {
+        merge: true,
+      });
+      batch.set( bomsRef, {
+        bomsInfo: collectedInventory.boms
+      },{
+        merge: true
+      })
+      await batch.commit();
+      
+      return {
+        styleCodesInfo: newStyleCodesInfo,
+        bomsInfo: collectedInventory.boms,
+        purchaseOrdersInfo: output ,
+        purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
+        GRNInfo: filteredGRN
+      };
+    })
   }
 })
 
@@ -1728,35 +1770,56 @@ exports.upsertInventory = onCall<InventoryInfo>({
   handler: async (data, context) => {
     console.log("The data is", data);
     const {company, inventory} = data;
-    const doc = await admin.firestore().collection("data").doc(company).get();
-    const docData = doc.data();
-    if (!docData) {
-      throw Error("The company does not exist" + company);
-    }
-    const inventoryInfo = docData.inventoryInfo??[];
-    const bomsInfo = docData.bomsInfo??[];
-    const styleCodesInfo = docData.styleCodesInfo??[];
-    const result = collectInventoryFromStyleCodes(inventoryInfo, bomsInfo);
-    const collectedInventory = result?.inventory;
-    if (!collectedInventory) {
-      throw Error("Inventory Collection Failed");
-    }
-    const output = upsertItemsInArray(collectedInventory, inventory, (oldItem: InventoryItems, newItem: InventoryItems) => oldItem.materialId === newItem.materialId &&
-    oldItem.materialDescription === newItem.materialDescription);
+    const dataRef = admin.firestore().collection("data").doc(company);
+    const bomsRef = admin.firestore().collection("boms").doc(company);
+    return await admin.firestore().runTransaction(async db => {
 
-    const p = distributeInventory(styleCodesInfo, result.boms, output);
+      const doc = await db.get(dataRef);
+      const docData = doc.data();
+      if (!docData) {
+        throw Error("Document is not prsent for the company");
+      }
 
-    await admin.firestore().collection("data").doc(company).set( {
-      inventoryInfo: p.inventoryInfo,
-      bomsInfo: p.bomsInfo,
-    }, {
-      merge: true,
-    });
-    return {
-      company,
-      inventoryInfo: p.inventoryInfo,
-      bomsInfo: p.bomsInfo,
-    };
+      const inventoryInfo = docData.inventoryInfo??[];
+
+      const bomsDoc = await db.get(bomsRef)
+      const bomsData = bomsDoc.data();
+      if (!bomsData){
+        throw Error("Boms Data not Present");
+      }
+      const bomsInfo = bomsData.bomsInfo??[];
+
+      const styleCodesInfo = docData.styleCodesInfo??[];
+      const result = collectInventoryFromStyleCodes(inventoryInfo, bomsInfo);
+      const collectedInventory = result?.inventory;
+      if (!collectedInventory) {
+        throw Error("Inventory Collection Failed");
+      }
+      const output = upsertItemsInArray(collectedInventory, inventory, (oldItem: InventoryItems, newItem: InventoryItems) => oldItem.materialId === newItem.materialId &&
+      oldItem.materialDescription === newItem.materialDescription);
+  
+      const p = distributeInventory(styleCodesInfo, result.boms, output);
+  
+      const batch = admin.firestore().batch()
+      // writeBatch(db);
+      batch.set( dataRef,  {
+        inventoryInfo: p.inventoryInfo,
+      }, {
+        merge: true,
+      });
+      batch.set( bomsRef, {
+        bomsInfo: p.bomsInfo,
+      },{
+        merge: true
+      })
+      await batch.commit();
+  
+      return {
+        company,
+        inventoryInfo: p.inventoryInfo,
+        bomsInfo: p.bomsInfo,
+      };
+    })
   },
 });
 
