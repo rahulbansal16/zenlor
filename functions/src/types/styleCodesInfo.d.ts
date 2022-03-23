@@ -154,6 +154,13 @@ export interface PurchaseOrderLineItems {
     deliveryDate: string
 }
 
+export interface MigrationInfo{
+    company: string,
+    source: string,
+    destination: string,
+    sourceName: string,
+    destinationName: string
+}
 
 // All the inventory will be directly inserted by the user
 export interface InventoryInfo {

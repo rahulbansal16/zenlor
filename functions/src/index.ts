@@ -15,7 +15,7 @@ import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
   BOMInfoDto,
   MaterialIssue,
-  PurchaseMaterials, StyleCodes, InventoryItems, GRNInfo as GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier} from "./types/styleCodesInfo";
+  PurchaseMaterials, StyleCodes, InventoryItems, /*GRNs,*/ GRNInfo as GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -1763,6 +1763,41 @@ exports.distributeInventory = functions
         bomsInfo: p.bomsInfo,
       };
     });
+
+  const upsertMigrateDataSchema = Joi.object<MigrationInfo, true>({
+    company: Joi.string().required(),
+    source: Joi.string().required(),
+    destination: Joi.string().required(),
+    sourceName: Joi.string().required(),
+    destinationName: Joi.string().required()
+    }).options({allowUnknown: true})
+
+
+exports.migrateData = onCall<MigrationInfo>({
+  name:"migrateData",
+  schema: upsertMigrateDataSchema,
+  handler: async (data, context) => {
+    const {company, source, sourceName, destination, destinationName} = data
+    const sourceRef = admin.firestore().collection(source||"data").doc(company);
+    const destRef = admin.firestore().collection(destination).doc(company);
+   return await admin.firestore() .runTransaction( async db => {
+     const sourceDoc = await db.get(sourceRef)
+     const sourceData = sourceDoc.data();
+     if(!sourceData)
+      throw new Error("Source Data does not exist");
+     const source = sourceData[sourceName]??[];
+     await db.set(destRef, {
+      [destinationName]: source
+     }, {
+      merge: true
+     })
+     return {
+      [destinationName]: source
+     }
+      
+    })
+  }
+})
 
 exports.upsertInventory = onCall<InventoryInfo>({
   name: "upsertInventory",
