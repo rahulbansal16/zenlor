@@ -600,8 +600,7 @@ const Action = ({ type }) => {
         //   </Table.Summary>
         // )}
         bordered
-        pagination={false}
-        size="small"
+        pagination
         sticky={true}
         components={components}
         rowSelection={rowSelection}
