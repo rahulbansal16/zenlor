@@ -749,21 +749,22 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
         // const result = distributeInventory(output, bomsInfo, inventoryInfo);
         let newStyleCodesInfo = addMaterialStatusToStyleCode(output, result.bomsInfo);
         newStyleCodesInfo = newStyleCodesInfo.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
-        const batch = admin.firestore().batch()
+        // const batch = admin.firestore().batch()
         // writeBatch(db);
-        batch.set( dataRef,{
+        let promises = []
+        promises.push(db.set( dataRef,{
           styleCodesInfo: newStyleCodesInfo,
           inventoryInfo: result.inventoryInfo,
           purchaseMaterialsInfo: result.purchaseMaterialsInfo
         }, {
           merge: true,
-        });
-        batch.set( bomsRef, {
+        }));
+        promises.push(db.set( bomsRef, {
           bomsInfo: result.bomsInfo
         },{
           merge: true
-        })
-        await batch.commit();
+        }))
+        await Promise.all(promises)
         return {
           company,
           styleCodesInfo: newStyleCodesInfo,
@@ -893,21 +894,21 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
           }
         }
         const result = updateBomsInfoFromStyleCodes(styleCodesInfo, bomsInfo, boms, inventory, oldPurchaseMaterials)
-        const batch = admin.firestore().batch()
+        // const batch = admin.firestore().batch()
+        
         // writeBatch(db);
-        batch.set( dataRef,  {
+        await db.set( dataRef,  {
           inventoryInfo: result.inventoryInfo,
           purchaseMaterialsInfo: result.purchaseMaterialsInfo,
-          inventoryInfo: result.inventoryInfo,
         }, {
           merge: true,
         });
-        batch.set( bomsRef, {
+        await db.set( bomsRef, {
           bomsInfo: result.bomsInfo
         },{
           merge: true
         })
-        await batch.commit();
+        // await batch.commit();
         return {
           company,
           bomsInfo: result.bomsInfo,
@@ -1429,23 +1430,24 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
   
       let newStyleCodesInfo = addMaterialStatusToStyleCode(styleCodes, collectedInventory.boms);
 
-      const batch = admin.firestore().batch()
+      // const batch = admin.firestore().batch()
       // writeBatch(db);
-      batch.set( dataRef,  {
+      let promises = []
+      promises.push(db.set( dataRef,  {
         inventoryInfo: collectedInventory.inventory,
         purchaseOrdersInfo: output,
         purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
         GRNInfo: filteredGRN
       }, {
         merge: true,
-      });
-      batch.set( bomsRef, {
+      }));
+      promises.push(db.set( bomsRef, {
         bomsInfo: collectedInventory.boms
       },{
         merge: true
-      })
-      await batch.commit();
-      
+      }))
+      await Promise.all(promises);
+      // await batch.commit();
       return {
         styleCodesInfo: newStyleCodesInfo,
         bomsInfo: collectedInventory.boms,
@@ -1849,19 +1851,21 @@ exports.upsertInventory = onCall<InventoryInfo>({
   
       const p = distributeInventory(styleCodesInfo, result.boms, output);
   
-      const batch = admin.firestore().batch()
+      // const batch = admin.firestore().batch()
       // writeBatch(db);
-      batch.set( dataRef,  {
+      var promises = []
+      promises.push(db.set( dataRef,  {
         inventoryInfo: p.inventoryInfo,
       }, {
         merge: true,
-      });
-      batch.set( bomsRef, {
+      }));
+      promises.push(db.set( bomsRef, {
         bomsInfo: p.bomsInfo,
       },{
         merge: true
-      })
-      await batch.commit();
+      }))
+
+      await Promise.all(promises)
   
       return {
         company,
