@@ -482,6 +482,7 @@ const Action = ({ type }) => {
           const newItem = performCalculation({...item, ...e},type)
           try {
             document.body.style.cursor = "wait";
+            setLoading(true)
             const result = await saveCellToServer(newItem, type, company)
             console.log("The result data is", result.data)
             dispatch(fetchDataAction({...result.data}))
@@ -492,6 +493,7 @@ const Action = ({ type }) => {
             })
           }
           document.body.style.cursor = "pointer";
+          setLoading(false)
         },
       }),
     };
@@ -595,7 +597,7 @@ const Action = ({ type }) => {
         //   </Table.Summary>
         // )}
         bordered
-        pagination
+        pagination = {{pageSizeOptions: ['50', '100', '120'], defaultPageSize:"100", showSizeChanger: true}}
         sticky={true}
         components={components}
         rowSelection={rowSelection}
