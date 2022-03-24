@@ -347,13 +347,18 @@ exports.updateData = functions
       const {department, id, json, modifiedAt, status} = data;
       const entry = {...json, modifiedAt, status: status || "active"};
       const doc = await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).get();
+      const bomDoc = await admin.firestore().collection("boms").doc(company).get();
       const companyData = doc.data();
       if (!companyData) {
         throw new Error("Data Not Present For the company" + company);
       }
       let departmentData = companyData[department] || [];
-
+      const bomData = bomDoc.data();
+      if (!bomData) {
+        throw new Error("Boms Data not present");
+      }
       const obj: any = {};
+      const bomObj: any = {};
       let amountDiff = 0;
       // For deleting the Json Values Need to change the code to allow reading the value
       if (data && data.json){
@@ -364,8 +369,8 @@ exports.updateData = functions
           materialId = materialId.substring(1)
           let k = `.${materialId}:${materialDescription}`
           amountDiff = (data.status === "deleted" ? 0 : data.json.values[k]) - oldItem.values[k]
-          const boms = companyData.bomsInfo;
-          obj["bomsInfo"] = issueInventory({
+          const boms = bomData.bomsInfo;
+          bomObj["bomsInfo"] = issueInventory({
             styleCode: oldItem.styleCode,
             materialIssue: [{
               materialId,
@@ -387,6 +392,7 @@ exports.updateData = functions
       });
       obj[department] = departmentData;
       await admin.firestore().collection("data").doc(company || DEFAULT_COMPANY).set(obj, {merge: true});
+      await admin.firestore().collection("boms").doc(company || DEFAULT_COMPANY).set(bomObj, {merge: true});
       return departmentData;
     });
 
