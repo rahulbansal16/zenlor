@@ -481,6 +481,7 @@ const Action = ({ type }) => {
           const item = newData[index];
           const newItem = performCalculation({...item, ...e},type)
           try {
+            document.body.style.cursor = "wait";
             const result = await saveCellToServer(newItem, type, company)
             console.log("The result data is", result.data)
             dispatch(fetchDataAction({...result.data}))
@@ -490,6 +491,7 @@ const Action = ({ type }) => {
               description: e.message
             })
           }
+          document.body.style.cursor = "pointer";
         },
       }),
     };
