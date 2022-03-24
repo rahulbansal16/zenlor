@@ -867,6 +867,7 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     const { company, boms } = data;
     try {
       const dataRef = admin.firestore().collection("data").doc(company);
+      const bomsRef = admin.firestore().collection("boms").doc(company);
       return await admin.firestore().runTransaction(async db => {
         const doc = await db.get(dataRef);
         const docData = doc.data();
@@ -877,7 +878,12 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
         if (!styleCodesInfo) {
           throw Error("StyleCodes Not Present");
         }
-        const bomsInfo: BOM[] = docData.bomsInfo ?? [];
+        const bomsDoc = await db.get(bomsRef);
+        const bomData = bomsDoc.data()
+        if (!bomData) {
+          throw Error("Boms Data Not present")
+        }
+        const bomsInfo: BOM[] = bomData.bomsInfo ?? [];
         const oldPurchaseMaterials = docData.purchaseMaterialsInfo ?? [];
         const inventory = docData.inventoryInfo ?? [];
         // This will use stylecode plus materialId
@@ -887,13 +893,21 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
           }
         }
         const result = updateBomsInfoFromStyleCodes(styleCodesInfo, bomsInfo, boms, inventory, oldPurchaseMaterials)
-        await db.set(dataRef ,{
-          bomsInfo: result.bomsInfo,
+        const batch = admin.firestore().batch()
+        // writeBatch(db);
+        batch.set( dataRef,  {
+          inventoryInfo: result.inventoryInfo,
           purchaseMaterialsInfo: result.purchaseMaterialsInfo,
           inventoryInfo: result.inventoryInfo,
         }, {
           merge: true,
         });
+        batch.set( bomsRef, {
+          bomsInfo: result.bomsInfo
+        },{
+          merge: true
+        })
+        await batch.commit();
         return {
           company,
           bomsInfo: result.bomsInfo,
