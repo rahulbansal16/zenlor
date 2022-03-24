@@ -51,6 +51,7 @@ const header = {
   dashboard: "Dashboard",
   purchaseOrder: "Purhcase Orders",
   inwardMaterial: "GRN",
+  grns: "GRNs LIST"
 };
 const EditableContext = React.createContext(null);
 const EditableRow = ({ index, ...props }) => {
@@ -311,6 +312,7 @@ const Action = ({ type }) => {
     console.log("Calling for type", type);
     setFilteredInfo(null);
     setSelectedRowsKeys([]);
+    setSelectedRows([])
   }, [type, action]);
 
   if (isFetching) {
@@ -368,7 +370,6 @@ const Action = ({ type }) => {
       setLoading(true)
       console.log("In the action of downloadPO");
       const upsertCreatePO = functions.httpsCallable("upsertCreatePO");
-      const selectedIds = selectedRows.map((row) => row.id)
       let result = ""
       try {
           result = await upsertCreatePO({
@@ -381,7 +382,6 @@ const Action = ({ type }) => {
           description: "PO is created successfully"
         }) 
         dispatch(fetchDataAction({...result.data}))
-        setSelectedRows([])
         window.location.reload()
       } catch(e){
        notification["error"] ({
@@ -389,17 +389,9 @@ const Action = ({ type }) => {
          description: e.message
        })
       }
-      // console.log("The result is", result);
-   
-      // result.data.purchaseOrdersInfo.forEach((element) => {
-      //   downloadCsv(element);
-      // });
       setLoading(false)
-   
-      // history.push({
-      //   pathname: `/action/purchaseOrder`,
-      //   search: `id=${selectedIds}`
-      // })
+      setSelectedRows([])
+      setSelectedRowsKeys([])
     } else if (action === "inwardMaterial") {
       const poId = selectedRows.map((item) => item.id);
       history.push({
@@ -417,7 +409,6 @@ const Action = ({ type }) => {
           GRN: selectedRows,
         });
         console.log("The result is ", result);
-        setSelectedRows([])
         dispatch(fetchDataAction(result.data));
         notification["success"]({
           message:"GRN Done",
@@ -429,6 +420,8 @@ const Action = ({ type }) => {
           description: e.message
         })
       }
+      setSelectedRowsKeys([])
+      setSelectedRows([])
       setLoading(false)
     } else if (action === "cancelPO"){
       // write some logic of canceling the PO
