@@ -173,10 +173,16 @@ exports.addData = functions
       const id = generateUId("", 15);
       const entry = {...json, createdAt, modifiedAt, id, status: "active", enteredAt};
       const doc = await admin.firestore().collection("data").doc(company).get();
+      const bomDoc = await admin.firestore().collection("boms").doc(company).get();
       console.log("The doc is", doc.data());
       const companyData = doc.data();
       if (!companyData) {
         throw new Error("Company not present in the DB" + company);
+      }
+
+      const bomData = bomDoc.data()
+      if (!bomData){
+        throw Error("Company Bom does not exist");
       }
       const oldDepartmentData = companyData[department];
       console.log("The oldDEparmentData is ", oldDepartmentData, companyData[department]);
@@ -185,16 +191,18 @@ exports.addData = functions
       //   [department]: departmentData
       // }
       const obj: any = {};
+      const bomObj: any = {}
       /* tslint:disable-next-line */
       obj[department] = departmentData;
       if (materialIssue) {
-        const boms = companyData.bomsInfo;
+        const boms = bomData.bomsInfo;
         if (!boms) {
           throw Error("Cannot issue without BOM entry");
         }
-        obj["bomsInfo"] = issueInventory(materialIssue, boms);
+        bomObj["bomsInfo"] = issueInventory(materialIssue, boms);
       }
       await admin.firestore().collection("data").doc(company).set(obj, {merge: true});
+      await admin.firestore().collection("boms").doc(company).set(bomObj, {merge: true})
       return departmentData;
     });
 
