@@ -269,7 +269,7 @@ const Action = ({ type }) => {
   const filteredColumns = useFilter(columns, dataSource);
   const applyFilter = useCallback( (dataSource) => {
     if (!dataSource)
-     return dataSource
+     return [] 
 
     if (type === "orderMaterials") {
       const styleCode = new URLSearchParams(search).get("styleCode") ?? ",";

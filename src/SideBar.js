@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { Layout } from 'antd';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
+import { useSelector } from "react-redux";
 const { SubMenu } = Menu;
 const { Header, Footer, Sider, Content } = Layout;
 
@@ -22,6 +23,7 @@ const SideBar = ({type}) => {
 
     const [collapsed, setCollapsed] = useState(false);
     const history = useHistory()
+    const company = useSelector( state => state.taskReducer.user.company)
     const toggleCollapsed = () => {
         setCollapsed(!collapsed)
     };
@@ -49,6 +51,7 @@ const SideBar = ({type}) => {
           onClick={(e)=>clickHandler(e)}
           inlineCollapsed={true}
         >
+          <SubMenu title={(company||"").toUpperCase()}></SubMenu>
           <SubMenu key="style" icon={<DesktopOutlined />} title="STYLE">
             <Menu.Item key="dashboard">Style Dashboard</Menu.Item>
             <Menu.Item key="orderMaterials">Bill Of Materials</Menu.Item>
