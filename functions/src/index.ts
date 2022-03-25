@@ -1190,6 +1190,7 @@ const collectInventoryFromStyleCodes = (boms: BOM[], inventories: InventoryItems
     if (mp[key]) {
       inventory.inventory += mp[key].inventory;
       inventory.activeOrdersQty += mp[key].activeOrdersQty;
+      inventory.inventory = parseFloat(inventory.inventory.toFixed(2))
       delete mp[key];
     }
   }
@@ -1276,7 +1277,7 @@ const assignInventoryToBOMItem = (bom: BOM, inventory: InventoryItems[]) => {
     bom.activeOrdersQty = 0;
     return;
   }
-  bom.inventory = Math.min(inventoryNeed, globalInventory.inventory);
+  bom.inventory = parseFloat(Math.min(inventoryNeed, globalInventory.inventory).toFixed(2));
   globalInventory.inventory -= bom.inventory;
   if (bom.inventory < inventoryNeed) {
     bom.activeOrdersQty = Math.min(globalInventory.activeOrdersQty, inventoryNeed-bom.inventory);
