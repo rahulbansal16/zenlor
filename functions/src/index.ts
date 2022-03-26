@@ -15,7 +15,7 @@ import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
   BOMInfoDto,
   MaterialIssue,
-  PurchaseMaterials, StyleCodes, InventoryItems, /*GRNs,*/ GRNInfo as GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo} from "./types/styleCodesInfo";
+  PurchaseMaterials, StyleCodes, InventoryItems, /*GRNs,*/ GRNInfo as GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs} from "./types/styleCodesInfo";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -628,6 +628,36 @@ const addMaterialStatusToStyleCode = (styleCodesInfo: StyleCodes[], bomsInfo: BO
   return updatedStyleCodes
 }
 
+const mapGRNsToList = (grns: GRNs[]) => {
+  let grnList : any = []
+  for(let grn of grns){
+    grnList = grnList.concat(grn.GRN.map( item => ({
+      ...item,
+      docUrl: grn.grnDocUrl,
+      poId: grn.poId
+    })))
+  }
+  return grnList
+}
+
+const mapGRNstoInwardMaterial = (grnsList: GRNs[]) => {
+  let grnItem: any = []
+  for (let grns of grnsList){
+    if (grns.status !== "active")
+      continue
+    
+    for (let grn of grns.GRN){
+      if (grn.status !== "active")
+        continue 
+      grnItem = grnItem.concat(grn.lineItems.map( item => ({
+        ...item,
+        grnId: grn.id
+      })))
+    }
+  }
+  return grnItem;
+}
+
 exports.getData = functions
     .region("asia-northeast3")
     .https
@@ -648,8 +678,9 @@ exports.getData = functions
       if (!companyData) {
         throw Error("The company does not exist " + company);
       }
+      const grnsInfo = companyData.GRNsInfo??[];
       let styleCodesInfo = (companyData.styleCodesInfo??[]).sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
-      const GRNInfo = companyData.GRNInfo??[];
+      // const GRNInfo = companyData.GRNInfo??[];
       styleCodesInfo = styleCodesInfo as StyleCodes[];
 
       const bomsDoc = await admin.firestore().collection("boms").doc(company).get();
@@ -665,7 +696,9 @@ exports.getData = functions
         ...suppliersData,
         bomsInfo,
         styleCodesInfo: styleCodesInfo,
-        GRNInfo: GRNInfo.filter((item:GRNItems) => item.status === "active"),
+        // GRNInfo: GRNInfo.filter((item:GRNItems) => item.status === "active"),
+        GRNsInfo: mapGRNsToList(grnsInfo),
+        inwardMaterial: mapGRNstoInwardMaterial(grnsInfo)
       };
     });
 
@@ -1389,6 +1422,48 @@ exports.updateStyleCodesInfo = functions
 //     category: Joi.string().required(),
 //   }),
 // })
+// interface UpdatePurchaseOrderStatus {
+//   ids: string[],
+//   status: string,
+//   company: string
+// }
+
+// const UpdatePurchaseOrderStatusSchema = Joi.object<UpdatePurchaseOrderStatus, true>({
+//   ids: Joi.array().unique(),
+//   status: Joi.string().required(),
+//   company: Joi.string()
+// })
+
+// exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
+//   name:"updatePOStatus",
+//   schema: UpdatePurchaseOrderStatusSchema,
+//   handler: async (data, context) => {
+//     const {company, ids, status} = data;
+//     const dataRef = admin.firestore().collection("data").doc(company);
+//     const grnRef = admin.firestore().collection("grnInfo").doc(company);
+//     return await admin.firestore().runTransaction(async db => {
+//       // I need to update the information from the UI and 
+//       const [doc, grnDoc] = await db.getAll(dataRef, grnRef)
+//       const docData = doc.data()
+//       if (!docData){
+//         throw Error("The Company Info does not exist")
+//       }
+//       const purchaseOrders:PurchaseOrder[] = docData.puchaseOrdersInfo || []
+//       const grnInfo: GRNs[] = grnDoc.data() || []
+
+//       for (let purchaseOrder of purchaseOrders){
+//         if(ids.find(id => purchaseOrder.id === id)){
+//           purchaseOrder.status = status
+//           // const grn = mapPOToGRN1([purchaseOrder])
+//           // grnInfo.concat
+//         }
+//       }
+
+
+//     })
+//   }
+// }) 
+
 
 exports.cancelPO = onCall<PurchaseOrdersInfo>({
   name:"cancelPO",
@@ -1526,7 +1601,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         const purchaseMaterialsInfo = docData.purchaseMaterialsInfo ?? [];
         const inventory: InventoryItems[] = docData.inventoryInfo ?? [];
         const styleCodes: StyleCodes[] = docData.styleCodesInfo ?? [];
-        const grnInfo: GRNItems[] = docData.GRNInfo ?? [];
+        const grnsInfo: GRNs[] = docData.GRNsInfo ?? [];
         const suppliersDoc = await db.get(suppliersRef);
         const suppliersDocData = suppliersDoc.data();
         if (!suppliersDocData){
@@ -1597,13 +1672,14 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           urls.push(poUrl)
         }
         let newStyleCodesInfo = addMaterialStatusToStyleCode(styleCodes, distributedInventory.bomsInfo);
-        const grn: GRNItems[] = mapPOToGRN(purchaseOrders);
+        const grns: GRNs[] = mapPOToGRN1(purchaseOrders);
         await db.set(dataRef,
           {
             inventoryInfo: distributedInventory.inventoryInfo,
             purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
             purchaseMaterialsInfo: result,
-            GRNInfo: [...grn, ...grnInfo],
+            // GRNInfo: [...grn, ...grnInfo],
+            GRNsInfo: [...grns, ...grnsInfo]
           }
           , {
             merge: true,
@@ -1619,7 +1695,8 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           purchaseOrderFiles: urls,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
           purchaseMaterialsInfo: result,
-          GRNInfo: [...grn, ...grnInfo]
+          GRNsInfo: [...grns]
+          // GRNInfo: [...grn, ...grnInfo]
         };
       })
     }
@@ -1981,30 +2058,76 @@ exports.createPO = functions
       return [...purchaseOrders, ...(pastOrders || [])];
     });
 
-const mapPOToGRN = (purchaseOrders : PurchaseOrder []) : GRNItems[] => {
-  let grnItems: GRNItems[]= [];
+  const mapPOToGRN1 = (purchaseOrders : PurchaseOrder []) : GRNs[] => {
+      let grns: GRNs[] = [];
+      for (const purchaseOrder of purchaseOrders) {
+        let grnID = generateUId("GRN", 8)
+        let grn: GRNs = {
+          poId: purchaseOrder.id,
+          status: 'active',
+          grnDocUrl: '',
+          GRN:[{
+            id: grnID,
+            createdAt: moment().format("MMM DD YY"),
+            status: 'active',
+            // challanNumber: '',
+            // invoiceNumber: '',
+            // docUrl: '',
+            supplier: purchaseOrder.supplier,
+            itemsCount: purchaseOrder.lineItems.length,
+            amount: purchaseOrder.amount,
+            lrNo: "",
+            dcNo: "",
+            invoiceNo: "",
+            lineItems: purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
+              id: generateUId("GRN-ITEM", 6),
+              grnId: grnID,
+              purchaseOrderId: purchaseOrder.id,
+              category: item.category,
+              type: item.type,
+              materialId: item.materialId,
+              materialDescription: item.materialDescription,
+              unit: item.unit,
+              purchaseQty: item.purchaseQty,
+              receivedQty: 0,
+              status: "active",
+              receivedDate: moment().format("MMM DD YY"),
+              rejectedQty: 0,
+              rejectedReason: "",
+              acceptedQty: 0,
+            })),
+          }]
+        } 
+        grns.push(grn)
+    }
+      return grns
+  };
 
-  for (const purchaseOrder of purchaseOrders) {
-    const data: GRNItems[] = purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
-      id: generateUId("GRN", 10),
-      purchaseOrderId: purchaseOrder.id,
-      category: item.category,
-      type: item.type,
-      materialId: item.materialId,
-      materialDescription: item.materialDescription,
-      unit: item.unit,
-      purchaseQty: item.purchaseQty,
-      receivedQty: 0,
-      status: "active",
-      receivedDate: moment().format("MMM DD YY"),
-      rejectedQty: 0,
-      rejectedReason: "",
-      acceptedQty: 0,
-    }));
-    grnItems = grnItems.concat(data);
-  }
-  return grnItems;
-};
+
+// const mapPOToGRN = (purchaseOrders : PurchaseOrder []) : GRNItems[] => {
+//   let grnItems: GRNItems[]= [];
+
+//   for (const purchaseOrder of purchaseOrders) {
+//     const data: GRNItems[] = purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
+//       id: generateUId("GRN", 10),
+//       purchaseOrderId: purchaseOrder.id,
+//       category: item.category,
+//       type: item.type,
+//       materialId: item.materialId,
+//       materialDescription: item.materialDescription,
+//       unit: item.unit,
+//       purchaseQty: item.purchaseQty,
+//       receivedQty: 0,
+//       status: "active",
+//       receivedDate: moment().format("MMM DD YY"),
+//       rejectedQty: 0,
+//       rejectedReason: "",
+//       acceptedQty: 0,
+//     }));
+//     grnItems = grnItems.concat(data);
+//   }
+//   return grnItems;
+// };
 
 exports.formatPO = functions
     .region("asia-northeast3")
