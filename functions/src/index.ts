@@ -1506,8 +1506,14 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
           }
           item.activeOrdersQty -= lineItem.purchaseQty;
         }
-        if (purchaseOrder.status === "CANCELED"){
+        if (purchaseOrder.status === PURCHASE_ORDER_STATUS.CANCELED){
           throw Error("Purchase Order is already canceled")
+        }
+        if (purchaseOrder.status === PURCHASE_ORDER_STATUS.GRN_DONE){
+          throw Error("Purchase Order can not be cancelled as GRN IS DONE")
+        }
+        if (purchaseOrder.status === PURCHASE_ORDER_STATUS.GRN_DONE){
+          throw Error("Purchase Order can not be cancelled as GRN IS DONE once")
         }
         purchaseOrder.status = "CANCELED";
         deletedPO[purchaseOrder.id] = true;
