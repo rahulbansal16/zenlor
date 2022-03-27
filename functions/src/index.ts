@@ -2154,7 +2154,7 @@ const createPOFormatFile = async (company: string, purchaseOrder : PurchaseOrder
 
   const workbook = new excelJS.Workbook();
 
-  const formateTemplateStream = readExcelTemplate(company);
+  const formateTemplateStream = readExcelTemplate(company, Constants.PO_TEMPLATE_FILE);
   await workbook.xlsx.read(formateTemplateStream);
   const worksheet = workbook.getWorksheet('Sheet1');
   // const data = transformPOToKeyValue(purchaseOrder);
@@ -2170,8 +2170,8 @@ const createPOFormatFile = async (company: string, purchaseOrder : PurchaseOrder
   return fileUrl
 }
 
-const readExcelTemplate = (company: string) => {
-  const filePath = `format/${company}/PurchaseOrder.xlsx`;
+const readExcelTemplate = (company: string, templateFile: string) => {
+  const filePath = `format/${company}/${templateFile}`;
   try {
     const file = admin.storage().bucket("gs://zenlor.appspot.com").file(filePath)
     return file.createReadStream()
