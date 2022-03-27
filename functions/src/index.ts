@@ -628,8 +628,8 @@ const addMaterialStatusToStyleCode = (styleCodesInfo: StyleCodes[], bomsInfo: BO
   return updatedStyleCodes
 }
 
-const mapGRNsToList = (grns: GRNs[]) => {
-  let grnList : any = []
+const mapGRNsToList = (grns: GRNs[]) :GRN[]=> {
+  let grnList:GRN[] = []
   for(let grn of grns){
     grnList = grnList.concat(grn.GRN.map( item => ({
       ...item,
