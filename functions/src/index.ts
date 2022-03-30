@@ -1749,7 +1749,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           purchaseOrderFiles: urls,
           purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
           purchaseMaterialsInfo: result,
-          GRNsInfo: [...grns]
+          GRNsInfo: mapGRNsToList([...grns, ...grnsInfo])
           // GRNInfo: [...grn, ...grnInfo]
         };
       })
