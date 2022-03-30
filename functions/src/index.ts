@@ -672,6 +672,8 @@ exports.getData = functions
       console.log("The company is", company);
       const companyDoc = await admin.firestore().collection("data").doc(company).get();
       const suppliersDoc = await admin.firestore().collection("suppliers").doc(company).get();
+      const purchaseMaterialsDoc = await admin.firestore().collection("purchaseMaterials").doc(company).get();
+
       const companyData = companyDoc.data();
       const suppliersData = suppliersDoc.data();
       // companyData["aggregate"] = {...await getAggregate(company)}
@@ -691,12 +693,18 @@ exports.getData = functions
       }
       const bomsInfo = bomsData.bomsInfo??[];
 
+      const purchaseMaterialsData = purchaseMaterialsDoc.data();
+      if (!purchaseMaterialsData){
+        throw Error("Purchase Material Data not Present");
+      }
+      const purchaseMaterialsInfo = purchaseMaterialsData.purchaseMaterialsInfo??[] 
       styleCodesInfo = addMaterialStatusToStyleCode(styleCodesInfo, bomsInfo);
       return {
         ...companyData,
         ...suppliersData,
         bomsInfo,
         styleCodesInfo: styleCodesInfo,
+        ...purchaseMaterialsInfo,
         // GRNInfo: GRNInfo.filter((item:GRNItems) => item.status === "active"),
         GRNsInfo: mapGRNsToList(grnsInfo),
         inwardMaterial: mapGRNstoInwardMaterial(grnsInfo)
@@ -777,6 +785,8 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
     try {
       const dataRef = admin.firestore().collection("data").doc(company);
       const bomsRef = admin.firestore().collection("boms").doc(company);
+      const purchaseMaterialsRef = admin.firestore().collection("purchaseMaterials").doc(company);
+
       return await admin.firestore().runTransaction( async db => {
         const doc = await db.get(dataRef);
         const docData = doc.data();
@@ -789,9 +799,14 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
         if(!bomData){
           throw Error("The Boms Data does not exist");
         }
+        const purchaseMaterialsDoc = await db.get(purchaseMaterialsRef);
+        const purchaseMaterialsData = purchaseMaterialsDoc.data();
+        if (!purchaseMaterialsData){
+          throw Error("Purchase Material data does not exist")
+        }
         const bomsInfo = bomData.bomsInfo??[];
         const inventoryInfo = docData.inventoryInfo??[];
-        const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
+        const purchaseMaterialsInfo = purchaseMaterialsData.purchaseMaterialsInfo??[];
         const output = upsertItemsInArray(styleCodesInfo, styleCodes, (oldItem, newItem) => oldItem.styleCode === newItem.styleCode);
         const result = updateBomsInfoFromStyleCodes(output, bomsInfo, [...bomsInfo], inventoryInfo, purchaseMaterialsInfo);
         // const result = distributeInventory(output, bomsInfo, inventoryInfo);
@@ -803,12 +818,16 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
         promises.push(db.set( dataRef,{
           styleCodesInfo: newStyleCodesInfo,
           inventoryInfo: result.inventoryInfo,
-          purchaseMaterialsInfo: result.purchaseMaterialsInfo
         }, {
           merge: true,
         }));
         promises.push(db.set( bomsRef, {
           bomsInfo: result.bomsInfo
+        },{
+          merge: true
+        }))
+        promises.push(db.set(purchaseMaterialsRef, {
+          purchaseMaterialsInfo: result.purchaseMaterialsInfo
         },{
           merge: true
         }))
@@ -917,6 +936,8 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
     try {
       const dataRef = admin.firestore().collection("data").doc(company);
       const bomsRef = admin.firestore().collection("boms").doc(company);
+      const purchaseMaterialsRef = admin.firestore().collection("purchaseMaterials").doc(company);
+ 
       return await admin.firestore().runTransaction(async db => {
         const doc = await db.get(dataRef);
         const docData = doc.data();
@@ -933,7 +954,12 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
           throw Error("Boms Data Not present")
         }
         const bomsInfo: BOM[] = bomData.bomsInfo ?? [];
-        const oldPurchaseMaterials = docData.purchaseMaterialsInfo ?? [];
+        const purchaseMaterialsDoc = await db.get(purchaseMaterialsRef);
+        const purchaseMaterialsData = purchaseMaterialsDoc.data();
+        if (!purchaseMaterialsData){
+          throw Error("Purchase Material data does not exist")
+        }
+        const oldPurchaseMaterials = purchaseMaterialsData.purchaseMaterialsInfo ?? [];
         const inventory = docData.inventoryInfo ?? [];
         // This will use stylecode plus materialId
         for (let bom of boms){
@@ -947,12 +973,16 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
         // writeBatch(db);
         await db.set( dataRef,  {
           inventoryInfo: result.inventoryInfo,
-          purchaseMaterialsInfo: result.purchaseMaterialsInfo,
         }, {
           merge: true,
         });
         await db.set( bomsRef, {
           bomsInfo: result.bomsInfo
+        },{
+          merge: true
+        })
+        await db.set( purchaseMaterialsRef, {
+          purchaseMaterialsInfo: result.purchaseMaterialsInfo,
         },{
           merge: true
         })
@@ -1079,7 +1109,7 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
   handler: async (data, context) => {
     console.log("The data is", data);
     const {company, purchaseMaterials} = data;
-    const doc = await admin.firestore().collection("data").doc(company).get();
+    const doc = await admin.firestore().collection("purchaseMaterials").doc(company).get();
     const docData = doc.data();
     if (!docData) {
       throw Error("The company does not exist" + company);
@@ -1089,7 +1119,7 @@ exports.upsertPurchaseMaterialsInfo = onCall<PurchaseMaterialsInfo>({
     const output = upsertItemsInArray(purchaseMaterialsInfo, purchaseMaterials,
         (oldItem, newItem) => (oldItem.materialId + oldItem.materialDescription) === (newItem.materialId + newItem.materialDescription) && oldItem.styleCode === newItem.styleCode,
         defaultPurchaseMaterials);
-    await admin.firestore().collection("data").doc(company).set( {
+    await admin.firestore().collection("purchaseMaterials").doc(company).set( {
       purchaseMaterialsInfo: output,
     }, {
       merge: true,
@@ -1522,6 +1552,8 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
 
     const dataRef = admin.firestore().collection("data").doc(company);
     const bomsRef = admin.firestore().collection("boms").doc(company);
+    const purchaseMaterialsRef = admin.firestore().collection("purchaseMaterials").doc(company);
+
     return await admin.firestore().runTransaction(async db => {
 
       const doc = await db.get(dataRef);
@@ -1539,7 +1571,12 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
       }
       const bomsInfo = bomData.bomsInfo??[];
   
-      const purchaseMaterialsInfo = docData.purchaseMaterialsInfo??[];
+      const purchaseMaterialsDoc = await db.get(purchaseMaterialsRef);
+      const purchaseMaterialsData = purchaseMaterialsDoc.data();
+      if (!purchaseMaterialsData){
+        throw Error("Purchase Material data does not exist")
+      }
+      const purchaseMaterialsInfo = purchaseMaterialsData.purchaseMaterialsInfo??[];
       const inventory: InventoryItems[] = docData.inventoryInfo??[];
       const styleCodes: StyleCodes[] = docData.styleCodesInfo??[];
       const grnInfo: GRNItems[] = docData.GRNInfo??[];
@@ -1580,7 +1617,6 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
       promises.push(db.set( dataRef,  {
         inventoryInfo: collectedInventory.inventory,
         purchaseOrdersInfo: output,
-        purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
         GRNInfo: filteredGRN
       }, {
         merge: true,
@@ -1590,6 +1626,11 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
       },{
         merge: true
       }))
+      await db.set(purchaseMaterialsRef, {
+        purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
+      },{
+        merge: true
+      })
       await Promise.all(promises);
       // await batch.commit();
       return {
@@ -1639,6 +1680,8 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
       const dataRef = admin.firestore().collection("data").doc(company);
       const suppliersRef = admin.firestore().collection("suppliers").doc(company);
       const bomRef = admin.firestore().collection("boms").doc(company);
+      const purchaseMaterialsRef = admin.firestore().collection("purchaseMaterials").doc(company);
+
       return await admin.firestore().runTransaction(async db => {
         const doc = await db.get(dataRef);
         const docData = doc.data();
@@ -1651,8 +1694,13 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         if (!bomData){
           throw Error("Bom Does not exist");
         }
+        const purchaseMaterialsDoc = await db.get(purchaseMaterialsRef);
+        const purchaseMaterialsData = purchaseMaterialsDoc.data();
+        if (!purchaseMaterialsData){
+          throw Error("Purchase Material data does not exist")
+        }
         const bomsInfo = bomData.bomsInfo ?? [];
-        const purchaseMaterialsInfo = docData.purchaseMaterialsInfo ?? [];
+        const purchaseMaterialsInfo = purchaseMaterialsData.purchaseMaterialsInfo ?? [];
         const inventory: InventoryItems[] = docData.inventoryInfo ?? [];
         const styleCodes: StyleCodes[] = docData.styleCodesInfo ?? [];
         const grnsInfo: GRNs[] = docData.GRNsInfo ?? [];
@@ -1731,7 +1779,6 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           {
             inventoryInfo: distributedInventory.inventoryInfo,
             purchaseOrdersInfo: [...purchaseOrders, ...purchaseOrdersInfo],
-            purchaseMaterialsInfo: result,
             // GRNInfo: [...grn, ...grnInfo],
             GRNsInfo: [...grns, ...grnsInfo]
           }
@@ -1740,6 +1787,11 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           });
         await db.set(bomRef, {
           bomsInfo: distributedInventory.bomsInfo
+        },{
+          merge: true
+        })
+        await db.set(purchaseMaterialsRef, {
+          purchaseMaterialsInfo: result,
         },{
           merge: true
         })
@@ -1858,6 +1910,7 @@ exports.upsertGRN = onCall<GRNInfo>({
     try {
       const dataRef = admin.firestore().collection("data").doc(company);
       const bomRef = admin.firestore().collection("boms").doc(company);
+      const purchaseMaterialsRef = admin.firestore().collection("purchaseMaterials").doc(company);
       const suppliersRef = admin.firestore().collection("suppliers").doc(company);
       return await admin.firestore().runTransaction(async db => {
         const doc = await db.get(dataRef);
@@ -1878,7 +1931,11 @@ exports.upsertGRN = onCall<GRNInfo>({
             }
           }
         }
-
+        const purchaseMaterialsDoc = await db.get(purchaseMaterialsRef);
+        const purchaseMaterialsData = purchaseMaterialsDoc.data();
+        if (!purchaseMaterialsData){
+          throw Error("Purchase Material data does not exist")
+        }
         // const activeGRNInfo = grnInfo.filter((item: GRNItems) => item.status === "active");
         // let grnInfoOutput = upsertItemsInArray(activeGRNInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
         // oldItem.materialId === newItem.materialId &&
@@ -1898,7 +1955,7 @@ exports.upsertGRN = onCall<GRNInfo>({
         }
         const bomsInfo = bomData.bomsInfo ?? [];
         const styleCodesInfo = docData.styleCodesInfo ?? [];
-        const purchaseMaterialsInfo = docData.purchaseMaterialsInfo ?? [];
+        const purchaseMaterialsInfo = purchaseMaterialsData.purchaseMaterialsInfo ?? [];
         const purchaseOrdersInfo: PurchaseOrder[] = docData.purchaseOrdersInfo ?? [];
         const result = collectInventoryFromStyleCodes(bomsInfo, inventoryInfo);
         const collectedInventory = result?.inventory;
@@ -1967,13 +2024,17 @@ exports.upsertGRN = onCall<GRNInfo>({
           GRNsInfo: grnsInfo,
           // GRNInfo: grnInfoOutput,
           inventoryInfo: p.inventoryInfo,
-          purchaseMaterialsInfo: newPurchaseMaterialInfo,
           purchaseOrdersInfo: purchaseOrdersInfo
         }, {
           merge: true,
         });
         await db.set(bomRef, {
           bomsInfo: p.bomsInfo
+        },{
+          merge: true
+        })
+        await db.set(purchaseMaterialsRef, {
+          purchaseMaterialsInfo: newPurchaseMaterialInfo,
         },{
           merge: true
         })
