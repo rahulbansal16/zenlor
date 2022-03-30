@@ -7,7 +7,19 @@ import { performCalculation } from "../../util"
 import { FETCH_DATA, 
   UPDATE_DATA, 
   FETCH_PO, FETCH_PURCHASE_MATERIALS_INFO, INSERT_ROW, UPDATE_AUTH, UPDATE_CELL, UPDATE_ROLE, UPDATE_STYLE_CODE_INFO } from "../actionType"
-
+const mapGRNstoInwardMaterial = (grns) => {
+  if (!grns){
+    return []
+  }
+  let data = []
+  for (let grn of grns){
+    data = data.concat(grn.lineItems.map(item => ({
+      ...item,
+      grnId: grn.id
+    })))
+  }
+  return data
+}
 export const initialState = {
     user: {
         rolesFetched: false
@@ -357,6 +369,73 @@ export const initialState = {
 
             ],
             dataSource: []
+    },
+    // purchaseOrderId: string,
+    // status: string,
+    // grnDocUrl: string,
+    grns:{
+      columns:[
+        {
+          title: "GRN ID",
+          dataIndex: 'id',
+          key: 'id'         
+        },
+        {
+          title: "PO",
+          dataIndex: 'poId',
+          key: 'poId'
+        },
+        {
+          title: "Supplier",
+          dataIndex: 'supplier',
+          key: 'supplier'
+        },
+        {
+          title: "No. Items",
+          dataIndex: 'itemsCount',
+          key: 'itemsCount'
+        },
+        {
+          title: "Amount",
+          dataIndex: 'amount',
+          key: 'amount'
+        },
+        {
+          title: "LR No.",
+          dataIndex: 'lrNo',
+          key: 'lrNo'
+        },		
+        {
+          title: "DC No.",
+          dataIndex: 'dcNo',
+          key: 'dcNo'
+        },
+        {
+          title: "Invoice No.",
+          dataIndex: 'invoiceNo',
+          key: 'invoiceNo'
+        },						
+        {
+          title: "Updated On",
+          dataIndex: 'updatedOn',
+          key: 'updatedOn'
+        },
+// GRN ID	REF ID	SUPPLIER	NO. OF ITEMS	AMOUNT	LR NO.	DC NO.	INVOICE NO.	UPDATED ON 	STATUS
+        {
+          title: "Status",
+          dataIndex: "status",
+          key:"status",
+          filter: "multiSelect"
+        },
+        {
+          title: "GRN Doc.",
+          dataIndex: "docUrl",
+          key:"grnDocUrl",
+          render : (text) => <a href={text}>Download</a>,
+
+        },
+      ],
+      dataSource:[]
     },
     inwardMaterial: {
       columns: [
@@ -735,7 +814,7 @@ const taskReducer = (state = initialState, action) => {
     switch(action.type){
         case FETCH_DATA: {
             const {cutting, styleCodes, washing, sewing, kajjaandbuttoning, packing, isFetching, departments, name, form} = action.payload
-            const {createPO, orderMaterials, dashboard, purchaseOrder, inwardMaterial} = state;
+            const {createPO, orderMaterials, dashboard, purchaseOrder, inwardMaterial, grns} = state;
             return {
                 ...state,
                 ...action.payload,
@@ -770,7 +849,11 @@ const taskReducer = (state = initialState, action) => {
                  },
                  inwardMaterial: {
                    ...state.inwardMaterial,
-                   dataSource: action?.payload?.GRNInfo || inwardMaterial?.dataSource || []
+                   dataSource: mapGRNstoInwardMaterial(action?.payload?.GRNsInfo) || inwardMaterial?.dataSource || []
+                 },
+                 grns: {
+                  ...state.grns,
+                  dataSource: action?.payload?.GRNsInfo || grns?.dataSource || []
                  },
                 form: form  || state.form
             }
@@ -780,7 +863,7 @@ const taskReducer = (state = initialState, action) => {
             ...state,
             inwardMaterial: {
              ...state.inwardMaterial,
-             dataSource: action?.payload?.GRNInfo??[]
+             dataSource: mapGRNstoInwardMaterial(action?.payload?.GRNsInfo) || []
             }
             // ...action.payload.data
           }

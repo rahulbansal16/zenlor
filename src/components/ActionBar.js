@@ -76,13 +76,21 @@ const actions = {
       value: "cancelPO"
     },
     {
-      key: "Inward Material",
-      value: "inwardMaterial"
+      key: "DO GRN",
+      value: "grns"
+    },
+    {
+      key:"OPEN GRN",
+      value: "openGRN"
     }
   ],
   inwardMaterial: [{
     key: "Inward Item",
     value:"inwardItem"
+  }],
+  grns: [{
+    key: "Inward Material",
+    value:"inwardMaterial"
   }]
 };
 

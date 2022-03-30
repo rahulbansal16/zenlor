@@ -297,11 +297,19 @@ const Action = ({ type }) => {
         );
     }
     if (type === "inwardMaterial") {
+      const id = new URLSearchParams(search).get("grnId") ?? ",";
+      const ids = id.split(",");
+      if (ids[0] !== "")
+        return dataSource.filter(
+          (item) => ids.includes(item.grnId) || !item.grnId
+        );
+    }
+    if (type === "grns") {
       const id = new URLSearchParams(search).get("poId") ?? ",";
       const ids = id.split(",");
       if (ids[0] !== "")
         return dataSource.filter(
-          (item) => ids.includes(item.purchaseOrderId) || !item.purchaseOrderId
+          (item) => ids.includes(item.poId) || !item.poId
         );
     }
     return dataSource;
@@ -393,10 +401,10 @@ const Action = ({ type }) => {
       setSelectedRows([])
       setSelectedRowsKeys([])
     } else if (action === "inwardMaterial") {
-      const poId = selectedRows.map((item) => item.id);
+      const grnId = selectedRows.map((item) => item.id);
       history.push({
         pathname: `/action/${data.action}`,
-        search: `poId=${poId}`,
+        search: `grnId=${grnId}`,
       });
     } else if (action === "inwardItem") {
       // This will do actualGRN as in updating the values in the db etc for the inventory
@@ -445,8 +453,34 @@ const Action = ({ type }) => {
       })
     }
       setLoading(false)
-    }
-    else {
+    } else if(action ==="grns") {
+      const poId = selectedRows.map((item) => item.id);
+      history.push({
+        pathname: `/action/${data.action}`,
+        search: `poId=${poId}`,
+      });
+    } else if(action === "openGRN") {
+      const updatePOStatus = functions.httpsCallable("updatePOStatus");
+      setLoading(true)
+      try {
+      const result = await updatePOStatus({
+        company,
+        status: "active",
+        ids: selectedRows.map( row => row.id),
+      });
+      dispatch(fetchDataAction(result.data));
+      notification["success"]({
+        message: "Allowing GRN",
+        description: "You can do GRN for the PO",
+      });
+      } catch(e){
+        notification["error"]({
+          message: "Failed to enable GRN",
+          description: e.message,
+        });
+      }
+      setLoading(false)
+    } else {
       notification["warning"]({
         message: "Option Coming Soon",
         description: "The option you selected is being implemented"
