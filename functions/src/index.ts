@@ -1835,6 +1835,9 @@ exports.upsertGRNItem = onCall<GRNInfo>({
     }, {
       merge: true,
     });
+    return {
+      GRNsInfo: mapGRNsToList(grnsInfo),
+    }
   },
 });
 
