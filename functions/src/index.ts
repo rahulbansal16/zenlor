@@ -1956,7 +1956,7 @@ exports.upsertGRN = onCall<GRNInfo>({
         for( let purchaseorder of purchaseOrdersInfo){
           if (purchaseorder.id === poID){
             purchaseorder.status = "GRN DONE"
-           const result = await createGRNFormatFile(company, grnForPO, purchaseorder, suppliersInfo, `grns/${company}/${parentGRN.poId}.xlsx`)
+           const result = await createGRNFormatFile(company, grnForPO, purchaseorder, suppliersInfo, parentGRN.grnDocUrl ?`grns/${company}/${parentGRN.poId}.xlsx`:undefined)
            parentGRN.grnDocUrl = result;
            break;
           }
