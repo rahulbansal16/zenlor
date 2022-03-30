@@ -2309,6 +2309,74 @@ const fillGRNWorksheet = (worksheet: excelJS.Worksheet, grn: GRN , purchaseOrder
   worksheet.getCell("G23").value = grn.lineItems.length
   worksheet.insertRow(28,["", "GRN NO.", "", "ORDER NO.", "", "INVOICE NO.", "", "DC NO.", "", "Transporter", "", "LR No.", ""])
 
+  worksheet.mergeCells("B28:C28")
+  worksheet.mergeCells("D28:E28")
+  worksheet.mergeCells("F28:G28")
+  worksheet.mergeCells("H28:I28")
+  worksheet.mergeCells("J28:K28")
+  worksheet.mergeCells("L28:M28")
+  worksheet.getCell("B28").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: {
+      argb: "FFFF7D7D"
+    },
+    bgColor: {
+      argb: "#808080"
+    }
+  }
+
+  worksheet.getCell("D28").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: {
+      argb: "FFFF7D7D"
+    },
+    bgColor: {
+      argb: "#808080"
+    }
+  }
+  worksheet.getCell("F28").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: {
+      argb: "FFFF7D7D"
+    },
+    bgColor: {
+      argb: "#808080"
+    }
+  }
+  worksheet.getCell("H28").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: {
+      argb: "FFFF7D7D"
+    },
+    bgColor: {
+      argb: "#808080"
+    }
+  }
+  worksheet.getCell("J28").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: {
+      argb: "FFFF7D7D"
+    },
+    bgColor: {
+      argb: "#808080"
+    }
+  }
+  worksheet.getCell("L28").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: {
+      argb: "FFFF7D7D"
+    },
+    bgColor: {
+      argb: "#808080"
+    }
+  }
+
   worksheet.getCell("B29").value = grn.id
   worksheet.getCell("D29").value = grn.id
   worksheet.getCell("F29").value = grn.invoiceNo
@@ -2317,6 +2385,18 @@ const fillGRNWorksheet = (worksheet: excelJS.Worksheet, grn: GRN , purchaseOrder
   worksheet.getCell("L29").value = grn.lrNo
 
   worksheet.insertRow(30,["", "ITEM LIST"])
+  worksheet.mergeCells("B30:M30")
+
+  worksheet.getCell("B30").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: {
+      argb: "FFFF7D7D"
+    },
+    bgColor: {
+      argb: "#808080"
+    }
+  }
   worksheet.insertRow(31, ["", "S. No.", "ITEM Id", "ITEM Desc", "Unit", "Ordered Qty", "Received Qty", "Rejected Qty", "Rejected Reason", "Accepted Qty", "Received On", "Amt. Payable"])
   let sn = grn.lineItems.length
   let total = 0
