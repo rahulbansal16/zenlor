@@ -195,11 +195,33 @@ export interface GRNInfo {
     GRN: GRNItems[]
 }
 
+export interface GRNs {
+    poId: string,
+    status: string,
+    grnDocUrl: string,
+    GRN: GRN[]
+}
+
+export interface GRN {
+    id: string,
+    lineItems: GRNItems[],
+    createdAt?: string,
+    updatedAt?: string,
+    status: string,
+    supplier: string,
+    itemsCount: number,
+    amount: number,
+    lrNo: string,
+    dcNo: string,
+    invoiceNo: string
+}
+
 export interface GRNItems {
     id: string,
     purchaseOrderId: string,
     category: string,
     type: string,
+    grnId: string,
     // styleCode: string,
     status: string,
     materialId: string,

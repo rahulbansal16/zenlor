@@ -15,7 +15,8 @@ import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
   BOMInfoDto,
   MaterialIssue,
-  PurchaseMaterials, StyleCodes, InventoryItems, /*GRNs,*/ GRNInfo as GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs} from "./types/styleCodesInfo";
+  PurchaseMaterials, StyleCodes, InventoryItems, /*GRNs,*/ GRNInfo, GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs} from "./types/styleCodesInfo";
+import { Constants, PURCHASE_ORDER_STATUS } from "./Constants";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -1422,47 +1423,94 @@ exports.updateStyleCodesInfo = functions
 //     category: Joi.string().required(),
 //   }),
 // })
-// interface UpdatePurchaseOrderStatus {
-//   ids: string[],
-//   status: string,
-//   company: string
-// }
+interface UpdatePurchaseOrderStatus {
+  ids: string[],
+  status: string,
+  company: string
+}
 
-// const UpdatePurchaseOrderStatusSchema = Joi.object<UpdatePurchaseOrderStatus, true>({
-//   ids: Joi.array().unique(),
-//   status: Joi.string().required(),
-//   company: Joi.string()
-// })
+const UpdatePurchaseOrderStatusSchema = Joi.object<UpdatePurchaseOrderStatus, true>({
+  ids: Joi.array().unique(),
+  status: Joi.string().valid("active").required(),
+  company: Joi.string()
+})
 
-// exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
-//   name:"updatePOStatus",
-//   schema: UpdatePurchaseOrderStatusSchema,
-//   handler: async (data, context) => {
-//     const {company, ids, status} = data;
-//     const dataRef = admin.firestore().collection("data").doc(company);
-//     const grnRef = admin.firestore().collection("grnInfo").doc(company);
-//     return await admin.firestore().runTransaction(async db => {
-//       // I need to update the information from the UI and 
-//       const [doc, grnDoc] = await db.getAll(dataRef, grnRef)
-//       const docData = doc.data()
-//       if (!docData){
-//         throw Error("The Company Info does not exist")
-//       }
-//       const purchaseOrders:PurchaseOrder[] = docData.puchaseOrdersInfo || []
-//       const grnInfo: GRNs[] = grnDoc.data() || []
+exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
+  name:"updatePOStatus",
+  schema: UpdatePurchaseOrderStatusSchema,
+  handler: async (data, context) => {
+    const {company, ids, status} = data;
+    const dataRef = admin.firestore().collection("data").doc(company);
+    return await admin.firestore().runTransaction(async db => {
+      // I need to update the information from the UI and 
+      const doc = await db.get(dataRef)
+      const docData = doc.data()
+      if (!docData) {
+        throw Error("The Company Info does not exist")
+      }
+      const purchaseOrders: PurchaseOrder[] = docData.purchaseOrdersInfo || []
+      const grnsInfo: GRNs[] = docData?.GRNsInfo || []
 
-//       for (let purchaseOrder of purchaseOrders){
-//         if(ids.find(id => purchaseOrder.id === id)){
-//           purchaseOrder.status = status
-//           // const grn = mapPOToGRN1([purchaseOrder])
-//           // grnInfo.concat
-//         }
-//       }
+      for (let purchaseOrder of purchaseOrders) {
+        if (ids.find(id => purchaseOrder.id === id)) {
+          if (purchaseOrder.status === "active" || purchaseOrder.status === "GRN STARTED"){
+            throw Error("PO is already in Active state")
+          }
+          purchaseOrder.status = status.toLowerCase();
+          for (let grn of grnsInfo) {
+            if (ids.find(id => grn.poId === id)) {
+              grn.status = "GRN STARTED";
+              let grnID = generateUId("GRN", 8)
+              grn.GRN.splice(0, 0, {
+                id: grnID,
+                lineItems: purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
+                  id: generateUId("GRN-ITEM", 6),
+                  grnId: grnID,
+                  purchaseOrderId: purchaseOrder.id,
+                  category: item.category,
+                  type: item.type,
+                  materialId: item.materialId,
+                  materialDescription: item.materialDescription,
+                  unit: item.unit,
+                  purchaseQty: item.purchaseQty,
+                  receivedQty: 0,
+                  status: "active",
+                  receivedDate: moment().format("MMM DD YY"),
+                  rejectedQty: 0,
+                  rejectedReason: "",
+                  acceptedQty: 0,
+                })),
+                status: "active",
+                supplier: purchaseOrder.supplier,
+                itemsCount: purchaseOrder.lineItems.length,
+                amount: purchaseOrder.amount,
+                lrNo: "",
+                dcNo: "",
+                invoiceNo: ""
+              })
+            }
+          }
+        }
+      }
 
+      // admin.firestore().collection("data").doc(company)
+      await db.set(dataRef,
+        {
+          GRNsInfo: grnsInfo,
+          purchaseOrdersInfo: purchaseOrders
+        },
+        {
+          merge: true
+        })
 
-//     })
-//   }
-// }) 
+      return {
+        GRNsInfo: mapGRNsToList(grnsInfo),
+        purchaseOrdersInfo: purchaseOrders
+      }
+
+    })
+  }
+}) 
 
 
 exports.cancelPO = onCall<PurchaseOrdersInfo>({
@@ -1713,12 +1761,13 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
   }
 });
 
-const upsertCreateGRNSchema = Joi.object<GRN, true>({
+const upsertCreateGRNSchema = Joi.object<GRNInfo, true>({
   company: Joi.string().required(),
   createdAt: Joi.string(),
   GRN: Joi.array().items({
     id: Joi.string().required(),
     purchaseOrderId: Joi.string().required(),
+    grnId: Joi.string().required(),
     category: Joi.string().required(),
     type: Joi.string().required(),
     styleCode: Joi.string(),
@@ -1739,7 +1788,7 @@ const upsertCreateGRNSchema = Joi.object<GRN, true>({
 //  Use it to udpate the items.
 // It does not lead to firing up of the values
 
-exports.upsertGRNItem = onCall<GRN>({
+exports.upsertGRNItem = onCall<GRNInfo>({
   name: "upsertGRNItem",
   schema: upsertCreateGRNSchema,
   handler: async (data, context) => {
@@ -1747,42 +1796,86 @@ exports.upsertGRNItem = onCall<GRN>({
     const {company, GRN} = data;
     const doc = await admin.firestore().collection("data").doc(company).get();
     const docData = doc.data();
+    let grnId = GRN[0].grnId
+    let isGRNIdDifferent = GRN.some( grn => grn.grnId !== grnId);
+    if (isGRNIdDifferent){
+      throw Error("Can not do more than 1 GRN simulataneously")
+    }
     if (!docData) {
       throw Error("The company does not exist" + company);
     }
-    const grnInfo = docData.GRNInfo;
-    if (!grnInfo) {
+    const grnsInfo = docData.GRNsInfo;
+    if (!grnsInfo) {
       throw Error("The GRN info does not exist");
     }
-
-    const grnInfoOutput = upsertItemsInArray(grnInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
+    let grnItemsRef:GRNItems[]=[];
+    for (let grnInfo of grnsInfo) {
+      for (let grn of grnInfo.GRN){
+        if (grn.id === grnId){
+          grnItemsRef = grn.lineItems
+          if (grn.status !== "active"){
+            throw Error("The GRN Should be in active status")
+          }
+        }
+      }
+    }
+    const grnInfoOutput = upsertItemsInArray(grnItemsRef, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
     oldItem.materialId === newItem.materialId &&
     oldItem.materialDescription === newItem.materialDescription);
 
+    for (let grnInfo of grnsInfo) {
+      for (let grn of grnInfo.GRN){
+        if (grn.id === grnId){
+          grn.lineItems = grnInfoOutput
+        }
+      }
+    }    
     await admin.firestore().collection("data").doc(company).set( {
-      GRNInfo: grnInfoOutput,
+      GRNsInfo: grnsInfo,
     }, {
       merge: true,
     });
   },
 });
 
-exports.upsertGRN = onCall<GRN>({
+exports.upsertGRN = onCall<GRNInfo>({
   name: "upsertGRN",
   schema: upsertCreateGRNSchema,
   handler: async (data, context) => {
-    console.log("The data is", data);
+    // console.log("The data is", data);
     const {company, GRN} = data;
+    if (GRN.length === 0){
+      throw Error("There is no Item to do GRN")
+    }
+    let grnId = GRN[0].grnId
+    let isGRNIdDifferent = GRN.some( grn => grn.grnId !== grnId);
+    if (isGRNIdDifferent){
+      throw Error("Can not do more than 1 GRN simulataneously")
+    }
     try {
       const dataRef = admin.firestore().collection("data").doc(company);
       const bomRef = admin.firestore().collection("boms").doc(company);
+      const suppliersRef = admin.firestore().collection("suppliers").doc(company);
       return await admin.firestore().runTransaction(async db => {
         const doc = await db.get(dataRef);
         const docData = doc.data();
         if (!docData) {
           throw Error("The company does not exist" + company);
         }
-        const grnInfo = docData.GRNInfo ?? [];
+        const grnsInfo: GRNs[] = docData.GRNsInfo ?? [];
+
+        let grnItemsRef:GRNItems[]=[];
+        for (let grnInfo of grnsInfo) {
+          for (let grn of grnInfo.GRN){
+            if (grn.id === grnId){
+              grnItemsRef = grn.lineItems
+              if (grn.status !== "active"){
+                throw Error("The GRN Should be in active status")
+              }
+            }
+          }
+        }
+
         // const activeGRNInfo = grnInfo.filter((item: GRNItems) => item.status === "active");
         // let grnInfoOutput = upsertItemsInArray(activeGRNInfo, GRN, (oldItem: GRNItems, newItem:GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
         // oldItem.materialId === newItem.materialId &&
@@ -1803,6 +1896,7 @@ exports.upsertGRN = onCall<GRN>({
         const bomsInfo = bomData.bomsInfo ?? [];
         const styleCodesInfo = docData.styleCodesInfo ?? [];
         const purchaseMaterialsInfo = docData.purchaseMaterialsInfo ?? [];
+        const purchaseOrdersInfo: PurchaseOrder[] = docData.purchaseOrdersInfo ?? [];
         const result = collectInventoryFromStyleCodes(bomsInfo, inventoryInfo);
         const collectedInventory = result?.inventory;
         if (!collectedInventory) {
@@ -1821,17 +1915,57 @@ exports.upsertGRN = onCall<GRN>({
         // let grnAfterRemovingItem = grnInfoOutput.filter( item => )
         const GRNDone = GRN.map((item: GRNItems) => ({
           ...item,
-          status: "done",
+          status: "DONE"
         }));
-        const grnInfoOutput = upsertItemsInArray(grnInfo, GRNDone, (oldItem: GRNItems, newItem: GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
+        const grnInfoOutput = upsertItemsInArray(grnItemsRef, GRNDone, (oldItem: GRNItems, newItem: GRNItems) => oldItem.purchaseOrderId === newItem.purchaseOrderId &&
           oldItem.materialId === newItem.materialId &&
           oldItem.materialDescription === newItem.materialDescription);
         const newPurchaseMaterialInfo = populatePurhcaseMaterialsFromBOM(p.bomsInfo, purchaseMaterialsInfo);
 
+        let poID = ""
+        let grnForPO;
+        let parentGRN;
+        for (let grnInfo of grnsInfo) {
+          for (let grn of grnInfo.GRN){
+            if (grn.id === grnId){
+              grn.lineItems = grnInfoOutput
+              parentGRN = grnInfo
+              grn.status = "DONE"
+              poID = grnInfo.poId
+              grnForPO = grn;
+            }
+          }
+        }    
+        
+        const suppliersDoc = await db.get(suppliersRef);
+        const suppliersDocData = suppliersDoc.data();
+        if (!suppliersDocData){
+          throw Error("Suppliers are not present in the doc");
+        }
+
+        if (!grnForPO){
+          throw Error("GRN doc does not exist")
+        }
+        if(!parentGRN){
+          throw Error("GRN doc does not exist") 
+        }
+        const suppliersInfo: Supplier[] = suppliersDocData.suppliersInfo ?? [];
+        for( let purchaseorder of purchaseOrdersInfo){
+          if (purchaseorder.id === poID){
+            purchaseorder.status = "GRN DONE"
+           const result = await createGRNFormatFile(company, grnForPO, purchaseorder, suppliersInfo, `grns/${company}/${parentGRN.poId}.xlsx`)
+           parentGRN.grnDocUrl = result;
+           break;
+          }
+        }
+        
+        console.log(Constants.NAMES)
         await db.set(dataRef ,{
-          GRNInfo: grnInfoOutput,
+          GRNsInfo: grnsInfo,
+          // GRNInfo: grnInfoOutput,
           inventoryInfo: p.inventoryInfo,
-          purchaseMaterialsInfo: newPurchaseMaterialInfo
+          purchaseMaterialsInfo: newPurchaseMaterialInfo,
+          purchaseOrdersInfo: purchaseOrdersInfo
         }, {
           merge: true,
         });
@@ -1842,10 +1976,12 @@ exports.upsertGRN = onCall<GRN>({
         })
         return {
           company,
-          GRNInfo: grnInfoOutput.filter((item) => item.status === "active"),
+          GRNsInfo: mapGRNsToList(grnsInfo),
+          // GRNInfo: grnInfoOutput.filter((item) => item.status === "active"),
           inventoryInfo: p.inventoryInfo,
           bomsInfo: p.bomsInfo,
-          purchaseMaterialsInfo: newPurchaseMaterialInfo
+          purchaseMaterialsInfo: newPurchaseMaterialInfo,
+          purchaseOrdersInfo: purchaseOrdersInfo
         };
       })
     }
@@ -2044,7 +2180,7 @@ exports.createPO = functions
           createdAt,
           deliveryDate: moment().format("MMM DD YY"),
           amount: totalAmount[key],
-          status: "active",
+          status: "ACTIVE",
           data: supplierMap[key],
         });
       }
@@ -2134,6 +2270,84 @@ exports.createPO = functions
 //   }
 //   return grnItems;
 // };
+const createGRNFormatFile = async (company: string, grn: GRN, purchaseOrder : PurchaseOrder, suppliers: Supplier[], filePath?: string) => {
+
+  const workbook = new excelJS.Workbook();
+
+  const formateTemplateStream = readExcelTemplate(company, Constants.GRN_TEMPLATE_FILE, filePath);
+  await workbook.xlsx.read(formateTemplateStream);
+  const worksheet = workbook.getWorksheet('Sheet1');
+  // const data = transformPOToKeyValue(purchaseOrder);
+  const supplier = suppliers.find( item => item.name.toLowerCase() === purchaseOrder.supplier.toLowerCase());
+
+  if (!supplier)
+    throw Error("Supplier does not exist in DB");
+
+  fillGRNWorksheet(worksheet, grn, purchaseOrder, supplier);
+  const outputFile = path.join(os.tmpdir(), `${grn.id}.xlsx`);
+  await workbook.xlsx.writeFile(outputFile)
+  const fileUrl = await uploadFileToStorage(outputFile, `grns/${company}/${purchaseOrder.id}.xlsx`)
+  return fileUrl
+}
+
+const fillGRNWorksheet = (worksheet: excelJS.Worksheet, grn: GRN , purchaseOrder: PurchaseOrder, supplier: Supplier) => {
+  worksheet.getCell("B15").value = "C/O " + supplier.person;
+  worksheet.getCell("B16").value = (purchaseOrder.supplier || "").toUpperCase();
+  worksheet.getCell("B17").value = supplier.address1;
+  worksheet.getCell("B18").value = supplier.address2;
+  worksheet.getCell("B19").value = supplier.city + " - " + supplier.pin + ", INDIA"
+  worksheet.getCell("B20").value = "GSTIN " + (supplier.gst??"")+ ", PAN " + (supplier.pan??"");
+  worksheet.getCell("B21").value = "Contact No " + supplier.phoneNumber??"";
+  worksheet.getCell("B22").value = "Email Id " + supplier.email??"";
+
+  worksheet.getCell("G14").value = "GRN DONE"
+  worksheet.getCell("G17").value = "Order Date " + moment(purchaseOrder.createdAt).format("DD MMM YY")
+  // worksheet.getCell("G")
+  worksheet.getCell("G23").value = grn.lineItems.length
+  worksheet.insertRow(28,["", "GRN NO.", "", "ORDER NO.", "", "INVOICE NO.", "", "DC NO.", "", "Transporter", "", "LR No.", ""])
+
+  worksheet.getCell("B29").value = grn.id
+  worksheet.getCell("D29").value = grn.id
+  worksheet.getCell("F29").value = grn.invoiceNo
+  worksheet.getCell("H29").value = grn.dcNo
+  worksheet.getCell("J29").value = ""
+  worksheet.getCell("L29").value = grn.lrNo
+
+  worksheet.insertRow(30,["", "ITEM LIST"])
+  worksheet.insertRow(31, ["", "S. No.", "ITEM Id", "ITEM Desc", "Unit", "Ordered Qty", "Received Qty", "Rejected Qty", "Rejected Reason", "Accepted Qty", "Received On", "Amt. Payable"])
+  let sn = grn.lineItems.length
+  let total = 0
+  for (let item of grn.lineItems){
+    const poLineItem  = purchaseOrder.lineItems.find(po => po.materialId === item.materialId && po.materialDescription === item.materialDescription)
+    if (!poLineItem){
+      throw Error("Item does not exist in purchase order")
+    }
+    worksheet.insertRow(32, ['', sn, item.id, item.materialDescription, poLineItem.unit, item.purchaseQty, item.receivedQty, item.rejectedQty ,item.rejectedReason, item.acceptedQty, item.receivedDate, Math.ceil((poLineItem.totalAmount/poLineItem.purchaseQty)*(item.acceptedQty))])
+    total += Math.ceil((poLineItem.totalAmount/poLineItem.purchaseQty)*(item.acceptedQty))
+    sn -=1 
+  }
+  worksheet.insertRow(32 + grn.lineItems.length, ['', "Total", "", "", "", "", "", "" , "", "", "", total])
+
+  // let total:any = {
+  //   preTaxAmount:0,
+  //   tax:0,
+  //   qty: 0,
+  //   taxAmount:0,
+  //   totalAmount:0
+  // }
+  // for (let i = 0 ; i <  purchaseOrder.lineItems.length ; i++){
+  //   const lineItem = purchaseOrder.lineItems[i]
+  //   total.preTaxAmount += lineItem.preTaxAmount;
+  //   total.tax += lineItem.tax;
+  //   total.qty += lineItem.purchaseQty;
+  //   total.taxAmount += lineItem.taxAmount
+  //   total.totalAmount += lineItem.totalAmount
+  //   worksheet.insertRow(26 + i, ['', i+1, lineItem.materialId, lineItem.materialDescription, lineItem.unit, lineItem.purchaseQty, lineItem.rate, lineItem.discount, lineItem.preTaxAmount, lineItem.tax, lineItem.taxAmount, lineItem.totalAmount, lineItem.deliveryDate])
+  // }
+  // worksheet.insertRow(26 + purchaseOrder.lineItems.length, ['', 'Total', '', '', '', total.qty, '', '', total.preTaxAmount, '', total.taxAmount, total.totalAmount, ''])
+
+  return worksheet;
+}
 
 exports.formatPO = functions
     .region("asia-northeast3")
@@ -2169,17 +2383,19 @@ const createPOFormatFile = async (company: string, purchaseOrder : PurchaseOrder
   if (!supplier)
     throw Error("Supplier does not exist in DB");
 
-  fillWorksheet(worksheet, purchaseOrder, supplier);
+  fillPurchaseOrderWorksheet(worksheet, purchaseOrder, supplier);
   const outputFile = path.join(os.tmpdir(), "output.xlsx");
   await workbook.xlsx.writeFile(outputFile)
   const fileUrl = await uploadFileToStorage(outputFile, `purchaseOrders/${company}/${purchaseOrder.id}.xlsx`)
   return fileUrl
 }
 
-const readExcelTemplate = (company: string, templateFile: string) => {
-  const filePath = `format/${company}/${templateFile}`;
+const readExcelTemplate = (company: string, templateFile: string, filePath?: string) => {
+  let file_path = filePath
+  if (!file_path)
+    file_path = `format/${company}/${templateFile}`;
   try {
-    const file = admin.storage().bucket("gs://zenlor.appspot.com").file(filePath)
+    const file = admin.storage().bucket("gs://zenlor.appspot.com").file(file_path)
     return file.createReadStream()
   }
   catch (e:any){
@@ -2187,7 +2403,7 @@ const readExcelTemplate = (company: string, templateFile: string) => {
   }
 }
 
-const fillWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrder, supplier: Supplier) => {
+const fillPurchaseOrderWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder: PurchaseOrder, supplier: Supplier) => {
   worksheet.getCell("B15").value = "C/O " + supplier.person;
   worksheet.getCell("B16").value = (purchaseOrder.supplier || "").toUpperCase();
   worksheet.getCell("B17").value = supplier.address1;
