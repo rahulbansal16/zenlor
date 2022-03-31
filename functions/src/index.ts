@@ -704,7 +704,7 @@ exports.getData = functions
         ...suppliersData,
         bomsInfo,
         styleCodesInfo: styleCodesInfo,
-        ...purchaseMaterialsInfo,
+        purchaseMaterialsInfo,
         // GRNInfo: GRNInfo.filter((item:GRNItems) => item.status === "active"),
         GRNsInfo: mapGRNsToList(grnsInfo),
         inwardMaterial: mapGRNstoInwardMaterial(grnsInfo)
