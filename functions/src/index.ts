@@ -1818,7 +1818,70 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
     }
   }
 });
+// id: string,
+// lineItems: GRNItems[],
+// createdAt?: string,
+// updatedAt?: string,
+// status: string,
+// supplier: string,
+// itemsCount: number,
+// amount: number,
+// lrNo: string,
+// dcNo: string,
+// invoiceNo: string
+const upsertGRNSchema = Joi.object<upsertGRN, true>({
+  company: Joi.string().required(),
+  GRN: Joi.array().items({
+    id: Joi.string().required(),
+    lrNo: Joi.string().allow(""),
+    dcNo: Joi.string().allow(""),
+    invoiceNo: Joi.string().allow("")
+  }).options({allowUnknown: true})
+})
+// .strict(false)
+    .unknown(false);
 
+exports.upsertGRNRow = onCall<upsertGRN>({
+  name: "upsertGRNRow",
+  schema: upsertGRNSchema,
+  handler: async (data, context) => {
+    const {company,  GRN} = data;
+    const dataRef = admin.firestore().collection("data").doc(company);
+    return await admin.firestore().runTransaction(async db => {
+      const doc = await db.get(dataRef);
+      const docData = doc.data();
+      if (!docData) {
+        throw Error("The company does not exist" + company);
+      }
+      const grnsInfo: GRNs[] = docData.GRNsInfo ?? [];
+      for(let grnInfo of grnsInfo){
+        for (let i = 0 ; i<grnInfo.GRN.length ;i++){
+          let dbgrn = grnInfo.GRN[i]
+          const idx = GRN.findIndex(item => item.id === dbgrn.id)
+          if (idx === -1){
+            continue
+          }
+          grnInfo.GRN.splice(i, 1, {
+            ...dbgrn,
+            ...GRN[idx]
+          })
+          // dbgrn = {
+          //   ...dbgrn,
+          //   ...GRN[idx]
+          // }
+        }
+      }
+      await db.set(dataRef ,{
+        GRNsInfo: grnsInfo
+      },{
+        merge: true
+      })
+      return {
+        GRNsInfo: mapGRNsToList(grnsInfo)
+      }
+    })
+  }
+})
 const upsertCreateGRNSchema = Joi.object<GRNInfo, true>({
   company: Joi.string().required(),
   createdAt: Joi.string(),
