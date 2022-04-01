@@ -2013,7 +2013,7 @@ exports.upsertGRN = onCall<GRNInfo>({
         for( let purchaseorder of purchaseOrdersInfo){
           if (purchaseorder.id === poID){
             purchaseorder.status = "GRN DONE"
-           const result = await createGRNFormatFile(company, grnForPO, purchaseorder, suppliersInfo, parentGRN.grnDocUrl ?`grns/${company}/${parentGRN.poId}.xlsx`:undefined)
+           const result = await createGRNFormatFile(company, grnForPO, purchaseorder, suppliersInfo, parentGRN.grnDocUrl ?`grns/${company}/GRN-${parentGRN.poId}.xlsx`:undefined)
            parentGRN.grnDocUrl = result;
            break;
           }
@@ -2350,7 +2350,7 @@ const createGRNFormatFile = async (company: string, grn: GRN, purchaseOrder : Pu
   fillGRNWorksheet(worksheet, grn, purchaseOrder, supplier);
   const outputFile = path.join(os.tmpdir(), `${grn.id}.xlsx`);
   await workbook.xlsx.writeFile(outputFile)
-  const fileUrl = await uploadFileToStorage(outputFile, `grns/${company}/${purchaseOrder.id}.xlsx`)
+  const fileUrl = await uploadFileToStorage(outputFile, `grns/${company}/GRN-${purchaseOrder.id}.xlsx`)
   return fileUrl
 }
 
@@ -2458,6 +2458,7 @@ const fillGRNWorksheet = (worksheet: excelJS.Worksheet, grn: GRN , purchaseOrder
       argb: "#808080"
     }
   }
+  let items = 0
   worksheet.insertRow(31, ["", "S. No.", "ITEM Id", "ITEM Desc", "Unit", "Ordered Qty", "Received Qty", "Rejected Qty", "Rejected Reason", "Accepted Qty", "Received On", "Amt. Payable"])
   let sn = grn.lineItems.length
   let total = 0
@@ -2466,12 +2467,17 @@ const fillGRNWorksheet = (worksheet: excelJS.Worksheet, grn: GRN , purchaseOrder
     if (!poLineItem){
       throw Error("Item does not exist in purchase order")
     }
-    worksheet.insertRow(32, ['', sn, item.id, item.materialDescription, poLineItem.unit, item.purchaseQty, item.receivedQty, item.rejectedQty ,item.rejectedReason, item.acceptedQty, item.receivedDate, Math.ceil((poLineItem.totalAmount/poLineItem.purchaseQty)*(item.acceptedQty))])
+    if (item.acceptedQty !== 0){
+      items += 1;
+    }
+    worksheet.insertRow(32, ['', sn, item.materialId, item.materialDescription, poLineItem.unit, item.purchaseQty, item.receivedQty, item.rejectedQty ,item.rejectedReason, item.acceptedQty, item.receivedDate, Math.ceil((poLineItem.totalAmount/poLineItem.purchaseQty)*(item.acceptedQty))])
     total += Math.ceil((poLineItem.totalAmount/poLineItem.purchaseQty)*(item.acceptedQty))
     sn -=1 
   }
   worksheet.insertRow(32 + grn.lineItems.length, ['', "Total", "", "", "", "", "", "" , "", "", "", total])
 
+ grn.amount = total;
+ grn.itemsCount = items;  
   // let total:any = {
   //   preTaxAmount:0,
   //   tax:0,
