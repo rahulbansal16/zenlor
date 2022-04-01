@@ -16,7 +16,7 @@ import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, P
   BOMInfoDto,
   MaterialIssue,
   PurchaseMaterials, StyleCodes, InventoryItems, /*GRNs,*/ GRNInfo, GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs} from "./types/styleCodesInfo";
-import { Constants, PURCHASE_ORDER_STATUS } from "./Constants";
+import { Constants, GRN_STATUS, PURCHASE_ORDER_STATUS } from "./Constants";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -632,6 +632,8 @@ const addMaterialStatusToStyleCode = (styleCodesInfo: StyleCodes[], bomsInfo: BO
 const mapGRNsToList = (grns: GRNs[]) :GRN[]=> {
   let grnList:GRN[] = []
   for(let grn of grns){
+    if (grn.status === GRN_STATUS.CANCELED)
+      continue
     grnList = grnList.concat(grn.GRN.map( item => ({
       ...item,
       docUrl: grn.grnDocUrl,
@@ -1579,7 +1581,7 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
       const purchaseMaterialsInfo = purchaseMaterialsData.purchaseMaterialsInfo??[];
       const inventory: InventoryItems[] = docData.inventoryInfo??[];
       const styleCodes: StyleCodes[] = docData.styleCodesInfo??[];
-      const grnInfo: GRNItems[] = docData.GRNInfo??[];
+      const grns:GRNs[] = docData.GRNsInfo??[];
   
       let deletedPO:any = {}
       const collectedInventory = collectInventoryFromStyleCodes(bomsInfo, inventory);
@@ -1600,13 +1602,17 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
         if (purchaseOrder.status === PURCHASE_ORDER_STATUS.GRN_DONE){
           throw Error("Purchase Order can not be cancelled as GRN IS DONE once")
         }
-        purchaseOrder.status = "CANCELED";
+        purchaseOrder.status = PURCHASE_ORDER_STATUS.CANCELED;
         deletedPO[purchaseOrder.id] = true;
+        for (let grn of grns){
+          if (grn.poId === purchaseOrder.id){
+            grn.status = GRN_STATUS.CANCELED;
+          }
+        }
       }
   
       const assignedInventory = assignInventoryToBOM(styleCodes, collectedInventory.boms, collectedInventory.inventory);
       const updatedPurchaseMaterialsInfo =  populatePurhcaseMaterialsFromBOM(assignedInventory.boms, purchaseMaterialsInfo);
-      let filteredGRN = grnInfo.filter( item => !deletedPO[item.purchaseOrderId])
       const output = upsertItemsInArray(purchaseOrdersInfo, purchaseOrders, (oldItem, newItem) => oldItem.id === newItem.id);
   
       let newStyleCodesInfo = addMaterialStatusToStyleCode(styleCodes, collectedInventory.boms);
@@ -1617,7 +1623,7 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
       promises.push(db.set( dataRef,  {
         inventoryInfo: collectedInventory.inventory,
         purchaseOrdersInfo: output,
-        GRNInfo: filteredGRN
+        GRNsInfo: grns
       }, {
         merge: true,
       }));
@@ -1638,7 +1644,7 @@ exports.cancelPO = onCall<PurchaseOrdersInfo>({
         bomsInfo: collectedInventory.boms,
         purchaseOrdersInfo: output ,
         purchaseMaterialsInfo: updatedPurchaseMaterialsInfo,
-        GRNInfo: filteredGRN
+        GRNsInfo: mapGRNsToList(grns)
       };
     })
   }
