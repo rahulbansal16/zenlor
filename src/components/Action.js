@@ -422,6 +422,7 @@ const Action = ({ type }) => {
           message:"GRN Done",
           description: "The GRN of Item is done successfully" 
         })
+        history.push("/action/grns")
       } catch(e){
         notification["error"]({
           message:"Error Doing GRN",
