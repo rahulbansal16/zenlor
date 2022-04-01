@@ -403,17 +403,26 @@ export const initialState = {
         {
           title: "LR No.",
           dataIndex: 'lrNo',
-          key: 'lrNo'
+          key: 'lrNo',
+          editable: true,
+          width: 150
+	
         },		
         {
           title: "DC No.",
           dataIndex: 'dcNo',
-          key: 'dcNo'
+          key: 'dcNo',
+          editable: true,
+          width: 150
+
         },
         {
           title: "Invoice No.",
           dataIndex: 'invoiceNo',
-          key: 'invoiceNo'
+          key: 'invoiceNo',
+          editable: true,
+          width: 150
+
         },						
         {
           title: "Updated On",

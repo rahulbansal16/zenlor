@@ -245,6 +245,18 @@ const saveCellToServer = async (item, type, company) => {
         GRN: [item]
       }
       break;
+    case "grns":
+      methodName ="upsertGRNRow"
+      payload = {
+        ...payload,
+        GRN: [{
+          id: item.id,
+          lrNo: item.lrNo,
+          dcNo: item.dcNo,
+          invoiceNo: item.invoiceNo
+        }]
+      }
+      break;
     default:
       methodName = "";
   }
@@ -402,10 +414,20 @@ const Action = ({ type }) => {
       setSelectedRowsKeys([])
     } else if (action === "inwardMaterial") {
       const grnId = selectedRows.map((item) => item.id);
-      history.push({
-        pathname: `/action/${data.action}`,
-        search: `grnId=${grnId}`,
-      });
+      if (selectedRows.length === 1){
+        history.push({
+          pathname: `/action/${data.action}`,
+          search: `grnId=${grnId}`,
+        });
+      } else {
+        notification["error"]({
+          message:"Please Select Only 1 GRN",
+          description: "Only 1 GRN can be inward at a time"
+        })
+        setSelectedRows([])
+        setSelectedRowsKeys([])
+      }
+
     } else if (action === "inwardItem") {
       // This will do actualGRN as in updating the values in the db etc for the inventory
       const upsertGRN = functions.httpsCallable("upsertGRN");
