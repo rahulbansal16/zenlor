@@ -1488,6 +1488,9 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
           if (purchaseOrder.status === "active" || purchaseOrder.status === "GRN STARTED"){
             throw Error("PO is already in Active state")
           }
+          if (purchaseOrder.status === PURCHASE_ORDER_STATUS.CANCELED){
+            throw Error("GRN can not be opened for a canceled PO")
+          }
           purchaseOrder.status = status.toLowerCase();
           for (let grn of grnsInfo) {
             if (ids.find(id => grn.poId === id)) {
