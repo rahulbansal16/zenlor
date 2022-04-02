@@ -161,6 +161,14 @@ export interface MigrationInfo{
     sourceName: string,
     destinationName: string
 }
+export interface DeleteData {
+    company: string,
+    collectionName: string,
+    objectName: string
+    // destinatio    "token": "3:LHl7/wXDi8NmoWoCnhARIw==:6FRAoab+fwZtsfdintR2c3w/D/gokmN2SmmS7VG9+LB6PCByrDxLaIR7SEYyf1g1Egy/7Ex9nkFqwj7XbgtV2gnlkCUVXMjM3Aose+0uvaQ5RVQikNR2pd0TlBW7TioAsIEmVNmWSUlK9EsP8LWtTBQbadOjXEsPhKjLN4aaaHdMEYbAoKm4XWjMzg/hmltMsZQgEy/kxK8AFrk6La9RA7DFf9arcALGDeCCftkAAzw3nXXo6yjNQDUgm4RwT4N+5+BnMckybFMr1Osoi5XDiU6EfD8ZirmnPc+oqjOP3e6ioyude5BDJh2Zuq/j5detkyVIug0njnx/q6lOBfyWwlUg70WAgxn8HSeHLm0DCRSzstFCO3Zy3exn++QRNzcRBaXO5hes1SK1MGyXibxc57UrMFrRPWMXnmcT7eFxpekl0Ova6rpukRbSNEnjPCKP29kIDnYOx8rMTRo5CUbBB4VhzSEm+OB9uOwBVnOha/m2EQgKKsf029735gyG3u/kwCPe2hwbChHrH0ZIj3vxLjDYbeAXm6FH0coJ5fXCuJwkprCmhOiixqNSx7D1ydh4:MEPuTaZdifyG1xhedETSo/bUMiRts/GWCEFwPDn5xoo=",
+
+}
+
 
 // All the inventory will be directly inserted by the user
 export interface InventoryInfo {

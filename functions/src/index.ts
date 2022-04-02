@@ -2179,6 +2179,24 @@ exports.distributeInventory = functions
       };
     });
 
+
+const deleteDataSchema = Joi.object<DeleteData, true> ({
+  company: Joi.string().required(),
+  collectionName: Joi.string().required(),
+  objectName: Joi.string().required()
+})
+
+exports.deleteData = onCall<DeleteData>({
+  name: "DeleteData",
+  schema: deleteDataSchema,
+  handler: async (data, context) => {
+    const {company, collectionName,objectName} = data;
+    return admin.firestore().collection(collectionName).doc(company).set({[objectName]:[]},{
+      merge: true
+    });
+  }
+})
+
   const upsertMigrateDataSchema = Joi.object<MigrationInfo, true>({
     company: Joi.string().required(),
     source: Joi.string().required(),
