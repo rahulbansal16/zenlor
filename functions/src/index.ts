@@ -1499,6 +1499,12 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
             if (ids.find(id => grn.poId === id)) {
               grn.status = "GRN STARTED";
               let grnID = generateUId("GRN", 8)
+              let mpLineItemsToRemainingQty:any = {}
+              for (let x of grn.GRN){
+                for (let item of x.lineItems){
+                  mpLineItemsToRemainingQty[item.materialId +"|"+item.materialDescription] = item.receivedQty + ( mpLineItemsToRemainingQty[item.materialId +"|"+item.materialDescription]||0)
+                }
+              }
               grn.GRN.splice(0, 0, {
                 id: grnID,
                 lineItems: purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
