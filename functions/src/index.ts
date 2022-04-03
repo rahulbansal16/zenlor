@@ -1491,6 +1491,9 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
           if (purchaseOrder.status === PURCHASE_ORDER_STATUS.CANCELED){
             throw Error("GRN can not be opened for a canceled PO")
           }
+          if (purchaseOrder.status !== PURCHASE_ORDER_STATUS.GRN_DONE){
+            throw Error("GRN can only be opened was it is done")
+          }
           purchaseOrder.status = status.toLowerCase();
           for (let grn of grnsInfo) {
             if (ids.find(id => grn.poId === id)) {
@@ -1507,15 +1510,15 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
                   materialId: item.materialId,
                   materialDescription: item.materialDescription,
                   unit: item.unit,
-                  purchaseQty: item.purchaseQty,
+                  purchaseQty: Math.ceil(item.purchaseQty-(mpLineItemsToRemainingQty[item.materialId+"|"+item.materialDescription]||0)),
                   receivedQty: 0,
-                  status: "active",
+                  status: GRN_STATUS.ACTIVE,
                   receivedDate: moment().format("MMM DD YY"),
                   rejectedQty: 0,
                   rejectedReason: "",
                   acceptedQty: 0,
                 })),
-                status: "active",
+                status: GRN_STATUS.ACTIVE,
                 supplier: purchaseOrder.supplier,
                 itemsCount: purchaseOrder.lineItems.length,
                 amount: purchaseOrder.amount,
