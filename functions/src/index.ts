@@ -1473,12 +1473,38 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
   handler: async (data, context) => {
     const {company, ids, status} = data;
     const dataRef = admin.firestore().collection("data").doc(company);
+    const bomRef = admin.firestore().collection("boms").doc(company);
+    const purchaseMaterialsRef = admin.firestore().collection("purchaseMaterials").doc(company)
+    
     return await admin.firestore().runTransaction(async db => {
       // I need to update the information from the UI and 
       const doc = await db.get(dataRef)
       const docData = doc.data()
       if (!docData) {
         throw Error("The Company Info does not exist")
+      }
+      const inventoryInfo = docData?.inventoryInfo;
+              
+      const purchaseMaterialsDoc = await db.get(purchaseMaterialsRef);
+      const purchaseMaterialsData = purchaseMaterialsDoc.data();
+      if (!purchaseMaterialsData){
+        throw Error("Purchase Material data does not exist")
+      }
+
+      const bomDoc = await db.get(bomRef);
+      const bomData = bomDoc.data();
+      if (!bomData){
+        throw Error("Bom Does not exist")
+      }
+
+      const bomsInfo = bomData.bomsInfo ?? [];
+      const styleCodesInfo = docData.styleCodesInfo ?? [];
+      const purchaseMaterialsInfo = purchaseMaterialsData.purchaseMaterialsInfo ?? [];
+      // const purchaseOrdersInfo: PurchaseOrder[] = docData.purchaseOrdersInfo ?? [];
+      const result = collectInventoryFromStyleCodes(bomsInfo, inventoryInfo);
+      let collectedInventory = result?.inventory;
+      if (!collectedInventory) {
+        throw Error("Inventory Collection Failed");
       }
       const purchaseOrders: PurchaseOrder[] = docData.purchaseOrdersInfo || []
       const grnsInfo: GRNs[] = docData?.GRNsInfo || []
@@ -1505,6 +1531,23 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
                   mpLineItemsToRemainingQty[item.materialId +"|"+item.materialDescription] = item.receivedQty + ( mpLineItemsToRemainingQty[item.materialId +"|"+item.materialDescription]||0)
                 }
               }
+              const inventory = purchaseOrder.lineItems.map((output) => ({
+                materialId: output.materialId,
+                materialDescription: output.materialDescription,
+                activeOrdersQty: Math.ceil(output.purchaseQty-(mpLineItemsToRemainingQty[output.materialId+"|"+ output.materialDescription]||0)),
+              }));
+              
+
+              collectedInventory = upsertItemsInArray(collectedInventory, inventory as any, (oldItem: InventoryItems, newItem: InventoryItems) => oldItem.materialId === newItem.materialId &&
+                oldItem.materialDescription === newItem.materialDescription,
+                undefined,
+                (oldItem: InventoryItems, newItem: any) => ({
+                  ...oldItem,
+                  ...newItem
+                }));
+
+ 
+
               grn.GRN.splice(0, 0, {
                 id: grnID,
                 lineItems: purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
@@ -1536,7 +1579,8 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
           }
         }
       }
-
+      const p = distributeInventory(styleCodesInfo, result.boms, collectedInventory);
+      const newPurchaseMaterialInfo = populatePurhcaseMaterialsFromBOM(p.bomsInfo, purchaseMaterialsInfo);
       // admin.firestore().collection("data").doc(company)
       await db.set(dataRef,
         {
@@ -1547,9 +1591,23 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
           merge: true
         })
 
+        await db.set(bomRef, {
+          bomsInfo: p.bomsInfo
+        },{
+          merge: true
+        })
+
+        await db.set(purchaseMaterialsRef, {
+          purchaseMaterialsInfo: newPurchaseMaterialInfo,
+        },{
+          merge: true
+        })
+
       return {
         GRNsInfo: mapGRNsToList(grnsInfo),
-        purchaseOrdersInfo: purchaseOrders
+        purchaseOrdersInfo: purchaseOrders,
+        purchaseMaterialsInfo: newPurchaseMaterialInfo,
+        bomsInfo: p.bomsInfo
       }
 
     })
