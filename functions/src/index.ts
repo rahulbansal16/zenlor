@@ -2049,7 +2049,7 @@ exports.upsertGRN = onCall<GRNInfo>({
           (oldItem: InventoryItems, newItem: any) => ({
             ...oldItem,
             inventory: oldItem.inventory + newItem.inventory,
-            activeOrdersQty: oldItem.activeOrdersQty - newItem.purchaseQty,
+            activeOrdersQty: Math.max(oldItem.activeOrdersQty - newItem.purchaseQty, 0),
           }));
 
         const p = distributeInventory(styleCodesInfo, result.boms, output);
