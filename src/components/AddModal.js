@@ -17,7 +17,7 @@ const AddNewModal = ({type, title, options = ['manual','csv']}) => {
     }
     return(
         <>
-        <Button type="primary" onClick={() => setVisible(true)}>Add New</Button>
+        <Button type="dashed" onClick={() => setVisible(true)}>Add New</Button>
         <Modal
             title={`Create ${title}`}
             centered
