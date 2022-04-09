@@ -595,8 +595,11 @@ const Action = ({ type }) => {
       <Row style = {{
         marginTop:'10px'
         }}>
-              <Col span={22}>
+              <Col span={16}>
                 <Title level={4}>{header[type].toUpperCase()}</Title>
+              </Col>
+              <Col span={6}>
+                <ActionBar type={type} onFinish={onFinish} loading={loading} />
               </Col>
               <Col span={2}>
                 <AddNewModal type={type} title={header[type]}/>
@@ -665,18 +668,6 @@ const Action = ({ type }) => {
         }
       />
       </div>
-
-      <div id ="table" style={{
-        position: 'fixed',
-        paddingTop:'20px',
-        paddingLeft:'20px',
-        bottom: '10px',
-        // height:'90px',
-        width: '100%'
-      }}>
-        <ActionBar type={type} onFinish={onFinish} loading={loading} />
-      </div>
-      {/* <ActionBar type={type} onFinish={onFinish}/> */}
     </div>
   );
 };
