@@ -1745,6 +1745,17 @@ const upsertCreatePOSchema = Joi.object<PurchaseMaterialsInfo, true>({
 // .strict(true)
     .unknown(false);
 
+const getEndDeliveryDateFromPO = (purchaseOrderLineItems: PurchaseOrderLineItems[]): string => {
+  let endDate: moment.Moment = moment();
+  purchaseOrderLineItems.forEach( lineItem => {
+    if (!endDate){
+      endDate = moment(lineItem.deliveryDate)
+    } else {
+      endDate = moment(lineItem.deliveryDate).isAfter(endDate)?moment(lineItem.deliveryDate):endDate
+    }
+  })
+  return endDate.format("MMM DD YY");
+}
 exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
   name: "upsertCreatePO",
   schema: upsertCreatePOSchema,
@@ -1786,7 +1797,6 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           throw Error("Suppliers are not present in the doc");
         }
         const suppliersInfo: Supplier[] = suppliersDocData.suppliersInfo ?? [];
-        let deliveryDate = "";
 
         for (let item of purchaseMaterials) {
           item = item as PurchaseMaterials;
@@ -1801,7 +1811,6 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
           if (item.purchaseQty <= 0) {
             throw Error("The purchaseQty can not be zero");
           }
-          deliveryDate = item.deliveryDate;
           inventoryItem.activeOrdersQty += item.purchaseQty;
           // console.log("The bom Items are activeOrdersQty pendingQty", bom.activeOrdersQty, bom.pendingQty);
           const { styleCode, totalAmount } = item;
@@ -1831,7 +1840,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
             supplier: key,
             createdAt,
             purchaseOrderId: "",
-            deliveryDate,
+            deliveryDate: getEndDeliveryDateFromPO(supplierMap[key]),
             amount: total[key],
             status: POStatus.ACTIVE.toString(),
             lineItems: supplierMap[key],
