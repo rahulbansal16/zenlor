@@ -594,16 +594,15 @@ const Action = ({ type }) => {
       {/* {loading?<Loader/>:<></>} */}
       <Row style = {{
         marginTop:'10px'
-        }}>
+        }}>              
+              <Col span={2}>
+                <AddNewModal type={type} title={header[type]}/>
+              </Col>
               <Col span={16}>
                 <Title level={4}>{header[type].toUpperCase()}</Title>
               </Col>
               <Col span={6}>
                 <ActionBar type={type} onFinish={onFinish} loading={loading} />
-              </Col>
-              <Col span={2}>
-                <AddNewModal type={type} title={header[type]}/>
-                {/* <Button type="primary">Add New</Button> */}
               </Col>
       </Row>
       <div style={{  overflowY: 'auto', maxHeight:'88vh'}}>
