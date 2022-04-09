@@ -1511,7 +1511,7 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
 
       for (let purchaseOrder of purchaseOrders) {
         if (ids.find(id => purchaseOrder.id === id)) {
-          if (purchaseOrder.status === "active" || purchaseOrder.status === "GRN STARTED"){
+          if (purchaseOrder.status === PURCHASE_ORDER_STATUS.ACTIVE || purchaseOrder.status === PURCHASE_ORDER_STATUS.GRN_STARTED){
             throw Error("PO is already in Active state")
           }
           if (purchaseOrder.status === PURCHASE_ORDER_STATUS.CANCELED){
@@ -1523,7 +1523,7 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
           purchaseOrder.status = status.toLowerCase();
           for (let grn of grnsInfo) {
             if (ids.find(id => grn.poId === id)) {
-              grn.status = "GRN STARTED";
+              grn.status = PURCHASE_ORDER_STATUS.GRN_STARTED;
               let grnID = generateUId("GRN", 8)
               let mpLineItemsToRemainingQty:any = {}
               for (let x of grn.GRN){
@@ -2004,7 +2004,7 @@ exports.upsertGRNItem = onCall<GRNInfo>({
       for (let grn of grnInfo.GRN){
         if (grn.id === grnId){
           grnItemsRef = grn.lineItems
-          if (grn.status !== "active"){
+          if (grn.status !== GRN_STATUS.ACTIVE){
             throw Error("The GRN Should be in active status")
           }
         }
@@ -2064,7 +2064,7 @@ exports.upsertGRN = onCall<GRNInfo>({
           for (let grn of grnInfo.GRN){
             if (grn.id === grnId){
               grnItemsRef = grn.lineItems
-              if (grn.status !== "active"){
+              if (grn.status !== GRN_STATUS.ACTIVE){
                 throw Error("The GRN Should be in active status")
               }
             }
