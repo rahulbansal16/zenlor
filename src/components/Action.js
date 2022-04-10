@@ -253,7 +253,8 @@ const saveCellToServer = async (item, type, company) => {
           id: item.id,
           lrNo: item.lrNo,
           dcNo: item.dcNo,
-          invoiceNo: item.invoiceNo
+          invoiceNo: item.invoiceNo,
+          trans: item.trans
         }]
       }
       break;

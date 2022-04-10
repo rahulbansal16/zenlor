@@ -261,3 +261,26 @@ export interface Supplier {
     phoneNumber: number,
     email: string
 }
+interface upsertGRNItem {
+    id: string,
+    lrNo: string,
+    trans: string,
+    dcNo: string,
+    invoiceNo: string
+}
+export interface upsertGRN {
+    company: string,
+    GRN: upsertGRNItem[]
+}
+
+export interface InventoryAPI {
+    category: string,
+    type: string,
+    id: string,
+    desc: string,
+    unit: string,
+    color: string,
+    pos: [{
+
+    }]
+}

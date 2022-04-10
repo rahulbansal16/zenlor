@@ -414,7 +414,6 @@ export const initialState = {
           key: 'dcNo',
           editable: true,
           width: 150
-
         },
         {
           title: "Invoice No.",
@@ -424,6 +423,13 @@ export const initialState = {
           width: 150
 
         },						
+        {
+          title: "Transporter",
+          dataIndex: "trans",
+          editable: true,
+          key: "trans",
+          width: 150
+        },
         {
           title: "Updated On",
           dataIndex: 'updatedOn',

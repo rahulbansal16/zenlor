@@ -1573,7 +1573,8 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
                 amount: purchaseOrder.amount,
                 lrNo: "",
                 dcNo: "",
-                invoiceNo: ""
+                invoiceNo: "",
+                trans: ""
               })
             }
           }
@@ -1913,6 +1914,7 @@ const upsertGRNSchema = Joi.object<upsertGRN, true>({
   GRN: Joi.array().items({
     id: Joi.string().required(),
     lrNo: Joi.string().allow(""),
+    trans: Joi.string().allow(""),
     dcNo: Joi.string().allow(""),
     invoiceNo: Joi.string().allow("")
   }).options({allowUnknown: true})
@@ -2451,6 +2453,7 @@ exports.createPO = functions
             lrNo: "",
             dcNo: "",
             invoiceNo: "",
+            trans:"",
             lineItems: purchaseOrder.lineItems.map( (item: PurchaseOrderLineItems) => ({
               id: generateUId("GRN-ITEM", 6),
               grnId: grnID,
