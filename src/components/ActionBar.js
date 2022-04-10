@@ -128,9 +128,10 @@ const ActionBar = ({type, onFinish, loading}) => {
           <Select
             placeholder="Select Action"
             size="medium"
+            style={{ border:"green 3px solid"}}
             autoFocus
             onChange={() => {setDisabledSave(false)}}
-            allowClear
+            // allowClear
             // getPopupContainer={() => document.getElementById("table")}
             // dropdownStyle={{marginBottom:'30px'}}
           >
