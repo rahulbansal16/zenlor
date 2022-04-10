@@ -379,7 +379,7 @@ const Action = ({ type }) => {
         pathname: `/action/${action}`,
         search: `id=${selectedItems}`,
       });
-      // '/action/'+action)
+      setTimeout(() => window.location.reload(), 0)
     } else if (action === "orderMaterials") {
       const selectedStyleCodes = selectedRows.map((row) => row.styleCode);
       history.push({
