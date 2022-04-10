@@ -279,7 +279,7 @@ export const initialState = {
                 dataIndex: "type",
                 key: "type",
                 filter: "multiSelect",
-                widht: 100
+                width: 100
               },
               {
                 title: "MATERIAL",
