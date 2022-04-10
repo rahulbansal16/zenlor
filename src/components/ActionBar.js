@@ -1,6 +1,6 @@
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Select, Button, Form, Space } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 const { Option } = Select;
 
@@ -97,9 +97,12 @@ const actions = {
 const ActionBar = ({type, onFinish, loading}) => {
     const history = useHistory();
     const [form] = Form.useForm();
+    const [disabledSave, setDisabledSave] = useState(true);
+
 
     useEffect( () => {
       form.resetFields()
+      setDisabledSave(true)
     } , [type])
 
     return (
@@ -126,7 +129,7 @@ const ActionBar = ({type, onFinish, loading}) => {
             placeholder="Select Action"
             size="medium"
             autoFocus
-            onChange={() => {}}
+            onChange={() => {setDisabledSave(false)}}
             allowClear
             // getPopupContainer={() => document.getElementById("table")}
             // dropdownStyle={{marginBottom:'30px'}}
@@ -142,7 +145,7 @@ const ActionBar = ({type, onFinish, loading}) => {
             <Button onClick = { () => {
               history.goBack()
             }}><LeftOutlined/> Back</Button>
-            <Button type="primary" htmlType="submit" loading={loading}>
+            <Button type="primary" htmlType="submit" loading={loading} disabled={disabledSave}>
               Next <RightOutlined />
             </Button>
           </Space>
