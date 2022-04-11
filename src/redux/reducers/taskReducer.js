@@ -432,8 +432,8 @@ export const initialState = {
         },
         {
           title: "Updated On",
-          dataIndex: 'updatedOn',
-          key: 'updatedOn'
+          dataIndex: 'updatedAt',
+          key: 'updatedAt'
         },
 // GRN ID	REF ID	SUPPLIER	NO. OF ITEMS	AMOUNT	LR NO.	DC NO.	INVOICE NO.	UPDATED ON 	STATUS
         {

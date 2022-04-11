@@ -213,13 +213,14 @@ export interface GRNs {
 export interface GRN {
     id: string,
     lineItems: GRNItems[],
-    createdAt?: string,
-    updatedAt?: string,
+    createdAt: string,
+    updatedAt: string,
     status: string,
     supplier: string,
     itemsCount: number,
     amount: number,
     lrNo: string,
+    trans: string, // transporter 
     dcNo: string,
     invoiceNo: string
 }
