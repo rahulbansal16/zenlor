@@ -6,6 +6,7 @@ export abstract class Constants {
 }
 export enum GRN_STATUS {
     ACTIVE = 'ACTIVE',
+    CANCELED = 'CANCELED',
 
 }
 export enum PURCHASE_ORDER_STATUS {
