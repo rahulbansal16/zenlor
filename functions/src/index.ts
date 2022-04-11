@@ -470,8 +470,33 @@ exports.backUpCompany = functions
       if (!docData) {
         throw new Error("");
       }
-      await admin.firestore().collection("backup").doc(company + moment().valueOf()).set(docData);
-      response.send(doc.data());
+      const boms = await admin.firestore().collection("boms").doc(company).get();
+      const bomsData = boms.data();
+      if(!bomsData){
+        throw new Error("");
+      }
+      const purchaseMaterials = await admin.firestore().collection("purchaseMaterials").doc(company).get();
+      const purchaseMaterialsData = purchaseMaterials.data();
+      if(!purchaseMaterialsData){
+        throw new Error("");
+      }
+      const suppliers = await admin.firestore().collection("suppliers").doc(company).get();
+      const suppliersData = suppliers.data();
+      if(!suppliersData){
+        throw new Error("");
+      }
+      let backupName = company + moment().valueOf(); 
+      await admin.firestore().collection("backup_data").doc(backupName).set(docData);
+      await admin.firestore().collection("backup_boms").doc(backupName).set(bomsData);
+      await admin.firestore().collection("backup_purchaseMaterials").doc(backupName).set(purchaseMaterialsData);
+      await admin.firestore().collection("backup_suppliers").doc(backupName).set(suppliersData);
+
+      response.send({
+        "data": docData,
+        "boms": bomsData,
+        "purchaseMaterials": purchaseMaterialsData,
+        "suppliers": suppliersData
+      });
     });
 
 exports.addDepartment = functions
