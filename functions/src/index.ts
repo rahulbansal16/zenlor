@@ -485,7 +485,7 @@ exports.backUpCompany = functions
       if(!suppliersData){
         throw new Error("");
       }
-      let backupName = company + moment().valueOf(); 
+      let backupName = company + moment().format("-MMM-DD-YY,h:mm:ss")
       await admin.firestore().collection("backup_data").doc(backupName).set(docData);
       await admin.firestore().collection("backup_boms").doc(backupName).set(bomsData);
       await admin.firestore().collection("backup_purchaseMaterials").doc(backupName).set(purchaseMaterialsData);
