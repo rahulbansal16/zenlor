@@ -1525,16 +1525,17 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
             if (ids.find(id => grn.poId === id)) {
               grn.status = PURCHASE_ORDER_STATUS.GRN_STARTED;
               let grnID = generateUId("GRN", 8)
-              let mpLineItemsToRemainingQty:any = {}
+              let mpLineItemsToRemainingQty:{[key:string]:number} = {}
               for (let x of grn.GRN){
                 for (let item of x.lineItems){
-                  mpLineItemsToRemainingQty[item.materialId +"|"+item.materialDescription] = item.receivedQty + ( mpLineItemsToRemainingQty[item.materialId +"|"+item.materialDescription]||0)
+                  const key = generateKey(item.materialId, item.materialDescription);
+                  mpLineItemsToRemainingQty[key] = item.receivedQty + ( mpLineItemsToRemainingQty[key]||0)
                 }
               }
               const inventory = purchaseOrder.lineItems.map((output) => ({
                 materialId: output.materialId,
                 materialDescription: output.materialDescription,
-                activeOrdersQty: Math.ceil(output.purchaseQty-(mpLineItemsToRemainingQty[output.materialId+"|"+ output.materialDescription]||0)),
+                activeOrdersQty: Math.max(0, Math.ceil(output.purchaseQty-(mpLineItemsToRemainingQty[generateKey(output.materialId, output.materialDescription)]||0))),
               }));
               
 
@@ -1543,7 +1544,8 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
                 undefined,
                 (oldItem: InventoryItems, newItem: any) => ({
                   ...oldItem,
-                  ...newItem
+                  ...newItem,
+                  activeOrdersQty: oldItem.activeOrdersQty + newItem.activeOrdersQty
                 }));
 
  
@@ -1559,7 +1561,7 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
                   materialId: item.materialId,
                   materialDescription: item.materialDescription,
                   unit: item.unit,
-                  purchaseQty: Math.ceil(item.purchaseQty-(mpLineItemsToRemainingQty[item.materialId+"|"+item.materialDescription]||0)),
+                  purchaseQty:Math.max(0, Math.ceil(item.purchaseQty-(mpLineItemsToRemainingQty[generateKey(item.materialId, item.materialDescription)]||0))),
                   receivedQty: 0,
                   status: GRN_STATUS.ACTIVE,
                   receivedDate: moment().format("MMM DD YY"),
@@ -1946,6 +1948,7 @@ exports.upsertGRNRow = onCall<upsertGRN>({
           }
           grnInfo.GRN.splice(i, 1, {
             ...dbgrn,
+            updatedAt: moment().format("MMM DD YY"),
             ...GRN[idx]
           })
           // dbgrn = {
@@ -2440,12 +2443,12 @@ exports.createPO = functions
         let grnID = generateUId("GRN", 8)
         let grn: GRNs = {
           poId: purchaseOrder.id,
-          status: 'active',
+          status: GRN_STATUS.ACTIVE,
           grnDocUrl: '',
           GRN:[{
             id: grnID,
             createdAt: moment().format("MMM DD YY"),
-            status: 'active',
+            status: GRN_STATUS.ACTIVE,
             // challanNumber: '',
             // invoiceNumber: '',
             // docUrl: '',
@@ -2468,7 +2471,7 @@ exports.createPO = functions
               unit: item.unit,
               purchaseQty: item.purchaseQty,
               receivedQty: 0,
-              status: "active",
+              status: GRN_STATUS.ACTIVE, 
               receivedDate: moment().format("MMM DD YY"),
               rejectedQty: 0,
               rejectedReason: "",
