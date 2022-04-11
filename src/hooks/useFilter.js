@@ -32,12 +32,16 @@ const useFilter = (columns, dataSource) => {
         if (!columns || !dataSource) 
         return []
        const columnsWithFilterResult = columns.map( column => {
+        let filterColumn = {
+            ...column,
+         //    sorter: (a,b) => a[column?.dataIndex] - b[column?.dataIndex]
+        }
+
+        if(column.dataIndex && column.dataIndex.includes("Url")){
+            filterColumn.render = (text) => <a href={text}>Download</a>
+        }
            if (!column.filter)
-               return column;
-           let filterColumn = {
-               ...column,
-            //    sorter: (a,b) => a[column?.dataIndex] - b[column?.dataIndex]
-           }
+               return filterColumn;
            const {filter, dataIndex} = column
            switch(filter){
                case "multiSelect":
