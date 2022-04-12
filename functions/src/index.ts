@@ -15,8 +15,9 @@ import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
   BOMInfoDto,
   MaterialIssue,
-  PurchaseMaterials, StyleCodes, InventoryItems, /*GRNs,*/ GRNInfo, GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs} from "./types/styleCodesInfo";
+  PurchaseMaterials, StyleCodes, InventoryItems, /*GRNs,*/ GRNInfo, GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs, upsertGRN, DeleteData} from "./types/styleCodesInfo";
 import { Constants, GRN_STATUS, PURCHASE_ORDER_STATUS } from "./Constants";
+import { generateKey } from "./util";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -2567,106 +2568,97 @@ const fillGRNWorksheet = (worksheet: excelJS.Worksheet, grn: GRN , purchaseOrder
   worksheet.getCell("G14").value = "GRN DONE"
   worksheet.getCell("G17").value = "Order Date " + moment(purchaseOrder.createdAt).format("DD MMM YY")
   // worksheet.getCell("G")
-  worksheet.getCell("G23").value = grn.lineItems.length
+  // worksheet.getCell("G23").value = grn.lineItems.length
   worksheet.insertRow(28,["", "GRN NO.", "", "ORDER NO.", "", "INVOICE NO.", "", "DC NO.", "", "Transporter", "", "LR No.", ""])
+try {
+  // worksheet.mergeCells("B28:C28")
+  // worksheet.mergeCells("D28:E28")
+  // worksheet.mergeCells("F28:G28")
+  // worksheet.mergeCells("H28:I28")
+  // worksheet.mergeCells("J28:K28")
+  // worksheet.mergeCells("L28:M28")
+} catch(e){}
+  // worksheet.getCell("B28").fill = {
+  //   type: "pattern",
+  //   pattern: "solid",
+  //   fgColor: {
+  //     argb: "#AEAAAA"
+  //   }
+  // }
 
-  worksheet.mergeCells("B28:C28")
-  worksheet.mergeCells("D28:E28")
-  worksheet.mergeCells("F28:G28")
-  worksheet.mergeCells("H28:I28")
-  worksheet.mergeCells("J28:K28")
-  worksheet.mergeCells("L28:M28")
-  worksheet.getCell("B28").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: {
-      argb: "FFFF7D7D"
-    },
-    bgColor: {
-      argb: "#808080"
-    }
-  }
-
-  worksheet.getCell("D28").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: {
-      argb: "FFFF7D7D"
-    },
-    bgColor: {
-      argb: "#808080"
-    }
-  }
-  worksheet.getCell("F28").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: {
-      argb: "FFFF7D7D"
-    },
-    bgColor: {
-      argb: "#808080"
-    }
-  }
-  worksheet.getCell("H28").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: {
-      argb: "FFFF7D7D"
-    },
-    bgColor: {
-      argb: "#808080"
-    }
-  }
-  worksheet.getCell("J28").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: {
-      argb: "FFFF7D7D"
-    },
-    bgColor: {
-      argb: "#808080"
-    }
-  }
-  worksheet.getCell("L28").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: {
-      argb: "FFFF7D7D"
-    },
-    bgColor: {
-      argb: "#808080"
-    }
-  }
-
-  worksheet.getCell("B29").value = grn.id
-  worksheet.getCell("D29").value = grn.id
+  // worksheet.getCell("D28").fill = {
+  //   type: "pattern",
+  //   pattern: "solid",
+  //   fgColor: {
+  //     argb: "#AEAAAA"
+  //   }
+  // }
+  // worksheet.getCell("F28").fill = {
+  //   type: "pattern",
+  //   pattern: "solid",
+  //   fgColor: {
+  //     argb: "#AEAAAA"
+  //   }
+  // }
+  // worksheet.getCell("H28").fill = {
+  //   type: "pattern",
+  //   pattern: "solid",
+  //   fgColor: {
+  //     argb: "#AEAAAA"
+  //   }
+  // }
+  // worksheet.getCell("J28").fill = {
+  //   type: "pattern",
+  //   pattern: "solid",
+  //   fgColor: {
+  //     argb: "#AEAAAA"
+  //   }
+  // }
+  // worksheet.getCell("L28").fill = {
+  //   type: "pattern",
+  //   pattern: "solid",
+  //   fgColor: {
+  //     argb: "pink"
+  //   }
+  // }
+  worksheet.insertRow(29,"")
+  worksheet.getCell("B29").value = grn.id.toUpperCase()
+  worksheet.getCell("D29").value = purchaseOrder.id.toUpperCase()
   worksheet.getCell("F29").value = grn.invoiceNo
   worksheet.getCell("H29").value = grn.dcNo
   worksheet.getCell("J29").value = ""
   worksheet.getCell("L29").value = grn.lrNo
+  worksheet.getCell("J29").value = grn.trans
 
+
+  worksheet.insertRow(30,"");
   worksheet.insertRow(30,["", "ITEM LIST"])
-  worksheet.mergeCells("B30:M30")
+  try {
+  // worksheet.mergeCells("B30:M30")
+  }catch(e){}
 
-  worksheet.getCell("B30").fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: {
-      argb: "FFFF7D7D"
-    },
-    bgColor: {
-      argb: "#808080"
-    }
-  }
+  // worksheet.getCell("B30").fill = {
+  //   type: "pattern",
+  //   pattern: "solid",
+  //   fgColor: {
+  //     argb: "#AEAAAA"
+  //   }
+  // }
   let items = 0
   worksheet.insertRow(31, ["", "S. No.", "ITEM Id", "ITEM Desc", "Unit", "Ordered Qty", "Received Qty", "Rejected Qty", "Rejected Reason", "Accepted Qty", "Received On", "Amt. Payable"])
   let sn = grn.lineItems.length
   let total = 0
+  let totalMap:{[key:string]: number} = {}
   for (let item of grn.lineItems){
     const poLineItem  = purchaseOrder.lineItems.find(po => po.materialId === item.materialId && po.materialDescription === item.materialDescription)
     if (!poLineItem){
       throw Error("Item does not exist in purchase order")
     }
+    totalMap["orderedQty"] = (totalMap["orderedQty"] || 0) + item.purchaseQty
+    totalMap["receivedQty"] = (totalMap["receivedQty"] || 0) + item.receivedQty
+    totalMap["rejectedQty"] = (totalMap["rejectedQty"] || 0) + item.rejectedQty
+    totalMap["acceptedQty"] = (totalMap["acceptedQty"] || 0) + item.acceptedQty
+
     if (item.acceptedQty !== 0){
       items += 1;
     }
@@ -2674,9 +2666,22 @@ const fillGRNWorksheet = (worksheet: excelJS.Worksheet, grn: GRN , purchaseOrder
     total += Math.ceil((poLineItem.totalAmount/poLineItem.purchaseQty)*(item.acceptedQty))
     sn -=1 
   }
-  worksheet.insertRow(32 + grn.lineItems.length, ['', "Total", "", "", "", "", "", "" , "", "", "", total])
+  worksheet.insertRow(32 + grn.lineItems.length, ['', "Total", "", "", "", totalMap["orderedQty"], totalMap["receivedQty"], totalMap["rejectedQty"] , "", totalMap["acceptedQty"], "", total])
 
  grn.amount = total;
+ let currentTotal = worksheet.getCell("G20").value
+ if (!currentTotal){
+   currentTotal = 0
+ }
+ currentTotal = currentTotal as number
+ let currentItemCount = worksheet.getCell("G23").value
+ if (!currentItemCount){
+   currentItemCount = 0
+ }
+ currentItemCount = currentItemCount as number
+ worksheet.getCell("G23").value = currentItemCount + totalMap["acceptedQty"]
+
+ worksheet.getCell("G20").value = currentTotal + total
  grn.itemsCount = items;  
   // let total:any = {
   //   preTaxAmount:0,
@@ -2695,6 +2700,7 @@ const fillGRNWorksheet = (worksheet: excelJS.Worksheet, grn: GRN , purchaseOrder
   //   worksheet.insertRow(26 + i, ['', i+1, lineItem.materialId, lineItem.materialDescription, lineItem.unit, lineItem.purchaseQty, lineItem.rate, lineItem.discount, lineItem.preTaxAmount, lineItem.tax, lineItem.taxAmount, lineItem.totalAmount, lineItem.deliveryDate])
   // }
   // worksheet.insertRow(26 + purchaseOrder.lineItems.length, ['', 'Total', '', '', '', total.qty, '', '', total.preTaxAmount, '', total.taxAmount, total.totalAmount, ''])
+  worksheet.insertRow(28,"")
 
   return worksheet;
 }
