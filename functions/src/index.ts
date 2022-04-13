@@ -842,6 +842,17 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
         newStyleCodesInfo = newStyleCodesInfo.sort((a: StyleCodes, b: StyleCodes) => moment(a.deliveryDate).valueOf() - moment(b.deliveryDate).valueOf());;
         // const batch = admin.firestore().batch()
         // writeBatch(db);
+        const sortedBom = result.bomsInfo.sort((a, b) => {
+          if (a.styleCode === b.styleCode){
+            if (a.category === b.category)
+              return a.type.localeCompare(b.type)
+            else{
+              return a.category.localeCompare(b.category);
+            }
+          } else {
+            return a.styleCode.localeCompare(b.styleCode);
+          }
+        })
         let promises = []
         promises.push(db.set( dataRef,{
           styleCodesInfo: newStyleCodesInfo,
