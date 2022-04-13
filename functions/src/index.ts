@@ -15,9 +15,9 @@ import {onCall} from "./helpers/functions";
 import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, PurchaseOrdersInfo, StyleCodesInfo, BOM,
   BOMInfoDto,
   MaterialIssue,
-  PurchaseMaterials, StyleCodes, InventoryItems, /*GRNs,*/ GRNInfo, GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs, upsertGRN, DeleteData} from "./types/styleCodesInfo";
-import { Constants, GRN_STATUS, PURCHASE_ORDER_STATUS } from "./Constants";
-import { generateKey } from "./util";
+  PurchaseMaterials, StyleCodes, InventoryItems, Store, /*GRNs,*/ GRNInfo, GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs, upsertGRN, DeleteData, InventoryRequest, InventoryResult} from "./types/styleCodesInfo";
+import { Constants, GRN_STATUS, PURCHASE_ORDER_STATUS} from "./Constants";
+import { generateKey, parseIdAndDescription } from "./util";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -1645,6 +1645,121 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
   }
 }) 
 
+const inventorySchema = Joi.object<InventoryRequest, true>({
+  company: Joi.string()
+})
+
+exports.inventoryAPI = onCall<InventoryRequest>({
+  name: "inventoryAPI",
+  schema: inventorySchema,
+  handler: async (data, context) => {
+    const {company} = data;
+    const doc = await admin.firestore().collection("data").doc(company).get()
+    const docData = doc.data()
+    if(!docData){
+      throw Error("Document is not present for company")
+    }
+    const purchaseOrders: PurchaseOrder[] = (docData.purchaseOrdersInfo??[]).filter((po:PurchaseOrder) => po.status !== PURCHASE_ORDER_STATUS.CANCELED);
+    const inventoryHash:{[key:string]: InventoryResult} = {};
+    for (let purchaseOrder of purchaseOrders){
+      for(let lineItem of purchaseOrder.lineItems){
+
+        let key:string = generateKey(lineItem.materialId, lineItem.materialDescription);
+        if (!inventoryHash[key]){
+          inventoryHash[key] = {
+            id: lineItem.materialId,
+            description: lineItem.materialDescription,
+            unit: lineItem.unit,
+            category: lineItem.category,
+            type: lineItem.type,
+            storeQty: 0,
+            inHouseAllocatedty: 0,
+            issuedQty: 0,
+            grnAcceptedQty: 0,
+            pos: []
+          }
+        }
+
+        inventoryHash[key].pos.push({
+          id: purchaseOrder.id,
+          orderQty: lineItem.purchaseQty,
+          supplier: purchaseOrder.supplier,
+          price: lineItem.totalAmount,
+          grns: []
+        })
+
+      }
+    }
+
+    const grns:GRNs[] = (docData.GRNsInfo??[]).filter((grn:GRNs) => grn.status === GRN_STATUS.ACTIVE);
+    for (let grn of grns){
+      const {poId} = grn;
+      for (let individualGRN of grn.GRN){
+        for (let lineItem of individualGRN.lineItems){
+          const {materialId, materialDescription} = lineItem;
+          const key = generateKey(materialId, materialDescription)
+          let inventoryResult = inventoryHash[key];
+          if (!inventoryResult){
+            throw Error("Something Inward without PO")
+          }
+          inventoryResult.grnAcceptedQty += lineItem.acceptedQty;
+          let po = inventoryResult.pos.find(item => item.id === poId)
+          if (!po){
+            throw Error("Inward Happended Without PO")
+          }
+          po.grns.push({
+            id: individualGRN.id,
+            status: individualGRN.status,
+            date: individualGRN.createdAt,
+            acceptedQty: lineItem.acceptedQty,
+            receivedQty: lineItem.purchaseQty,
+            rejectedQty: lineItem.rejectedQty
+          })
+        }
+      }
+    }
+    
+    const stores:Store[] = docData.store||[];
+    for(let store of stores){
+      const {values} = store;
+      let keys: string[] = Object.keys(values);
+      for (let key of keys){
+        let {materialId, materialDescription} = parseIdAndDescription(key);
+        let materialKey = generateKey(materialId, materialDescription)
+        inventoryHash[materialKey].issuedQty += values[key]
+      }
+    }
+
+    const inventoryItems: InventoryItems[] = docData.inventoryInfo || [];
+
+    for (let inventoryItem of inventoryItems){
+      let key = generateKey(inventoryItem.materialId, inventoryItem.materialDescription)
+      if (!inventoryHash[key]){
+        inventoryHash[key] = {
+          id: inventoryItem.materialId,
+          description: inventoryItem.materialDescription,
+          unit: "",
+          category: "",
+          type: "",
+          storeQty: 0,
+          inHouseAllocatedty: 0,
+          issuedQty: 0,
+          grnAcceptedQty: 0,
+          pos: []
+        }
+        // throw Error("Inventory Item does not Exist In PO")
+      }
+      inventoryHash[key].storeQty = inventoryItem.inventory;
+    }
+
+    let result: InventoryResult[] = []
+    const keys = Object.keys(inventoryHash)
+    for (const key of keys){
+      result.push(inventoryHash[key])
+    }
+    return result
+  }
+})
 
 exports.cancelPO = onCall<PurchaseOrdersInfo>({
   name:"cancelPO",

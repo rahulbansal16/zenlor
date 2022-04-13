@@ -274,14 +274,44 @@ export interface upsertGRN {
     GRN: upsertGRNItem[]
 }
 
-export interface InventoryAPI {
+export interface InventoryGRN {
+    id: string,
+    date: string,
+    status: string,
+    receivedQty: number,
+    acceptedQty: number,
+    rejectedQty: number
+}
+export interface PO {
+    id: string,
+    orderQty: number,
+    supplier: string,
+    price: number,
+    grns: InventoryGRN[]
+}
+export interface InventoryResult {
     category: string,
     type: string,
     id: string,
-    desc: string,
+    description: string,
+    // desc: string,
     unit: string,
-    color: string,
-    pos: [{
+    // color: string,
+    grnAcceptedQty: number,
+    issuedQty: number,
+    inHouseAllocatedty: number,
+    storeQty: number,
+    pos: PO[]
+}
 
-    }]
+export interface InventoryRequest {
+    company: string
+}
+
+export interface Store {
+    styleCode: string,
+    createdAt: string
+    values: {
+        [key:string]: number
+    }
 }
