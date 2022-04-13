@@ -1673,7 +1673,7 @@ exports.inventoryAPI = onCall<InventoryRequest>({
             category: lineItem.category,
             type: lineItem.type,
             storeQty: 0,
-            inHouseAllocatedty: 0,
+            // inHouseAllocatedty: 0,
             issuedQty: 0,
             grnAcceptedQty: 0,
             pos: []
@@ -1712,7 +1712,7 @@ exports.inventoryAPI = onCall<InventoryRequest>({
             status: individualGRN.status,
             date: individualGRN.createdAt,
             acceptedQty: lineItem.acceptedQty,
-            receivedQty: lineItem.purchaseQty,
+            receivedQty: lineItem.receivedQty,
             rejectedQty: lineItem.rejectedQty
           })
         }
@@ -1742,7 +1742,7 @@ exports.inventoryAPI = onCall<InventoryRequest>({
           category: "",
           type: "",
           storeQty: 0,
-          inHouseAllocatedty: 0,
+          // inHouseAllocatedty: 0,
           issuedQty: 0,
           grnAcceptedQty: 0,
           pos: []
