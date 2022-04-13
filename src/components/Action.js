@@ -599,10 +599,10 @@ const Action = ({ type }) => {
               <Col span={2}>
                 <AddNewModal type={type} title={header[type]}/>
               </Col>
-              <Col span={16}>
+              <Col span={14}>
                 <Title level={4}>{header[type].toUpperCase()}</Title>
               </Col>
-              <Col span={6}>
+              <Col span={8}>
                 <ActionBar type={type} onFinish={onFinish} loading={loading} />
               </Col>
       </Row>
