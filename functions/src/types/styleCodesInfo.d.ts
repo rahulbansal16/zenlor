@@ -289,6 +289,10 @@ export interface PO {
     price: number,
     grns: InventoryGRN[]
 }
+export interface Issue{
+    qty: number,
+    date: string
+}
 export interface InventoryResult {
     category: string,
     type: string,
@@ -302,6 +306,7 @@ export interface InventoryResult {
     // inHouseAllocatedty: number,
     storeQty: number,
     pos: PO[]
+    issues: Issue[]
 }
 
 export interface InventoryRequest {

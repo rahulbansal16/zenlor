@@ -17,7 +17,7 @@ import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, P
   MaterialIssue,
   PurchaseMaterials, StyleCodes, InventoryItems, Store, /*GRNs,*/ GRNInfo, GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs, upsertGRN, DeleteData, InventoryRequest, InventoryResult} from "./types/styleCodesInfo";
 import { Constants, GRN_STATUS, PURCHASE_ORDER_STATUS} from "./Constants";
-import { generateKey, parseIdAndDescription } from "./util";
+import { generateKey, getDateFormat, parseIdAndDescription } from "./util";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -882,7 +882,7 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
         return {
           company,
           styleCodesInfo: newStyleCodesInfo,
-          bomsInfo: result.bomsInfo,
+          bomsInfo: sortedBom,
           inventoryInfo: result.inventoryInfo,
           purchaseMaterialsInfo: result.purchaseMaterialsInfo
         };
@@ -1695,7 +1695,8 @@ exports.inventoryAPI = onCall<InventoryRequest>({
             // inHouseAllocatedty: 0,
             issuedQty: 0,
             grnAcceptedQty: 0,
-            pos: []
+            pos: [],
+            issues: []
           }
         }
 
@@ -1740,12 +1741,16 @@ exports.inventoryAPI = onCall<InventoryRequest>({
     
     const stores:Store[] = docData.store||[];
     for(let store of stores){
-      const {values} = store;
+      const {values, createdAt} = store;
       let keys: string[] = Object.keys(values);
       for (let key of keys){
         let {materialId, materialDescription} = parseIdAndDescription(key);
         let materialKey = generateKey(materialId, materialDescription)
         inventoryHash[materialKey].issuedQty += values[key]
+        inventoryHash[materialKey].issues.push({
+          qty: values[key],
+          date: createdAt
+        })
       }
     }
 
@@ -1764,7 +1769,8 @@ exports.inventoryAPI = onCall<InventoryRequest>({
           // inHouseAllocatedty: 0,
           issuedQty: 0,
           grnAcceptedQty: 0,
-          pos: []
+          pos: [],
+          issues: []
         }
         // throw Error("Inventory Item does not Exist In PO")
       }
