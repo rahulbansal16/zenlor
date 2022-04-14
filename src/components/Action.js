@@ -520,11 +520,12 @@ const Action = ({ type }) => {
   let column = filteredColumns.map((col) => {
     const { company } = user;
     if (!col.editable) {
-      return col;
+      return {...col, ellipsis:true};
     }
     return {
       ...col,
-      ellipsis: true,
+      // ellipsis: true,
+      render: (elem) => <div style={{borderBottom:"1px solid lightpink"}}className="editable">{elem}</div>,
       onCell: (record) => ({
         record,
         editable: col.editable || true,
