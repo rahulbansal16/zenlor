@@ -1746,6 +1746,21 @@ exports.inventoryAPI = onCall<InventoryRequest>({
       for (let key of keys){
         let {materialId, materialDescription} = parseIdAndDescription(key);
         let materialKey = generateKey(materialId, materialDescription)
+        if(!inventoryHash[materialKey]){
+          inventoryHash[materialKey] = {
+            id: materialId,
+            description: materialDescription,
+            unit: "",
+            category: "",
+            type: "",
+            storeQty: 0,
+            // inHouseAllocatedty: 0,
+            issuedQty: 0,
+            grnAcceptedQty: 0,
+            pos: [],
+            issues: []
+          }
+        }
         inventoryHash[materialKey].issuedQty += values[key]
         inventoryHash[materialKey].issues.push({
           qty: values[key],
