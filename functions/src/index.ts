@@ -1018,13 +1018,24 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
         // const batch = admin.firestore().batch()
         
         // writeBatch(db);
+      const sortedBom = result.bomsInfo.sort((a, b) => {
+          if (a.styleCode === b.styleCode){
+            if (a.category === b.category)
+              return a.type.localeCompare(b.type)
+            else{
+              return a.category.localeCompare(b.category);
+            }
+          } else {
+            return a.styleCode.localeCompare(b.styleCode);
+          }
+        })
         await db.set( dataRef,  {
           inventoryInfo: result.inventoryInfo,
         }, {
           merge: true,
         });
         await db.set( bomsRef, {
-          bomsInfo: result.bomsInfo
+          bomsInfo: sortedBom
         },{
           merge: true
         })
@@ -1036,7 +1047,7 @@ exports.upsertBOMInfo = onCall<BOMInfo>({
         // await batch.commit();
         return {
           company,
-          bomsInfo: result.bomsInfo,
+          bomsInfo: sortedBom,
           purchaseMaterialsInfo: result.bomsInfo,
         }
       })
