@@ -14,7 +14,7 @@ const fetchAllKeys = (dataSource, column) => {
     })
     // console.log("The filters", filters)
     const hash = {}
-    const result = filters.filter(item => {
+    let result = filters.filter(item => {
         // console.log("The item value is", item.value)
         if(!hash[item.value]){
             hash[item.value] = true
@@ -22,7 +22,10 @@ const fetchAllKeys = (dataSource, column) => {
         }
         return false
     });
-    // console.log("The final result is", result)
+
+    if (result.length !== 0 && result[0].value.localeCompare) 
+        result.sort((a,b) => a?.value?.localeCompare(b?.value))
+
     return result
 }
 
