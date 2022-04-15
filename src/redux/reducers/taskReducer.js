@@ -115,7 +115,8 @@ export const initialState = {
               title: "Status",
               dataIndex: "materialStatus",
               key: "status",
-              filter: "multiSelect"
+              filter: "multiSelect",
+              render: (data) => <ZenlorTags text={data}/>
             },
             // {
               // children : [

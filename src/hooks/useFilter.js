@@ -2,6 +2,7 @@
 // Multiselect
 
 import { useEffect, useState } from "react";
+import ZenlorTags from "../components/ZenlorTags";
 
 // 
 const fetchAllKeys = (dataSource, column) => {
@@ -23,8 +24,13 @@ const fetchAllKeys = (dataSource, column) => {
         return false
     });
 
-    if (result.length !== 0 && result[0].value.localeCompare) 
-        result.sort((a,b) => a?.value?.localeCompare(b?.value))
+    if (result && result.length !== 0 && result[0].value && result[0].value.localeCompare && typeof result[0].value === "string" && typeof result[0].value.localeCompare === "function") 
+        result.sort((a,b) => {
+            if (typeof a.value === "string")
+                return a?.value?.localeCompare(b?.value)
+            return a.value - b.value
+        
+        })
 
     return result
 }
@@ -43,6 +49,11 @@ const useFilter = (columns, dataSource) => {
         if(column.dataIndex && column.dataIndex.includes("Url")){
             filterColumn.render = (text) => <a href={text}>Download</a>
         }
+        
+        if (column.dataIndex && column.dataIndex.includes("materialStatus")){
+            filterColumn.render =  (data) => <ZenlorTags text={data}/>
+        }
+
            if (!column.filter)
                return filterColumn;
            const {filter, dataIndex} = column
