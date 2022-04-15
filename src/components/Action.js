@@ -525,7 +525,7 @@ const Action = ({ type }) => {
     return {
       ...col,
       // ellipsis: true,
-      render: (elem) => <div style={{borderBottom:"1px solid lightpink"}}className="editable">{elem}</div>,
+      render: (elem) => <div style={{borderBottom:"1px solid lightblue"}}className="editable">{elem}</div>,
       onCell: (record) => ({
         record,
         editable: col.editable || true,
