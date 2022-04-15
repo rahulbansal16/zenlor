@@ -42,6 +42,7 @@ export const initialState = {
             title: "Style Code",
             dataIndex: "styleCode",
             key: "styleCode",
+            filterSearch: true,
             filter: "multiSelect",
             showSorterTooltip: false,
           },
@@ -51,12 +52,9 @@ export const initialState = {
               key: "brand",
               showSorterTooltip: false,
               filter: "multiSelect",
+              filterSearch: true,
               sortType:"", // date, number, integer, string
               // https://codesandbox.io/s/filter-and-sorter-antd-4-18-1-forked-zhoph?file=/index.js
-              filters: [{
-                text:"WROGN",
-                value:"WROGN"
-              }],
               render: (text) => <a>{text}</a>,
               width: 150
             },
@@ -64,6 +62,8 @@ export const initialState = {
               title: "Product",
               dataIndex: "product",
               key: "product",
+              filter: "multiSelect",
+              filterSearch: true,
             },
             {
               title: "Order No",
@@ -71,6 +71,8 @@ export const initialState = {
               showSorterTooltip: false,
               key: "orderNo",
               editable: true,
+              filter: "multiSelect",
+              filterSearch: true,
               width: 150
             },
             {
@@ -78,6 +80,8 @@ export const initialState = {
               dataIndex: "confirmDate",
               showSorterTooltip: false,
               key: "confirmDate",
+              filter: "multiSelect",
+              filterSearch: true,
               editable: true,
               width: 150
             },
@@ -86,6 +90,8 @@ export const initialState = {
               showSorterTooltip: false,
               dataIndex: "orderQty",
               key: "orderQty",
+              filter: "multiSelect",
+              filterSearch: true,
               editable: true,
               width: 150
             },
@@ -93,6 +99,8 @@ export const initialState = {
               title: "To Make Quantity",
               dataIndex: "makeQty",
               key: "makeQty",
+              filter: "multiSelect",
+              filterSearch: true,
               editable: true,
               width: 150
             },
@@ -264,6 +272,7 @@ export const initialState = {
                 title: "Style Code",
                 dataIndex: "styleCode",
                 filter: "multiSelect",
+                filterSearch: true,
                 key: "styleCode",
                 width: 200
               },
@@ -271,6 +280,7 @@ export const initialState = {
                 title: "Cat.",
                 dataIndex: "category",
                 key: "category",
+                filterSearch: true,
                 filter: "multiSelect",
                 width: 100
               },
@@ -278,6 +288,7 @@ export const initialState = {
                 title: "Type",
                 dataIndex: "type",
                 key: "type",
+                filterSearch: true,
                 filter: "multiSelect",
                 width: 100
               },
@@ -311,6 +322,8 @@ export const initialState = {
                 title: "Placement",
                 dataIndex: "placement",
                 key: "placement",
+                              filter: "multiSelect",
+              filterSearch: true,
                 editable: true,
                 width: 100
               },
@@ -318,6 +331,8 @@ export const initialState = {
                 title:"W%",
                 dataIndex: "wastage",
                 key: "wastage",
+                              filter: "multiSelect",
+              filterSearch: true,
                 editable: true,
                 width: 100
               },
@@ -325,6 +340,8 @@ export const initialState = {
                 title: "Consumption",
                 dataIndex: "consumption",
                 key: "consumption",
+              filter: "multiSelect",
+              filterSearch: true,
                 editable: true,
                 width: 100
               }, 
@@ -640,6 +657,8 @@ export const initialState = {
               {
                 title: "Supplier",
                 dataIndex: "supplier",
+                filter: "multiSelect",
+                filterSearch: true,
                 key: "supplier",
                 editable: true,
                 width: 200
@@ -680,6 +699,8 @@ export const initialState = {
         title: "Supplier",
         dataIndex: "supplier",
         key: "supplier",
+        filter: "multiSelect",
+        filterSearch: true,
       },
       {
         title: "Created At",
