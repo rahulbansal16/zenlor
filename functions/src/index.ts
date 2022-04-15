@@ -932,7 +932,7 @@ const updateBomsInfoFromStyleCodes = (styleCodes: StyleCodes[],
    } => {
   const bomJoinedStyleCode = join(newboms, styleCodes, (a, b)=>a.styleCode === b.styleCode);
   const mappedBOMDTO: any = bomJoinedStyleCode.map( (bom) => {
-    if (!bom.makeQty)
+    if (bom.makeQty === undefined)
      throw Error(`The StyleCode ${bom.styleCode} does not exist`)
     return {
     styleCode: bom.styleCode,
@@ -3004,7 +3004,8 @@ exports.upsertSuppliersInfo = onCall<SupplierInfo>({
           throw Error("The company does not exist" + company);
         }
         const suppliersInfo= docData?.suppliersInfo??[];
-        const output = upsertItemsInArray(suppliersInfo, suppliers, (oldItem, newItem) => oldItem.gst === newItem.gst && oldItem.name === newItem.name);
+        let output = upsertItemsInArray(suppliersInfo, suppliers, (oldItem, newItem) => oldItem.gst === newItem.gst && oldItem.name === newItem.name);
+        output = output.sort((a, b) => a.name.localeCompare(b.name))
         await db.set( dataRef,{
           suppliersInfo: output
         }, {
