@@ -376,12 +376,13 @@ const Action = ({ type }) => {
       // });
       // console.log("The result is", result.data);
       // dispatch(fetchPurchaseMaterialsInfo(result.data.purchaseMaterialsInfo))
+      setFilteredInfo(null)
       const selectedItems = selectedRows.map(purchaseMaterialKey);
       history.push({
         pathname: `/action/${action}`,
         search: `id=${selectedItems}`,
       });
-      setTimeout(() => window.location.reload(), 0)
+      // setTimeout(() => window.location.reload(), 0)
     } else if (action === "orderMaterials") {
       const selectedStyleCodes = selectedRows.map((row) => row.styleCode);
       history.push({
