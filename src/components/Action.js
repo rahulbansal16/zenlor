@@ -14,6 +14,7 @@ import { Select } from 'antd';
 import {Table as ExportTable} from "antd";
 
 import moment from "moment";
+import locale from "antd/lib/date-picker/locale/en_US";
 
 import { useDispatch, useSelector } from "react-redux";
 import { SmileOutlined } from "@ant-design/icons";
@@ -144,7 +145,7 @@ const EditableCell = ({
             },
           ]}
         >
-          <DatePicker ref={inputRef} onBlur={save} format="MMM DD YY" />
+          <DatePicker ref={inputRef} onBlur={save} locale={locale} format="MMM DD YY" />
         </Form.Item>
       );
     };
@@ -600,7 +601,10 @@ const Action = ({ type }) => {
               <Col span={2}>
                 <AddNewModal type={type} title={header[type]}/>
               </Col>
-              <Col span={14}>
+              <Col span={2}>
+                <Button disabled={!filteredInfo} onClick={() => setFilteredInfo(null)}>Clear Filters</Button>
+              </Col>
+              <Col span={12}>
                 <Title level={4}>{header[type].toUpperCase()}</Title>
               </Col>
               <Col span={8}>
