@@ -47,12 +47,12 @@ const { Option } = Select;
 const { Title } = Typography;
 
 const header = {
-  orderMaterials: "BOM",
-  createPO: "Purchase Orders",
-  dashboard: "Dashboard",
-  purchaseOrder: "Purhcase Orders",
-  inwardMaterial: "GRN",
-  grns: "GRNs LIST"
+  orderMaterials: "Bill Of Materials",
+  createPO: "Create POs",
+  dashboard: "Style Dashboard",
+  purchaseOrder: "Purchase Orders",
+  inwardMaterial: "Create GRNs",
+  grns: "Goods Received Notes"
 };
 const EditableContext = React.createContext(null);
 const EditableRow = ({ index, ...props }) => {
@@ -107,7 +107,7 @@ const EditableCell = ({
       let formattedValue = values;
       if (isDate) {
         formattedValue[dataIndex] = moment(values[dataIndex]).format(
-          "DD MMM YY"
+          "MMM DD YY"
         );
       }
       if (dataIndex === "supplier"){
@@ -605,8 +605,8 @@ const Action = ({ type }) => {
               <Col span={2}>
                 <Button disabled={!filteredInfo} onClick={() => setFilteredInfo(null)}>Clear Filters</Button>
               </Col>
-              <Col span={12}>
-                <Title level={4}>{header[type].toUpperCase()}</Title>
+              <Col span={12} style={{backgroundColor:'lightblue', textAlign:'center'}}>
+                <Title style={{textAlign:"center", height:'100%'}} level={4}>{header[type].toUpperCase()}</Title>
               </Col>
               <Col span={8}>
                 <ActionBar type={type} onFinish={onFinish} loading={loading} />
