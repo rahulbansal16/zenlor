@@ -835,7 +835,7 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
         const bomsInfo = bomData.bomsInfo??[];
         const inventoryInfo = docData.inventoryInfo??[];
         const purchaseMaterialsInfo = purchaseMaterialsData.purchaseMaterialsInfo??[];
-        const output = upsertItemsInArray(styleCodesInfo, 
+        let output = upsertItemsInArray(styleCodesInfo, 
           styleCodes, 
           (oldItem, newItem) => oldItem.styleCode === newItem.styleCode,
           (oldItem: StyleCodes, newItem: StyleCodes) => ({
@@ -844,6 +844,11 @@ exports.upsertStyleCodesInfo = onCall<StyleCodesInfo>({
               confirmDate: getDateFormat(newItem.confirmDate || oldItem.confirmDate),
               deliveryDate: getDateFormat(newItem.deliveryDate || oldItem.deliveryDate)
           }));
+        output = output.map(item => ({
+          ...item,
+          confirmDate:getDateFormat(item.confirmDate),
+          deliveryDate: getDateFormat(item.deliveryDate)
+        }))
         const result = updateBomsInfoFromStyleCodes(output, bomsInfo, [...bomsInfo], inventoryInfo, purchaseMaterialsInfo);
         // const result = distributeInventory(output, bomsInfo, inventoryInfo);
         let newStyleCodesInfo = addMaterialStatusToStyleCode(output, result.bomsInfo);
