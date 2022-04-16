@@ -2039,7 +2039,7 @@ exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
         for (const key in supplierMap) {
           purchaseOrders.push({
             id: generateUId("PO-", 10).toUpperCase(),
-            supplier: key,
+            supplier: key.toLocaleUpperCase(),
             createdAt,
             purchaseOrderId: "",
             deliveryDate: getEndDeliveryDateFromPO(supplierMap[key]),
