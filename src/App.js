@@ -1,6 +1,7 @@
 import { Layout } from 'antd';
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { useHistory } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import './App.less';
 import Authorization from "./auth/Authorization";
@@ -18,10 +19,14 @@ import { fetchDataAction, udpateRole, updateAuth } from "./redux/actions";
 import SideBar from "./SideBar";
 const { Header, Footer, Sider, Content } = Layout;
 
-const renderPages = () => {
+const RenderPages = () => {
+  const history = useHistory()
   return (
     <Switch>
-      <Route exact path="/" render = { () => <Department/>} />
+      <Route exact path = "/" render={() => history.push({
+        pathname:`/action/dashboard`
+      })} />
+      <Route exact path="/factory/" render = { () => <Department/>} />
       <Route exact path="/action/:type/new" render = { (props) => 
         <Layout>
           <SideBar></SideBar>
@@ -102,7 +107,7 @@ function App() {
     // style={{overflowY:'hidden'}}
     >
       <Router>
-        {renderPages()}
+        <RenderPages/>
       </Router>
     </div>
   );
