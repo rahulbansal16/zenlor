@@ -1,4 +1,5 @@
 import moment = require("moment");
+import { Constants } from "./Constants";
 
 
 export const generateKey = (materialId: string, materialDescription: string): string=> {
@@ -15,8 +16,12 @@ export const parseIdAndDescription = (key:string):{ materialId: string, material
 }
 
 export const getDateFormat = (date: string) => {
-    return moment(date).format("MMM YY DD")
+    return moment(date, Constants.DATE_FORMAT).format(Constants.DATE_FORMAT)
 //    return moment(date).format("MMM ")
+}
+
+export const getCurrentDate = () => {
+    return moment().format(Constants.DATE_FORMAT);
 }
 
 // export const cmpDate = (date, ) => {

@@ -3,6 +3,7 @@ export abstract class Constants {
    static readonly NAMES = "";
    static readonly PO_TEMPLATE_FILE = "PurchaseOrder.xlsx";
    static readonly GRN_TEMPLATE_FILE = "GRN.xlsx";
+   static readonly DATE_FORMAT = "DD MMM YY"
 }
 export enum GRN_STATUS {
     ACTIVE = 'ACTIVE',
