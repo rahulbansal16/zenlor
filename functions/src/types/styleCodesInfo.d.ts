@@ -287,6 +287,7 @@ export interface PO {
     orderQty: number,
     supplier: string,
     price: number,
+    createdAt: string,
     grns: InventoryGRN[]
 }
 export interface Issue{
