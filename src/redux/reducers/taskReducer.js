@@ -293,9 +293,9 @@ export const initialState = {
                 filter: "multiSelect",
                 width: 100
               },
-              {
-                title: "MATERIAL",
-                children:[
+              // {
+                // title: "MATERIAL",
+                // children:[
                   // {
                   //   title: "S.No",
                   //   dataIndex: "no",
@@ -315,10 +315,11 @@ export const initialState = {
                     title: "Unit",
                     dataIndex: "unit",
                     key: "unit",
+                    width: 100
                   },
                 
-                ]
-              },
+                // ]
+              // },
               {
                 title: "Placement",
                 dataIndex: "placement",
@@ -344,7 +345,7 @@ export const initialState = {
               filter: "multiSelect",
               filterSearch: true,
                 editable: true,
-                width: 100
+                width: 150
               }, 
               {
                 title: "Quantity",
@@ -712,7 +713,7 @@ export const initialState = {
         title: "Delivery Date",
         dataIndex: "deliveryDate",
         key: "deliveryDate",
-        editable: true,
+        // editable: true,
         width: 150
       },
       {

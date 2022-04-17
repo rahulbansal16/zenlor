@@ -107,7 +107,7 @@ const EditableCell = ({
       let formattedValue = values;
       if (isDate) {
         formattedValue[dataIndex] = moment(values[dataIndex]).format(
-          "MMM DD YY"
+          "DD MMM YY"
         );
       }
       if (dataIndex === "supplier"){
@@ -614,7 +614,7 @@ const Action = ({ type }) => {
       </Row>
       <div style={{  overflowY: 'auto', maxHeight:'88vh'}}>
       <ExportTable
-        scroll={{x:true}}
+        scroll={{x:1200}}
         exportable
         size="small"
         locale={ {
