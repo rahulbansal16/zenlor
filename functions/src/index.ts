@@ -17,7 +17,7 @@ import {BOMInfo, PurchaseMaterialsInfo, PurchaseOrder, PurchaseOrderLineItems, P
   MaterialIssue,
   PurchaseMaterials, StyleCodes, InventoryItems, Store, /*GRNs,*/ GRNInfo, GRN, GRNItems, InventoryInfo, Category, SupplierInfo, Supplier, MigrationInfo, GRNs, upsertGRN, DeleteData, InventoryRequest, InventoryResult} from "./types/styleCodesInfo";
 import { Constants, GRN_STATUS, PURCHASE_ORDER_STATUS} from "./Constants";
-import { generateKey, getDateFormat, parseIdAndDescription } from "./util";
+import { generateKey, getCurrentDate, getDateFormat, parseIdAndDescription } from "./util";
 // import * as router from "./routes/router";
 // const app = express();
 /* tslint:disable */
@@ -261,7 +261,7 @@ exports.generateCSV = functions
     });
 
 const csvDate = (date: any) => {
-  return moment(date, "MMM DD YY, h:mm:ss a").format("DD MMM YYYY");
+  return moment(date, "DD MMM YY, h:mm:ss a").format(Constants.DATE_FORMAT)
 };
 
 const sum = (values1: { [x: string]: any; }, values2: { [x: string]: any; }) => {
@@ -486,7 +486,7 @@ exports.backUpCompany = functions
       if(!suppliersData){
         throw new Error("");
       }
-      let backupName = company + moment().format("-MMM-DD-YY,h:mm:ss:a")
+      let backupName = company + moment().format("-DD-MMM-YY,h:mm:ss:a")
       await admin.firestore().collection("backup_data").doc(backupName).set(docData);
       await admin.firestore().collection("backup_boms").doc(backupName).set(bomsData);
       await admin.firestore().collection("backup_purchaseMaterials").doc(backupName).set(purchaseMaterialsData);
@@ -795,10 +795,10 @@ const insertStyleCodeSchema = Joi.object<StyleCodesInfo, true>({
     brand: Joi.string().required(),
     product: Joi.string().required(),
     orderNo: Joi.string().default(""),
-    confirmDate: Joi.string().default(moment().format("DD MMM YY")),
+    confirmDate: Joi.string().default(getCurrentDate()),
     orderQty: Joi.number().required(),
     makeQty: Joi.number(),
-    deliveryDate: Joi.string().default(moment().format("DD MMM YY")),
+    deliveryDate: Joi.string().default(getCurrentDate()),
     styleCodeStatus: Joi.string().default("active"),
   }).options({allowUnknown: true}).strict(false),
 })
@@ -1075,7 +1075,7 @@ const defaultPurchaseMaterials: any = {
   taxAmount: 0,
   totalAmount: 0,
   supplier: "",
-  deliveryDate: moment().format("MMM YY DD"),
+  deliveryDate: getCurrentDate(),
 };
 
 const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:PurchaseMaterials[]) => {
@@ -1119,7 +1119,7 @@ const populatePurhcaseMaterialsFromBOM = (boms: BOM[], purchaseMaterials:Purchas
     taxAmount: 0,
     totalAmount: 0,
     supplier: "",
-    deliveryDate: moment().format("MMM DD YY"),
+    deliveryDate: getCurrentDate(),
   }));
   const purchaseMaterialsInfo = upsertItemsInArray(purchaseMaterials,
       mapMergedBomsToPurchaseMaterial,
@@ -1625,13 +1625,13 @@ exports.updatePOStatus= onCall<UpdatePurchaseOrderStatus>({
                   purchaseQty:Math.max(0, Math.ceil(item.purchaseQty-(mpLineItemsToRemainingQty[generateKey(item.materialId, item.materialDescription)]||0))),
                   receivedQty: 0,
                   status: GRN_STATUS.ACTIVE,
-                  receivedDate: moment().format("MMM DD YY"),
+                  receivedDate: getCurrentDate(),
                   rejectedQty: 0,
                   rejectedReason: "",
                   acceptedQty: 0,
                 })),
-                updatedAt: moment().format("MMM DD YY"),
-                createdAt: moment().format("MMM DD YY"),
+                updatedAt: getCurrentDate(),
+                createdAt: getCurrentDate(),
                 status: GRN_STATUS.ACTIVE,
                 supplier: purchaseOrder.supplier,
                 itemsCount: purchaseOrder.lineItems.length,
@@ -1721,6 +1721,7 @@ exports.inventoryAPI = onCall<InventoryRequest>({
           orderQty: lineItem.purchaseQty,
           supplier: purchaseOrder.supplier,
           price: lineItem.totalAmount,
+          createdAt: purchaseOrder.createdAt,
           grns: []
         })
 
@@ -1956,7 +1957,7 @@ const getEndDeliveryDateFromPO = (purchaseOrderLineItems: PurchaseOrderLineItems
       endDate = moment(lineItem.deliveryDate).isAfter(endDate)?moment(lineItem.deliveryDate):endDate
     }
   })
-  return endDate.format("MMM DD YY");
+  return endDate.format(Constants.DATE_FORMAT);
 }
 exports.upsertCreatePO= onCall<PurchaseMaterialsInfo>({
   name: "upsertCreatePO",
@@ -2145,7 +2146,7 @@ exports.upsertGRNRow = onCall<upsertGRN>({
           }
           grnInfo.GRN.splice(i, 1, {
             ...dbgrn,
-            updatedAt: moment().format("MMM DD YY"),
+            updatedAt: getCurrentDate(),
             ...GRN[idx]
           })
           // dbgrn = {
@@ -2208,7 +2209,7 @@ exports.upsertGRNItem = onCall<GRNInfo>({
     if (!docData) {
       throw Error("The company does not exist" + company);
     }
-    const grnsInfo = docData.GRNsInfo;
+    const grnsInfo: GRNs[] = docData.GRNsInfo;
     if (!grnsInfo) {
       throw Error("The GRN info does not exist");
     }
@@ -2231,6 +2232,7 @@ exports.upsertGRNItem = onCall<GRNInfo>({
       for (let grn of grnInfo.GRN){
         if (grn.id === grnId){
           grn.lineItems = grnInfoOutput
+          grn.updatedAt = getCurrentDate()
         }
       }
     }    
@@ -2345,6 +2347,7 @@ exports.upsertGRN = onCall<GRNInfo>({
               grn.status = "DONE"
               poID = grnInfo.poId
               grnForPO = grn;
+              grn.updatedAt = getCurrentDate()
             }
           }
         }    
@@ -2612,7 +2615,7 @@ exports.createPO = functions
           id: generateUId("", 10).toUpperCase(),
           supplier: key,
           createdAt,
-          deliveryDate: moment().format("MMM DD YY"),
+          deliveryDate: getCurrentDate(),
           amount: totalAmount[key],
           status: "ACTIVE",
           data: supplierMap[key],
@@ -2644,7 +2647,7 @@ exports.createPO = functions
           grnDocUrl: '',
           GRN:[{
             id: grnID,
-            createdAt: moment().format("MMM DD YY"),
+            createdAt: getCurrentDate(),
             status: GRN_STATUS.ACTIVE,
             // challanNumber: '',
             // invoiceNumber: '',
@@ -2652,7 +2655,7 @@ exports.createPO = functions
             supplier: purchaseOrder.supplier,
             itemsCount: purchaseOrder.lineItems.length,
             amount: purchaseOrder.amount,
-            updatedAt: moment().format("MMM DD YY"),
+            updatedAt: getCurrentDate(),
             lrNo: "",
             dcNo: "",
             invoiceNo: "",
@@ -2669,7 +2672,7 @@ exports.createPO = functions
               purchaseQty: item.purchaseQty,
               receivedQty: 0,
               status: GRN_STATUS.ACTIVE, 
-              receivedDate: moment().format("MMM DD YY"),
+              receivedDate: getCurrentDate(),
               rejectedQty: 0,
               rejectedReason: "",
               acceptedQty: 0,
@@ -2697,7 +2700,7 @@ exports.createPO = functions
 //       purchaseQty: item.purchaseQty,
 //       receivedQty: 0,
 //       status: "active",
-//       receivedDate: moment().format("MMM DD YY"),
+//       receivedDate: getCurrentDate(),
 //       rejectedQty: 0,
 //       rejectedReason: "",
 //       acceptedQty: 0,
@@ -2737,7 +2740,7 @@ const fillGRNWorksheet = (worksheet: excelJS.Worksheet, grn: GRN , purchaseOrder
   worksheet.getCell("B22").value = "Email Id " + supplier.email??"";
 
   worksheet.getCell("G14").value = "GRN DONE"
-  worksheet.getCell("G17").value = "Order Date " + moment(purchaseOrder.createdAt).format("DD MMM YY")
+  worksheet.getCell("G17").value = "Order Date " + getDateFormat(purchaseOrder.createdAt)
   // worksheet.getCell("G")
   // worksheet.getCell("G23").value = grn.lineItems.length
   worksheet.insertRow(28,["", "GRN NO.", "", "ORDER NO.", "", "INVOICE NO.", "", "DC NO.", "", "Transporter", "", "LR No.", ""])
@@ -2941,7 +2944,7 @@ const fillPurchaseOrderWorksheet = (worksheet: excelJS.Worksheet, purchaseOrder:
   worksheet.getCell("B22").value = "Email Id " + supplier.email??"";
 
   worksheet.getCell("G15").value = "Order No. " + purchaseOrder.id
-  worksheet.getCell("G19").value = "Order Date " + moment(purchaseOrder.createdAt).format("DD MMM YY")
+  worksheet.getCell("G19").value = "Order Date " + getDateFormat(purchaseOrder.createdAt) 
   worksheet.getCell("G22").value = purchaseOrder.deliveryDate
   let total:any = {
     preTaxAmount:0,
