@@ -1708,6 +1708,7 @@ exports.inventoryAPI = onCall<InventoryRequest>({
             category: lineItem.category,
             type: lineItem.type,
             storeQty: 0,
+            reqQty: 0,
             // inHouseAllocatedty: 0,
             issuedQty: 0,
             grnAcceptedQty: 0,
@@ -1771,6 +1772,7 @@ exports.inventoryAPI = onCall<InventoryRequest>({
             category: "",
             type: "",
             storeQty: 0,
+            reqQty: 0,
             // inHouseAllocatedty: 0,
             issuedQty: 0,
             grnAcceptedQty: 0,
@@ -1795,6 +1797,7 @@ exports.inventoryAPI = onCall<InventoryRequest>({
           id: inventoryItem.materialId,
           description: inventoryItem.materialDescription,
           unit: "",
+          reqQty: 0,
           category: "",
           type: "",
           storeQty: 0,
@@ -1808,6 +1811,32 @@ exports.inventoryAPI = onCall<InventoryRequest>({
       }
       inventoryHash[key].storeQty = inventoryItem.inventory;
     }
+
+    const bomsDoc = await admin.firestore().collection("boms").doc(company).get()
+    const bomData = bomsDoc.data();
+    const boms:BOM[] = (bomData?.bomsInfo??[])
+    for (const bom of boms){
+      const {materialId, materialDescription} = bom;
+      const key = generateKey(materialId, materialDescription)
+      if (!inventoryHash[key]){
+        inventoryHash[key] = {
+          id: materialId,
+          description: materialDescription,
+          unit: "",
+          reqQty: 0,
+          category: "",
+          type: "",
+          storeQty: 0,
+          // inHouseAllocatedty: 0,
+          issuedQty: 0,
+          grnAcceptedQty: 0,
+          pos: [],
+          issues: []
+        }
+      }
+      inventoryHash[key].reqQty += bom.reqQty;
+    }
+
 
     let result: InventoryResult[] = []
     const keys = Object.keys(inventoryHash)
