@@ -43,6 +43,7 @@ const useFilter = (columns, dataSource) => {
        const columnsWithFilterResult = columns.map( column => {
         let filterColumn = {
             ...column,
+            ellipsis: true,
          //    sorter: (a,b) => a[column?.dataIndex] - b[column?.dataIndex]
         }
 

@@ -526,7 +526,7 @@ const Action = ({ type }) => {
     }
     return {
       ...col,
-      // ellipsis: true,
+      ellipsis: true,
       render: (elem) => <div style={{borderBottom:"1px solid lightblue"}}className="editable">{elem}</div>,
       onCell: (record) => ({
         record,
@@ -605,7 +605,7 @@ const Action = ({ type }) => {
               <Col span={2}>
                 <Button disabled={!filteredInfo} onClick={() => setFilteredInfo(null)}>Clear Filters</Button>
               </Col>
-              <Col span={12} style={{backgroundColor:'lightblue', textAlign:'center'}}>
+              <Col span={12} style={{textAlign:'center'}}>
                 <Title style={{textAlign:"center", height:'100%'}} level={4}>{header[type].toUpperCase()}</Title>
               </Col>
               <Col span={8}>
@@ -614,7 +614,7 @@ const Action = ({ type }) => {
       </Row>
       <div style={{  overflowY: 'auto', maxHeight:'88vh'}}>
       <ExportTable
-        scroll={{x:1200}}
+        scroll={{x:"max-content"}}
         exportable
         size="small"
         locale={ {

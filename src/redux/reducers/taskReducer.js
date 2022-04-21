@@ -45,6 +45,8 @@ export const initialState = {
             filterSearch: true,
             filter: "multiSelect",
             showSorterTooltip: false,
+            fixed: 'left',
+            width:150
           },
             {
               title: "Brand",
@@ -64,6 +66,7 @@ export const initialState = {
               key: "product",
               filter: "multiSelect",
               filterSearch: true,
+              width: 100
             },
             {
               title: "Order No",
@@ -116,7 +119,8 @@ export const initialState = {
               dataIndex: "materialStatus",
               key: "status",
               filter: "multiSelect",
-              render: (data) => <ZenlorTags text={data}/>
+              render: (data) => <ZenlorTags text={data}/>,
+              width: 150,
             },
             // {
               // children : [
@@ -275,7 +279,8 @@ export const initialState = {
                 filter: "multiSelect",
                 filterSearch: true,
                 key: "styleCode",
-                width: 200
+                fixed: 'left',
+                width: 130
               },
               {
                 title: "Cat.",
@@ -305,17 +310,21 @@ export const initialState = {
                     title: "Id",
                     dataIndex: "materialId",
                     key: "materialId",
+                    width: 90,
+                    // fixed: "left"
                   },
                   {
                     title: "Description",
                     dataIndex: "materialDescription",
                     key: "materialDescription",
+                    width: 150,
+                    // fixed: "left"
                   },       
                   {
                     title: "Unit",
                     dataIndex: "unit",
                     key: "unit",
-                    width: 100
+                    width: 40
                   },
                 
                 // ]
@@ -327,7 +336,8 @@ export const initialState = {
                               filter: "multiSelect",
               filterSearch: true,
                 editable: true,
-                width: 100
+                width: 100,
+                ellipsis: true
               },
               {
                 title:"W%",
@@ -336,7 +346,7 @@ export const initialState = {
                               filter: "multiSelect",
               filterSearch: true,
                 editable: true,
-                width: 100
+                width:70
               },
               {
                 title: "Consumption",
@@ -354,24 +364,25 @@ export const initialState = {
                   title: "Required",
                   dataIndex: "reqQty",
                   key: "reqQty",
+                  width: 70,
                 },
                 {
                   title: "Inventory",
                   dataIndex: "inventory",
                   key: "inventory",
-                  width: 100
+                  width: 60
                 },
                 {
                   title: "Ordered",
                   dataIndex: "activeOrdersQty",
                   key: "activeOrdersQty",
-                  width: 100
+                  width: 60
                 },             
                 {
                   title:"Issued",
                   dataIndex:"issueQty",
                   key: "issueQty",
-                  width: 100
+                  width: 60
                 },
               ]
               },
@@ -397,76 +408,82 @@ export const initialState = {
         {
           title: "GRN ID",
           dataIndex: 'id',
-          key: 'id'         
+          key: 'id',
+          width: 100
         },
         {
           title: "PO",
           dataIndex: 'poId',
-          key: 'poId'
+          key: 'poId',
+          width: 100
         },
         {
           title: "Supplier",
           dataIndex: 'supplier',
-          key: 'supplier'
+          key: 'supplier',
+          width: 100
+
         },
         {
           title: "No. Items",
           dataIndex: 'itemsCount',
-          key: 'itemsCount'
+          key: 'itemsCount',
+          width: 80
         },
         {
           title: "Amount",
           dataIndex: 'amount',
-          key: 'amount'
+          key: 'amount',
+          width: 100
         },
         {
           title: "LR No.",
           dataIndex: 'lrNo',
           key: 'lrNo',
           editable: true,
-          width: 150
-	
+          width: 100
         },		
         {
           title: "DC No.",
           dataIndex: 'dcNo',
           key: 'dcNo',
           editable: true,
-          width: 150
+          width: 100
         },
         {
           title: "Invoice No.",
           dataIndex: 'invoiceNo',
           key: 'invoiceNo',
           editable: true,
-          width: 150
-
+          width: 100
         },						
         {
           title: "Transporter",
           dataIndex: "trans",
           editable: true,
           key: "trans",
-          width: 150
+          width: 100
         },
         {
           title: "Updated On",
           dataIndex: 'updatedAt',
-          key: 'updatedAt'
+          key: 'updatedAt',
+          width: 100
         },
 // GRN ID	REF ID	SUPPLIER	NO. OF ITEMS	AMOUNT	LR NO.	DC NO.	INVOICE NO.	UPDATED ON 	STATUS
         {
           title: "Status",
           dataIndex: "status",
           key:"status",
-          filter: "multiSelect"
+          filter: "multiSelect",
+          width: 100
         },
         {
           title: "GRN Doc.",
           dataIndex: "docUrl",
           key:"grnDocUrl",
           render : (text) => <a href={text}>Download</a>,
-
+          width: 100
         },
       ],
       dataSource:[]
@@ -501,12 +518,12 @@ export const initialState = {
    
         // },
         {
-          title:"Material Id",
+          title:"Id",
           dataIndex: "materialId",
           key: "materialId"
         },
         {
-          title: "Material Description",
+          title: "Description",
           dataIndex: "materialDescription",
           key:"materialDescription",
           width: 100
@@ -514,33 +531,35 @@ export const initialState = {
         {
           title:"unit",
           dataIndex:"unit",
-          key:"unit"
+          key:"unit",
+          width: 50
         },
         {
           title: "Order Qty",
           dataIndex: "purchaseQty",
-          key:"purchaseQty"
+          key:"purchaseQty",
+          width: 100
         },
         {
           title:"Received Qty",
           dataIndex:"receivedQty",
           key:"receivedQty",
           editable: true,
-          width: 150
+          width: 100
         },
         {
           title: "Received Date",
           dataIndex: "receivedDate",
           key:"receivedDate",
           editable: true,
-          width: 150
+          width: 100
         },        
         {
           title:"Rejected Qty",
           dataIndex:"rejectedQty",
           key:"rejectedQty",
           editable: true,
-          width: 150
+          width: 100
         },
         {
           title: "Rejected Reason",
@@ -554,7 +573,7 @@ export const initialState = {
           dataIndex: "acceptedQty",
           key:"acceptedQty",
           editable: true,
-          width: 150
+          width: 100
         },
       ],
       dataSource:[]
