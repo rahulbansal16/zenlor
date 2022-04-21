@@ -59,13 +59,13 @@ const SideBar = ({type}) => {
           </SubMenu>
           <SubMenu key="crm" icon={<ContainerOutlined />} title="CRM">
           {/* Sale Orders	Costing & Pricing */}
-            <Menu.Item key="saleOrders">Sale Orders</Menu.Item>
-            <Menu.Item key="costingAndPricing">Costing And Pricing</Menu.Item>
+            {/* <Menu.Item key="saleOrders">Sale Orders</Menu.Item> */}
+            {/* <Menu.Item key="costingAndPricing">Costing And Pricing</Menu.Item> */}
           </SubMenu>
           <SubMenu key="procure" icon={<UpSquareOutlined />} title="PROCURE">
           {/* Purchase Orders	Transfer Orders	Quotations */}
             <Menu.Item key="purchaseOrder">Purchase Orders</Menu.Item>
-            <Menu.Item key="transferOrderQuotations">Transder Orders Quotations</Menu.Item>
+            {/* <Menu.Item key="transferOrderQuotations">Transder Orders Quotations</Menu.Item> */}
           </SubMenu>
           {/* <Menu.Item key="1" icon={<PieChartOutlined />}>
             Style
@@ -79,15 +79,15 @@ const SideBar = ({type}) => {
           <SubMenu key="inventory" icon={<AccountBookOutlined />} title="INVENTORY">
           {/* Style Dashboard	Bill of Materials */}
           {/* Item List	Goods Received Notes	Goods Consumed Notes	Goods Dispatched Notes */}
-            <Menu.Item key="itemList" onClick={() => window.open(itemListUrl)} >Item List</Menu.Item>
-            <Menu.Item key="grns">Goods Received Notes</Menu.Item>
-            <Menu.Item onClick={() => window.open('https://zenlor.web.app/store?lineNumber=1')} key="goodsConsumedNotes">Goods Consumed Notes</Menu.Item>
-            <Menu.Item key="goodsDispatchedNotes">Goods Dispatched Notes</Menu.Item>
+            <Menu.Item key="itemList" onClick={() => window.open(itemListUrl)} >Inventory Dashboard</Menu.Item>
+            <Menu.Item key="grns">GRN</Menu.Item>
+            <Menu.Item onClick={() => window.open('https://zenlor.web.app/store?lineNumber=1')} key="goodsConsumedNotes">Material Issue</Menu.Item>
+            {/* <Menu.Item key="goodsDispatchedNotes">Goods Dispatched Notes</Menu.Item> */}
           </SubMenu>
           <SubMenu key="jobwork" icon={<MailOutlined />} title="JOB WORK">
           {/* Received Orders	Issued Orders */}
-            <Menu.Item key="receivedOrders">Received Orders</Menu.Item>
-            <Menu.Item key="issuedOrders">Issued Orders</Menu.Item>
+            {/* <Menu.Item key="receivedOrders">Received Orders</Menu.Item>
+            <Menu.Item key="issuedOrders">Issued Orders</Menu.Item> */}
           </SubMenu>
           <SubMenu key="payments" icon={<DollarOutlined />} title="PAYMENTS">
             {/* <Menu.Item key="5">Option 5</Menu.Item>
