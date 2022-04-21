@@ -390,8 +390,22 @@ export const initialState = {
                 title: "Pend",
                 dataIndex: "pendingQty",
                 key: "pendingQty",
-                filter: "multiSelect",
-                width: 100
+                // filter: "multiSelect",
+                filters: [{
+                  text:"Zero",
+                  value: 0
+                }, {
+                  text: "Non-Zero",
+                  value: 1
+                }],
+                width: 100,
+                onFilter: (value, record) => {
+                  if(value === 0){
+                    return record.pendingQty === 0
+                  } else {
+                    return record.pendingQty !== 0
+                  }
+                },
               },  
               // Table.SELECTION_COLUMN,
             ],
