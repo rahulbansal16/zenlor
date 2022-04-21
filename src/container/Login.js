@@ -40,7 +40,7 @@ const Login =  () => {
     const user = useSelector(state => state.taskReducer.user)
     const history = useHistory()
     console.log("The user us ", user)
-    if (user){
+    if (user && user.uid){
         history.push('/')
         return "Already Login"
     }
