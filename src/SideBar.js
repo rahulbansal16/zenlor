@@ -78,7 +78,7 @@ const SideBar = ({type}) => {
           <SubMenu key="inventory" icon={<AccountBookOutlined />} title="INVENTORY">
           {/* Style Dashboard	Bill of Materials */}
           {/* Item List	Goods Received Notes	Goods Consumed Notes	Goods Dispatched Notes */}
-            <Menu.Item key="itemList">Item List</Menu.Item>
+            <Menu.Item key="itemList" onClick={() => window.open("https://docs.google.com/spreadsheets/u/4/d/12_vFdJAhBa2cZn9bcF-U1chMq1HYCacGSrmUrMxsPfc/edit?usp=sharing")} >Item List</Menu.Item>
             <Menu.Item key="grns">Goods Received Notes</Menu.Item>
             <Menu.Item onClick={() => window.open('https://zenlor.web.app/store?lineNumber=1')} key="goodsConsumedNotes">Goods Consumed Notes</Menu.Item>
             <Menu.Item key="goodsDispatchedNotes">Goods Dispatched Notes</Menu.Item>

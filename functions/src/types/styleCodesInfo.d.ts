@@ -304,6 +304,7 @@ export interface InventoryResult {
     // color: string,
     grnAcceptedQty: number,
     issuedQty: number,
+    reqQty: number,
     // inHouseAllocatedty: number,
     storeQty: number,
     pos: PO[]
