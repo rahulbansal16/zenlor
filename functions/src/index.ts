@@ -662,6 +662,7 @@ const mapGRNsToList = (grns: GRNs[]) :GRN[]=> {
       continue
     grnList = grnList.concat(grn.GRN.map( item => ({
       ...item,
+      id: item.id.toUpperCase(),
       docUrl: grn.grnDocUrl,
       poId: grn.poId
     })))
@@ -3060,6 +3061,23 @@ exports.upsertSuppliersInfo = onCall<SupplierInfo>({
     }
   }
 })
+
+exports.makeItNan = functions
+    .region("asia-northeast3")
+    .https.onCall(async (body, context) => {
+    // .https.onCall(async (body: { department: any; json: any; createdAt: any; modifiedAt: any; enteredAt: any; }, context: { auth: { uid: any; }; }) => {
+      const doc = await admin.firestore().collection("data").doc("test").get();
+      const data = doc.data()
+      if (!data) {
+        return
+      }
+      data.inventoryInfo[0].inventory = NaN
+      await admin.firestore().collection("data").doc("test").set(
+        data , {
+        merge: true
+      })
+      // return departmentData;
+    });
 
 // Will pick it up when making the RestFul APIs
 // const router = express.Router();

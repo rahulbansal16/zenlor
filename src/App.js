@@ -99,7 +99,7 @@ function App() {
     let getData = functions.httpsCallable('getData')
     const result = await getData(companyId);
     console.log("The result is ", result.data);
-    dispatch(fetchDataAction({...result.data, isFetching:false}))
+    // dispatch(fetchDataAction({...result.data, isFetching:false}))
   }
 
   return (
